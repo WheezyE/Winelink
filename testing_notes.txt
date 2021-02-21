@@ -1,0 +1,3 @@
+Find what's causing VARA graphical bugs (test with Wine in an x86 VM): 
+ - https://groups.io/g/VARA-MODEM/topic/installing_winlink_express/80678030?p=,,,20,0,0,0::recentpostdate%2Fsticky,,,20,2,0,80678030
+ - 
