@@ -1,5 +1,5 @@
 # Winelink
-Scripts to install Winlink (RMS Express & VARA) on Raspberry Pi 4
+A script to install Winlink (RMS Express & VARA) on Raspberry Pi 4
 
 # Future work
 1. Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
