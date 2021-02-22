@@ -10,6 +10,7 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 Simply copy and paste these commands in your Raspberry Pi 4's terminal:
 ```bash
 sudo apt install git -y
+rm -rf ~/Downloads/Winelink # remove any old winelink installs
 cd ~/Downloads
 git clone https://github.com/WheezyE/Winelink
 cd Winelink
