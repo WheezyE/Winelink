@@ -4,12 +4,10 @@ A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the R
 
 This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlink (RMS Express) & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now.
 
-![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
-
 To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  Box86 is much smaller in file size and much easier to install too.
 
 ## Installation
-Simply run these commands in your Raspberry Pi 4's terminal
+Simply copy and paste these commands in your Raspberry Pi 4's terminal
 ```bash
 sudo apt install git -y
 cd ~/Downloads
@@ -19,7 +17,22 @@ sudo chmod +x install_winelink.sh
 ./install_winelink.sh
 ```
 
-If you would like to use an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), software may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
+You should then be able to run RMS Express with this command
+```
+wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
+```
+
+If you wish to run VARA directly, you can do so with this command
+```
+wine ~/.wine/drive_c/VARA/VARA.exe
+```
+
+If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
+
+## Examples
+
+![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
+VARA running on a Raspberry Pi 4B (Twister OS)
     
 ## Credits
  - [The Box86 team](https://discord.gg/Fh8sjmu)
@@ -43,16 +56,17 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Make the script's user-interface look better.
  - [ ] Add an AHK script to click the "Ok" button after VARA is installed.
  - [ ] Add more clean-up functions to the script.
- - [ ] Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
-   - Address internet issues.
-   - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
-   - Find crashes.
+ - [ ] Add shortcuts to the desktop
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
    - Ask Botspot if I can borrow some of his [pi-apps](https://github.com/Botspot/pi-apps) code.
  - [ ] Expand this script to detect/include Android ([Termux](https://github.com/termux/termux-app) + [proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
  - [ ] Expand this script to detect/include x86 Linux.
  - [ ] Expand this script to detect/include Mac.
  - [ ] Expand this script to detect/include ChromeBook Linux beta.
+ - [ ] Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
+   - Address internet issues.
+   - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
+   - Find crashes.
  - [ ] Work with the Wine team to fix [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
  - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
 
