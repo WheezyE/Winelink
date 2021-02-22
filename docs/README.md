@@ -20,10 +20,10 @@ This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlin
                                                      - Nelson Mandela
 
 ## Distribution
-    This script is free to use, open-source, and should not be monetized.  If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).
+This script is free to use, open-source, and should not be monetized.  If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).
 
 ## Legal
-    All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86 and Wine are both open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.
+All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86 and Wine are both open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.
 
 ## Future work
  - [ ] Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
@@ -42,5 +42,5 @@ This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlin
 
 ## Donations
 If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb or KM4ACK - without whom, this script would not exist.
- - Sebastien "ptitSeb" Chevalier (author of [box86](https://github.com/ptitSeb/box86)) [paypal.me/0ptitSeb]
- - Jason "KM4ACK" Oleham (Linux elmer & ham radio pioneer) [paypal.me/km4ack]
+ - Sebastien "ptitSeb" Chevalier (author of [box86](https://github.com/ptitSeb/box86)) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
+ - Jason "KM4ACK" Oleham (Linux elmer & ham radio pioneer) [paypal.me/km4ack](paypal.me/km4ack)
