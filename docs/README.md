@@ -7,7 +7,7 @@ This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlin
 To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  Box86 is much smaller in file size and much easier to install too.
 
 ## Installation
-Simply copy and paste these commands in your Raspberry Pi 4's terminal
+Simply copy and paste these commands in your Raspberry Pi 4's terminal:
 ```bash
 sudo apt install git -y
 cd ~/Downloads
@@ -16,17 +16,11 @@ cd Winelink
 sudo chmod +x install_winelink.sh
 ./install_winelink.sh
 ```
-Installation takes about 90 minutes and lots of errors will appear in the terminal (just ignore those).
+_Installation takes about 90 minutes and lots of errors will appear in the terminal (just ignore those)._
 
-You should then be able to run RMS Express with this command
-```
-wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
-```
+You should then be able to run RMS Express with this command: `wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe`
 
-If you wish to run VARA directly, you can do so with this command
-```
-wine ~/.wine/drive_c/VARA/VARA.exe
-```
+If you wish to run VARA directly, you can do so with this command: `wine ~/.wine/drive_c/VARA/VARA.exe`
 
 If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
 
