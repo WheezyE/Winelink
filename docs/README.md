@@ -47,13 +47,12 @@ VARA running on a Raspberry Pi 4B (Twister OS)
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s Winlink on Linux guides
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
  - N7ACW & AD7HE for getting me started in ham radio
- - Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
          "My humanity is bound up in yours, for we can only be human together"
                                                      - Nelson Mandela
 
 ## Legal
-All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86 and Wine are both open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.
+All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86 and Wine are both open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
 ## Future work
  - [x] Make a logo for the github page.
