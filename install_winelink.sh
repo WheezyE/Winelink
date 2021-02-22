@@ -117,6 +117,7 @@ wget http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/
 unzip -o nt4pdhdll.exe
 cp pdh.dll ~/.wine/drive_c/windows/system32
 
+rm -rf ~/.cache/winetricks/ # clean up cached Microsoft installers
 
 
 
