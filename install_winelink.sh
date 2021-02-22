@@ -31,14 +31,13 @@
 #        - Jason Oleham (KM4ACK) - inspiration & Linux elmer: paypal.me/km4ack
 #
 
-
+clear
 ############  Setup the RPi4 to run Windows .exe files ############ 
 # To run Windows .exe files on RPi4, we need an x86 emulator (box86) and a Windows API Call interpreter (wine)
 # Box86 is opensource and runs about 10x faster than ExaGear or Qemu.  It's much smaller and easier to install too.
 
 ### Install Box86
 sudo apt-get install cmake -y
-
 cd ~/Downloads
 mkdir box86-installer && cd box86-installer
 git clone https://github.com/ptitSeb/box86
@@ -59,6 +58,7 @@ sudo mv ~/.wine ~/.wine-old
 sudo mv /usr/local/bin/wine /usr/local/bin/wine-old
 sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old
 sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old
+
 # Download wine
 cd ~/Downloads
 wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_5.21~buster_i386.deb
@@ -67,12 +67,14 @@ dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer
 dpkg-deb -xv wine-devel_5.21~buster_i386.deb wine-installer
 rm wine-devel-i386_5.21~buster_i386.deb # clean up
 rm wine-devel_5.21~buster_i386.deb # clean up
+
 # Install wine
 sudo mv wine-installer/opt/wine-devel ~/wine
 rm -rf wine-installer # clean up
 sudo ln -s ~/wine/bin/wine /usr/local/bin/wine
 sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
 sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
+
 # Initialize wine silently
 rm -rf ~/.cache/wine # make sure we don't install mono or gecko (if their msi files are in wine cache)
 DISPLAY=0 wine wineboot # silently makes a fresh wineprefix in ~/.wine and skips installation of mono & gecko
@@ -132,6 +134,7 @@ cd ~/Downloads
 wget -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs # Download Winlink no matter its version number
 7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller"
 wine ~/Downloads/WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
+rm -rf ~/Downloads/WinlinkExpressInstaller # clean up
 
 # Download/extract/install VARA HF (or newer) [https://rosmodem.wordpress.com/]
 cd ~/Downloads
@@ -139,6 +142,7 @@ VARALINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?<=<a href=").*?
 megadl ${VARALINK}
 7z x VARA*.zip -o"VARAInstaller"
 wine ~/Downloads/VARAInstaller/VARA\ setup*.exe /SILENT
+rm -rf ~/Downloads/VARAInstaller # clean up
 # NOTE: VARA prompts user to hit 'ok' after install even if silent install.  We could skip it with wine AHK, but since the next step is user configuration and involves user input anyway, we can just have the user click ok here.
 # Inno Setup Installer commandline commands: https://jrsoftware.org/ishelp/index.php?topic=setupcmdline
 
@@ -154,10 +158,8 @@ wine ~/.wine/drive_c/VARA/VARA.exe
 echo "In RMS Express, enter your callsign, password, gridsquare, and soundcard in/out, then close the program.  Ignore any errors for now."
 wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
 
-### end ###
-
 
 #############  Known bugs ############# 
 # The Channel Selector is functional, it just takes about 5 minutes to update its propagation indices and sometimes crashes the first time it's loaded.  Just restart it if it crashes.  If you let it run for 5 minutes, then you shouldn't have to do that again - just don't hit the Update Table Via Internet button.  I'm currently experimenting with ITS HF: http://www.greg-hand.com/hfwin32.html
 # VARA has some graphics issues for now.  This is an issue with Wine, not box86
-# RMS Express internet may not work on the first run for some reason. Maybe due to vbrun6 being installed with old box86?
+# RMS Express internet may not work on the first run (or in some cases ever) for some reason.  This might be due to vbrun6 being installed with old box86?
