@@ -16,6 +16,7 @@ cd Winelink
 sudo chmod +x install_winelink.sh
 ./install_winelink.sh
 ```
+Installation takes about 90 minutes and lots of errors will appear in the terminal (just ignore those).
 
 You should then be able to run RMS Express with this command
 ```
