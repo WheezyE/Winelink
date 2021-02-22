@@ -177,6 +177,12 @@ clear
 echo "In RMS Express, enter your callsign, password, gridsquare, and soundcard in/out, then close the program.  Ignore any errors for now."
 wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
 
+clear
+echo "We're going to run Winlink a few more times so it can shake some bugs out"
+wineserver -k
+wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
+wineserver -k
+wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
 
 #############  Known bugs ############# 
 # The Channel Selector is functional, it just takes about 5 minutes to update its propagation indices and sometimes crashes the first time it's loaded.  Just restart it if it crashes.  If you let it run for 5 minutes, then you shouldn't have to do that again - just don't hit the Update Table Via Internet button.  I'm currently experimenting with ITS HF: http://www.greg-hand.com/hfwin32.html
