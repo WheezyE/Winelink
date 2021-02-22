@@ -38,7 +38,7 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Expand this script to detect/include x86 Linux.
  - [ ] Expand this script to detect/include Mac.
  - [ ] Expand this script to detect/include ChromeBook Linux beta.
- - [ ] Work with the Wine team to fix graphical errors in VARA.
+ - [ ] Work with the Wine team to fix [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
  - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
 
 ## Distribution
