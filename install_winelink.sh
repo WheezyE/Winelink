@@ -2,7 +2,7 @@
 
 ########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########
 # Author: Eric Wiessner (KI7POL)                                              #
-# Version: 0.46 (work in progress 02/21/2021)                                 #
+# Version: 0.47 (work in progress 02/21/2021)                                 #
 # Credits:                                                                    #
 #   The Box86 team                                                            #
 #      (ptitSeb, pale, chills340, phoenixbyrd, Botspot, !FlameKat53, epychan, #
@@ -31,7 +31,20 @@
 #        - Jason Oleham (KM4ACK) - inspiration & Linux elmer: paypal.me/km4ack
 #
 
+
+############  Clean up files from any failed past runs of this script ############ 
+rm ~/Downloads/wine-devel-i386_5.21~buster_i386.deb
+rm ~/Downloads/wine-devel_5.21~buster_i386.deb
+rm -rf ~/Downloads/wine-installer
+rm ~/Downloads/winetricks
+rm -rf ~/Downloads/box86-installer
+rm ~/Downloads/Winlink_Express_install_*.zip
+rm -rf ~/Downloads/WinlinkExpressInstaller
+rm ~/Downloads/VARA*.zip
+rm -rf ~/Downloads/VARAInstaller
 clear
+
+
 ############  Setup the RPi4 to run Windows .exe files ############ 
 # To run Windows .exe files on RPi4, we need an x86 emulator (box86) and a Windows API Call interpreter (wine)
 # Box86 is opensource and runs about 10x faster than ExaGear or Qemu.  It's much smaller and easier to install too.
@@ -59,23 +72,23 @@ sudo mv /usr/local/bin/wine /usr/local/bin/wine-old
 sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old
 sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old
 
-# Download wine
+# Download Wine and extract it (into a directory called wine-installer)
 cd ~/Downloads
 wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_5.21~buster_i386.deb
 wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel_5.21~buster_i386.deb
 dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer
 dpkg-deb -xv wine-devel_5.21~buster_i386.deb wine-installer
-rm wine-devel-i386_5.21~buster_i386.deb # clean up
-rm wine-devel_5.21~buster_i386.deb # clean up
+rm ~/Downloads/wine-devel-i386_5.21~buster_i386.deb # clean up
+rm ~/Downloads/wine-devel_5.21~buster_i386.deb # clean up
 
-# Install wine
+# Install Wine (from the wine-installer directory we just made)
 sudo mv wine-installer/opt/wine-devel ~/wine
-rm -rf wine-installer # clean up
 sudo ln -s ~/wine/bin/wine /usr/local/bin/wine
 sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
 sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
+rm -rf ~/Downloads/wine-installer # clean up
 
-# Initialize wine silently
+# Initialize Wine silently
 rm -rf ~/.cache/wine # make sure we don't install mono or gecko (if their msi files are in wine cache)
 DISPLAY=0 wine wineboot # silently makes a fresh wineprefix in ~/.wine and skips installation of mono & gecko
 
@@ -86,8 +99,8 @@ cd ~/Downloads
 wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # download
 sudo chmod +x winetricks 
 sudo cp winetricks /usr/local/bin # install
-rm winetricks # clean up
 sudo apt-get install cabextract -y # winetricks needs this
+rm ~/Downloads/winetricks # clean up
 
 
 ### Setup Wine (install system requirements into our wineprefix for Winlink & VARA)
@@ -134,6 +147,7 @@ cd ~/Downloads
 wget -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs # Download Winlink no matter its version number
 7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller"
 wine ~/Downloads/WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
+rm ~/Downloads/Winlink_Express_install_*.zip # clean up
 rm -rf ~/Downloads/WinlinkExpressInstaller # clean up
 
 # Download/extract/install VARA HF (or newer) [https://rosmodem.wordpress.com/]
@@ -142,6 +156,7 @@ VARALINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?<=<a href=").*?
 megadl ${VARALINK}
 7z x VARA*.zip -o"VARAInstaller"
 wine ~/Downloads/VARAInstaller/VARA\ setup*.exe /SILENT
+rm ~/Downloads/VARA*.zip # clean up
 rm -rf ~/Downloads/VARAInstaller # clean up
 # NOTE: VARA prompts user to hit 'ok' after install even if silent install.  We could skip it with wine AHK, but since the next step is user configuration and involves user input anyway, we can just have the user click ok here.
 # Inno Setup Installer commandline commands: https://jrsoftware.org/ishelp/index.php?topic=setupcmdline
@@ -149,12 +164,15 @@ rm -rf ~/Downloads/VARAInstaller # clean up
 
 
 ###### Configure Winlink and VARA ######
+clear
 echo "In winecfg, go to the Audio tab to set up your default in/out soundcards."
 wine winecfg
 
+clear
 echo "In VARA, set up your soundcard input and output (go to Settings ... Soundcard)"
 wine ~/.wine/drive_c/VARA/VARA.exe
 
+clear
 echo "In RMS Express, enter your callsign, password, gridsquare, and soundcard in/out, then close the program.  Ignore any errors for now."
 wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
 
