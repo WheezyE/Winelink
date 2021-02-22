@@ -1,6 +1,6 @@
 ![logo](WinelinkLogo.png "logo")
 # Winelink
-A Winlink (RMS Express & VARA) installer Script for the Raspberry Pi 4.
+A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
 This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlink (RMS Express) & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now.
 
