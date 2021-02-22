@@ -25,6 +25,15 @@ If you wish to run VARA directly, you can do so with this command: `wine ~/.wine
 
 If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
 
+## Known issues
+ - The internet isn't working for some reason.
+ - VARA has some graphical glitches (screen looks black) when run through RMS Express.
+ - When VARA is run by itself, the CPU gauge doesn't seem to display.
+ - The installation takes about 90 minutes
+ - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore.
+ - I haven't actually tested over-the-air connections yet since I'm still just a tech.  If some generals could test, that would be awesome.
+ - My installer isn't very elegant at the moment, but I'll try to make it look a bit better in the future.
+
 ## Examples
 
 ![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
