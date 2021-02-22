@@ -1,4 +1,4 @@
-![Official logo](img/WinelinkLogo.png "Official Logo")
+![Official logo](docs/img/WinelinkLogo.png "Official Logo")
 # Winelink
 A script to install Winlink (RMS Express & VARA) on Raspberry Pi 4
 
