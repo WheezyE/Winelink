@@ -7,7 +7,7 @@ This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlin
 To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  Box86 is much smaller in file size and much easier to install too.
 
 ## Installation
-Simply copy and paste these commands in your Raspberry Pi 4's terminal:
+Simply copy and paste these commands into your Raspberry Pi 4's terminal:
 ```bash
 sudo apt install git -y
 rm -rf ~/Downloads/Winelink # remove any old winelink installs
