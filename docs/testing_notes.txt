@@ -1,3 +1,34 @@
 Find what's causing VARA graphical bugs (test with Wine in an x86 VM): 
  - https://groups.io/g/VARA-MODEM/topic/installing_winlink_express/80678030?p=,,,20,0,0,0::recentpostdate%2Fsticky,,,20,2,0,80678030
- - 
+
+Reference an old script to make the UI of the script better:
+ - https://github.com/AresValley/Artemis/blob/master/spec_files/Linux/raspbian_build.sh
+ 
+Android commands (following this guide: https://wiki.termux.com/wiki/PRoot ):
+    #Install Termux from the Google Play Store
+    apt-get update
+    apt-get upgrade -y
+    pkg install proot-distro -y
+    proot-distro install ubuntu-20.04
+    proot-distro login ubuntu-20.04
+    
+    
+    
+List of Linux libraries that Wine depends on: https://wiki.winehq.org/Building_Wine#Satisfying_Build_Dependencies
+
+Native Windows DLL's vs Built-in Wine Libraries: https://wiki.winehq.org/Wine_Developer%27s_Guide/Architecture_Overview#Wine.2FWindows_DLLs
+https://wiki.winehq.org/Winecfg#Libraries
+https://en.wikipedia.org/wiki/Wine_(software)#Libraries_and_applications
+
+List of built-in Wine DLL's here:
+https://github.com/wine-mirror/wine/tree/master/dlls
+
+
+
+
+# At beginning of script, pave the way
+wineserver -k
+sudo rm -rf ~/.wine ~/wine ~/.cache/wine ~/Downloads/wine-installer ~/Downloads/box86installer
+
+
+Do we need `sudo apt-get install p7zip-full -y`? or can we just use cabextract?
