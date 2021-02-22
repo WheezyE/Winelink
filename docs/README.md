@@ -4,7 +4,7 @@ A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the R
 
 This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlink (RMS Express) & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now.
 
-To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than ExaGear or Qemu.  It's much smaller and easier to install too.
+To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  Box86 is much smaller in file size and much easier to install too.
 
 ## Installation
 Simply run these commands in your Raspberry Pi 4's terminal
@@ -17,7 +17,7 @@ sudo chmod +x install_winelink.sh
 ./install_winelink.sh
 ```
 
-If you would like to use an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), software may run very slow and you will need to compile a custom 2G/2G split memory kernel by yourself before installing.  Auto-detection/installation of a custom kernel is planned for a future release of this script.
+If you would like to use an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), software may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
     
 ## Credits
  - [The Box86 team](https://discord.gg/Fh8sjmu)
