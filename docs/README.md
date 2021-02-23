@@ -27,7 +27,6 @@ If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B
 
 ## Known issues
  - The internet isn't working for some reason.
- - VARA has some graphical glitches (screen looks black) when run through RMS Express.
  - When VARA is run by itself, the CPU gauge doesn't seem to display.
  - The installation takes about 90 minutes
  - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore.
@@ -44,7 +43,7 @@ VARA running on a Raspberry Pi 4B (Twister OS)
 >      (ptitSeb, pale, chills340, phoenixbyrd, Botspot, !FlameKat53, epychan,
 >       Heasterian, monkaBlyat, SpacingBat3, #lukefrenner, Icenowy, Longhorn,
 >       #MonthlyDoseOfRPi, luschia, Binay Devkota, hacker420, et.al.)
- - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s Winlink on Linux guides
+ - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
  - N7ACW & AD7HE for getting me started in ham radio
 
