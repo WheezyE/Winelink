@@ -2,7 +2,7 @@
 # Winelink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
-This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlink (RMS Express) & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now.  **_This project is still very early in development and has lots of bugs_**
+This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Express, & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now.  **_This project is still very early in development and has lots of bugs_**
 
 To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  Box86 is much smaller in file size and much easier to install too.
 
@@ -59,7 +59,7 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Add more error-checking to the script.
  - [ ] Make the script's user-interface look better.
  - [ ] Add an AHK script to click the "Ok" button after VARA is installed.
- - [ ] Add more clean-up functions to the script.
+ - [x] Add more clean-up functions to the script.
  - [ ] Add shortcuts to the desktop
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
    - Ask Botspot if I can borrow some of his [pi-apps](https://github.com/Botspot/pi-apps) code.
@@ -71,7 +71,8 @@ All software used by this script is free and legal to use (with the exception of
    - Address internet issues.
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
- - [ ] Work with the Wine team to fix [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
+ - [x] Work with the Wine team to fix [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
+ - [ ] Figure out why VARA's CPU gauge isn't working.
  - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
 
 ## Distribution
