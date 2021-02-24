@@ -72,7 +72,7 @@ All software used by this script is free and legal to use (with the exception of
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
  - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
- - [ ] Add the fix for VARA graphical errors to the script {figure out this line / psudocode here: sed 's/"Managed"="N"/"Managed"="Y"' ~/.wine/user.reg # Uncheck "Allow the window manager to control the windows" in winecfg's Graphics tab (to prevent VARA graphics glitches when VARA is auto-run by RMS Express)}
+ - [ ] Add the fix for VARA graphical errors to the script {figure out this line / psudocode here: sed 's/"Managed"="Y"/"Managed"="N"' ~/.wine/user.reg # Uncheck "Allow the window manager to control the windows" in winecfg's Graphics tab (to prevent VARA graphics glitches when VARA is auto-run by RMS Express)}
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://forum.winehq.org/viewtopic.php?f=8&t=34987).
  - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
 
