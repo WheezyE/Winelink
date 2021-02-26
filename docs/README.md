@@ -55,26 +55,27 @@ All software used by this script is free and legal to use (with the exception of
 
 ## Future work
  - [x] Make a logo for the github page.
- - [ ] Add more error-checking to the script.
  - [ ] Make the script's user-interface look better.
  - [ ] Add an AHK script to click the "Ok" button after VARA is installed.
  - [x] Add more clean-up functions to the script.
  - [ ] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
  - [ ] Add shortcuts to the desktop
+ - [ ] Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
+   - Address internet issues.
+   - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
+   - Find crashes.
+ - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
+ - [x] Add the fix for VARA graphical errors to the script
+ - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://forum.winehq.org/viewtopic.php?f=8&t=34987).
+ - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
+ - [ ] Add more error-checking to the script.
+ #### Add more platforms
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
    - Ask Botspot if I can borrow some of his [pi-apps](https://github.com/Botspot/pi-apps) code.
  - [ ] Expand this script to detect/include Android ([Termux](https://github.com/termux/termux-app) + [proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
  - [ ] Expand this script to detect/include x86 Linux.
  - [ ] Expand this script to detect/include Mac.
  - [ ] Expand this script to detect/include ChromeBook Linux beta.
- - [ ] Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
-   - Address internet issues.
-   - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
-   - Find crashes.
- - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
- - [ ] Add the fix for VARA graphical errors to the script {figure out this line / psudocode here: sed 's/"Managed"="Y"/"Managed"="N"' ~/.wine/user.reg # Uncheck "Allow the window manager to control the windows" in winecfg's Graphics tab (to prevent VARA graphics glitches when VARA is auto-run by RMS Express)}
- - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://forum.winehq.org/viewtopic.php?f=8&t=34987).
- - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
 
 ## Distribution
 If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).  This script is free to use, open-source, and should not be monetized (for further information see the [license file](LICENSE)).
