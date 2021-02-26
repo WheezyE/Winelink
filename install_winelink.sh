@@ -88,9 +88,37 @@ sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
 sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
 rm -rf ~/Downloads/wine-installer # clean up
 
+# These extra packages are only needed for installing wine-staging on RPi (credits: chills340)
+#sudo apt install libstb0
+#cd ~/Downloads
+#wget http://ftp.us.debian.org/debian/pool/main/f/faudio/libfaudio0_20.11-1~bpo10+1_i386.deb
+#dpkg-deb -xv libfaudio0_20.11-1~bpo10+1_i386.deb libfaudio
+#sudo cp -TRv libfaudio/usr/ /usr/
+
 # Initialize Wine silently
 rm -rf ~/.cache/wine # make sure we don't install mono or gecko (if their msi files are in wine cache)
 DISPLAY=0 wine wineboot # silently makes a fresh wineprefix in ~/.wine and skips installation of mono & gecko
+
+
+### Fix some VARA graphics glitches caused by Wine's window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
+# Make sure "Allow the window manager to control the windows" is unchecked in winecfg's Graphics tab
+RESULT=$(grep '"Managed"="Y"' ~/.wine/user.reg)
+if [ "$RESULT" == '"Managed"="Y"' ]
+then
+    sed -i 's/"Managed"="Y"/"Managed"="N"/g' ~/.wine/user.reg
+fi    # if wine already enabled window manager control then disable it
+
+RESULT=$(grep '"Managed"="N"' ~/.wine/user.reg)
+if [ "$RESULT" == '"Managed"="N"' ]
+then
+    : # if wine has window manager control disabled, then do nothing
+else
+    echo '' >> ~/.wine/user.reg
+    echo '[Software\\Wine\\X11 Driver] 1614196385' >> ~/.wine/user.reg
+    echo '#time=1d70ae6ab06f57a' >> ~/.wine/user.reg
+    echo '"Decorated"="Y"' >> ~/.wine/user.reg
+    echo '"Managed"="N"' >> ~/.wine/user.reg
+fi    # if wine doesn't have any window manager control setting preferences yet, then set them as disabled
 
 
 ### Download & install winetricks
@@ -118,7 +146,6 @@ unzip -o nt4pdhdll.exe
 cp pdh.dll ~/.wine/drive_c/windows/system32
 
 rm -rf ~/.cache/winetricks/ # clean up cached Microsoft installers
-
 
 
 
