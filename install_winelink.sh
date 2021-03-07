@@ -2,7 +2,7 @@
 
 ########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########
 # Author: Eric Wiessner (KI7POL)                                              #
-# Version: 0.47 (work in progress 02/21/2021)                                 #
+# Version: Work in progress (lots of bugs!)                                   #
 # Credits:                                                                    #
 #   The Box86 team                                                            #
 #      (ptitSeb, pale, chills340, phoenixbyrd, Botspot, !FlameKat53, epychan, #
@@ -64,40 +64,49 @@ git checkout master
 
 
 ### Download and install Wine 5.21 devel buster for i386
+
 # Backup old wine
 wineserver -k # stop any old wine installations from running
 sudo mv ~/wine ~/wine-old
 sudo mv ~/.wine ~/.wine-old
 sudo mv /usr/local/bin/wine /usr/local/bin/wine-old
+sudo mv /usr/local/bin/wineboot /usr/local/bin/wineboot-old
 sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old
 sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old
 
-# Download Wine and extract it (into a directory called wine-installer)
+# Download, extract wine, and install wine
+# (Replace the links/versions below with links/versions from the WineHQ site for the version of wine you wish to install. Note that we need the i386 version for Box86 even though we're installing it on our ARM processor.)
+# (Pick an i386 version of wine-devel, wine-staging, or wine-stable)
 cd ~/Downloads
-wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_5.21~buster_i386.deb
-wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel_5.21~buster_i386.deb
-dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer
+wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_5.21~buster_i386.deb # NOTE: Replace this link with the version you want
+wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel_5.21~buster_i386.deb  # NOTE: Also replace this link with the version you want
+dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer # NOTE: Make sure these dpkg command matches the filename of the deb package you just downloaded
 dpkg-deb -xv wine-devel_5.21~buster_i386.deb wine-installer
-rm ~/Downloads/wine-devel-i386_5.21~buster_i386.deb # clean up
-rm ~/Downloads/wine-devel_5.21~buster_i386.deb # clean up
+mv ~/Downloads/wine-installer/opt/wine* ~/wine
+rm wine*.deb # clean up
+rm -rf wine-installer # clean up
 
-# Install Wine (from the wine-installer directory we just made)
-sudo mv wine-installer/opt/wine-devel ~/wine
-sudo ln -s ~/wine/bin/wine /usr/local/bin/wine
+# Install shortcuts (make 32bit launcher & symlinks. Credits: grayduck, Botspot)
+echo -e '#!/bin/bash\nsetarch linux32 -L '"$HOME/wine/bin/wine "'"$@"' | sudo tee -a /usr/local/bin/wine >/dev/null # Create a script to launch wine programs as 32bit only
+#sudo ln -s ~/wine/bin/wine /usr/local/bin/wine # You could aslo just make a symlink, but box86 only works for 32bit apps at the moment
+sudo ln -s ~/wine/bin/wineboot /usr/local/bin/wineboot
 sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
 sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
-rm -rf ~/Downloads/wine-installer # clean up
+sudo chmod +x /usr/local/bin/wine /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver
 
-# These extra packages are only needed for installing wine-staging on RPi (credits: chills340)
-#sudo apt install libstb0
+# These packages are needed for running wine-staging on RPi 4 (Credits: chills340)
+#sudo apt install libstb0 -y
 #cd ~/Downloads
 #wget http://ftp.us.debian.org/debian/pool/main/f/faudio/libfaudio0_20.11-1~bpo10+1_i386.deb
-#dpkg-deb -xv libfaudio0_20.11-1~bpo10+1_i386.deb libfaudio
+#wget -r -l1 -np -nd -A "libfaudio0_*~bpo10+1_i386.deb" http://ftp.us.debian.org/debian/pool/main/f/faudio/ # Download libfaudio i386 no matter its version number
+#dpkg-deb -xv libfaudio0_*~bpo10+1_i386.deb libfaudio
 #sudo cp -TRv libfaudio/usr/ /usr/
+#rm libfaudio0_*~bpo10+1_i386.deb # clean up
+#rm -rf libfaudio # clean up
 
 # Initialize Wine silently
 rm -rf ~/.cache/wine # make sure we don't install mono or gecko (if their msi files are in wine cache)
-DISPLAY=0 wine wineboot # silently makes a fresh wineprefix in ~/.wine and skips installation of mono & gecko
+DISPLAY=0 wineboot # silently makes a fresh wineprefix in ~/.wine and skips installation of mono & gecko
 
 
 ### Fix some VARA graphics glitches caused by Wine's window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
@@ -194,7 +203,7 @@ rm -rf ~/Downloads/VARAInstaller # clean up
 ###### Configure Winlink and VARA ######
 clear
 echo "In winecfg, go to the Audio tab to set up your default in/out soundcards."
-wine winecfg
+winecfg
 
 clear
 echo "In VARA, set up your soundcard input and output (go to Settings ... Soundcard)"
