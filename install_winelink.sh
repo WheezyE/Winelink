@@ -109,27 +109,6 @@ rm -rf ~/.cache/wine # make sure we don't install mono or gecko (if their msi fi
 DISPLAY=0 wineboot # silently makes a fresh wineprefix in ~/.wine and skips installation of mono & gecko
 
 
-### Fix some VARA graphics glitches caused by Wine's window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
-# Make sure "Allow the window manager to control the windows" is unchecked in winecfg's Graphics tab
-RESULT=$(grep '"Managed"="Y"' ~/.wine/user.reg)
-if [ "$RESULT" == '"Managed"="Y"' ]
-then
-    sed -i 's/"Managed"="Y"/"Managed"="N"/g' ~/.wine/user.reg
-fi    # if wine already enabled window manager control then disable it
-
-RESULT=$(grep '"Managed"="N"' ~/.wine/user.reg)
-if [ "$RESULT" == '"Managed"="N"' ]
-then
-    : # if wine has window manager control disabled, then do nothing
-else
-    echo '' >> ~/.wine/user.reg
-    echo '[Software\\Wine\\X11 Driver] 1614196385' >> ~/.wine/user.reg
-    echo '#time=1d70ae6ab06f57a' >> ~/.wine/user.reg
-    echo '"Decorated"="Y"' >> ~/.wine/user.reg
-    echo '"Managed"="N"' >> ~/.wine/user.reg
-fi    # if wine doesn't have any window manager control setting preferences yet, then set them as disabled
-
-
 ### Download & install winetricks
 sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old # backup old winetricks
 cd ~/Downloads
@@ -204,6 +183,31 @@ rm -rf ~/Downloads/VARAInstaller # clean up
 clear
 echo "In winecfg, go to the Audio tab to set up your default in/out soundcards."
 winecfg
+
+
+
+### Fix some VARA graphics glitches caused by Wine's window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
+# Make sure "Allow the window manager to control the windows" is unchecked in winecfg's Graphics tab
+RESULT=$(grep '"Managed"="Y"' ~/.wine/user.reg)
+if [ "$RESULT" == '"Managed"="Y"' ]
+then
+    sed -i 's/"Managed"="Y"/"Managed"="N"/g' ~/.wine/user.reg
+fi    # if wine already enabled window manager control then disable it
+
+RESULT=$(grep '"Managed"="N"' ~/.wine/user.reg)
+if [ "$RESULT" == '"Managed"="N"' ]
+then
+    : # if wine has window manager control disabled, then do nothing
+else
+    echo '' >> ~/.wine/user.reg
+    echo '[Software\\Wine\\X11 Driver] 1614196385' >> ~/.wine/user.reg
+    echo '#time=1d70ae6ab06f57a' >> ~/.wine/user.reg
+    echo '"Decorated"="Y"' >> ~/.wine/user.reg
+    echo '"Managed"="N"' >> ~/.wine/user.reg
+fi    # if wine doesn't have any window manager control setting preferences yet, then set them as disabled
+
+
+
 
 clear
 echo "In VARA, set up your soundcard input and output (go to Settings ... Soundcard)"
