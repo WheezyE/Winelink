@@ -74,7 +74,7 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Add more error-checking to the script.
  #### Add more platforms
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
-   - Ask Botspot if I can borrow some of his [pi-apps](https://github.com/Botspot/pi-apps) code.
+   - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
  - [ ] Expand this script to detect/include Android ([Termux](https://github.com/termux/termux-app) + [proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
  - [ ] Expand this script to detect/include x86 Linux.
  - [ ] Expand this script to detect/include Mac.
