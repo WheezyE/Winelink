@@ -30,18 +30,10 @@
 #        - Sebastien "ptitSeb" Chevalier - author of "Box86": paypal.me/0ptitSeb
 #        - Jason Oleham (KM4ACK) - inspiration & Linux elmer: paypal.me/km4ack
 #
-
-
-############  Clean up files from any failed past runs of this script ############ 
-rm ~/Downloads/wine-devel-i386_5.21~buster_i386.deb
-rm ~/Downloads/wine-devel_5.21~buster_i386.deb
-rm -rf ~/Downloads/wine-installer
-rm ~/Downloads/winetricks
-rm -rf ~/Downloads/box86-installer
-rm ~/Downloads/Winlink_Express_install_*.zip
-rm -rf ~/Downloads/WinlinkExpressInstaller
-rm ~/Downloads/VARA*.zip
-rm -rf ~/Downloads/VARAInstaller
+winelink_dir=$(pwd)
+mkdir $winelink_dir/downloads/
+############  Clean up files from any failed past runs of this script ############
+rm -rf $winelink_dir/downloads/
 clear
 
 
@@ -51,7 +43,7 @@ clear
 
 ### Install Box86
 sudo apt-get install cmake -y
-cd ~/Downloads
+cd $winelink_dir/downloads/
 mkdir box86-installer && cd box86-installer
 git clone https://github.com/ptitSeb/box86
 cd box86/
@@ -77,12 +69,12 @@ sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old
 # Download, extract wine, and install wine
 # (Replace the links/versions below with links/versions from the WineHQ site for the version of wine you wish to install. Note that we need the i386 version for Box86 even though we're installing it on our ARM processor.)
 # (Pick an i386 version of wine-devel, wine-staging, or wine-stable)
-cd ~/Downloads
+cd $winelink_dir/downloads/
 wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_5.21~buster_i386.deb # NOTE: Replace this link with the version you want
 wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel_5.21~buster_i386.deb  # NOTE: Also replace this link with the version you want
 dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer # NOTE: Make sure these dpkg command matches the filename of the deb package you just downloaded
 dpkg-deb -xv wine-devel_5.21~buster_i386.deb wine-installer
-mv ~/Downloads/wine-installer/opt/wine* ~/wine
+mv $winelink_dir/downloads/wine-installer/opt/wine* ~/wine
 rm wine*.deb # clean up
 rm -rf wine-installer # clean up
 
@@ -96,7 +88,7 @@ sudo chmod +x /usr/local/bin/wine /usr/local/bin/wineboot /usr/local/bin/winecfg
 
 # These packages are needed for running wine-staging on RPi 4 (Credits: chills340)
 #sudo apt install libstb0 -y
-#cd ~/Downloads
+#cd $winelink_dir/downloads
 #wget http://ftp.us.debian.org/debian/pool/main/f/faudio/libfaudio0_20.11-1~bpo10+1_i386.deb
 #wget -r -l1 -np -nd -A "libfaudio0_*~bpo10+1_i386.deb" http://ftp.us.debian.org/debian/pool/main/f/faudio/ # Download libfaudio i386 no matter its version number
 #dpkg-deb -xv libfaudio0_*~bpo10+1_i386.deb libfaudio
@@ -111,12 +103,11 @@ DISPLAY=0 wineboot # silently makes a fresh wineprefix in ~/.wine and skips inst
 
 ### Download & install winetricks
 sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old # backup old winetricks
-cd ~/Downloads
+cd $winelink_dir/downloads
 wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # download
 sudo chmod +x winetricks 
-sudo cp winetricks /usr/local/bin # install
+sudo mv winetricks /usr/local/bin # install
 sudo apt-get install cabextract -y # winetricks needs this
-rm ~/Downloads/winetricks # clean up
 
 
 ### Setup Wine (install system requirements into our wineprefix for Winlink & VARA)
@@ -128,10 +119,12 @@ BOX86_NOBANNER=1 winetricks -q riched30 richtx32 crypt32 comctl32ocx comdlg32ocx
 
 # Install an older pdh.dll (the pdh.dll from "winetricks pdh" is too new for VARA)
 sudo apt-get install zip -y
-cd ~/Downloads && mkdir pdhNT40 && cd pdhNT40
+cd $winelink_dir/downloads
 wget http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe
-unzip -o nt4pdhdll.exe
-cp pdh.dll ~/.wine/drive_c/windows/system32
+7z x nt4pdhdll.exe pdh.dll
+mv pdh.dll ~/.wine/drive_c/windows/system32
+rm nt4pdhdll.exe # clean up
+
 
 rm -rf ~/.cache/winetricks/ # clean up cached Microsoft installers
 
@@ -139,14 +132,14 @@ rm -rf ~/.cache/winetricks/ # clean up cached Microsoft installers
 
 # NOTE: THIS IS A KLUDGE!!
 # dotnet35sp1 installer needs an old box86, but our programs need the latest box86. Update box86 with these commands.
-cd ~/Downloads/box86-installer
+cd $winelink_dir/downloads/box86-installer
 cd box86/
 git checkout cad160205fd9a267e6c3d9d784fbef72b1c68dde # freeze box86 version on a commit known to work
 cd build
 make -j4
 sudo make install
 
-rm -rf ~/Downloads/box86-installer # clean up
+rm -rf $winelink_dir/downloads/box86-installer # clean up
 
 
 
@@ -159,21 +152,21 @@ sudo apt-get install p7zip-full -y
 sudo apt-get install megatools -y
 
 # Download/extract/install Winlink Express (formerly RMS Express) [https://downloads.winlink.org/User%20Programs/]
-cd ~/Downloads
+cd $winelink_dir/downloads
 wget -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs # Download Winlink no matter its version number
 7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller"
-wine ~/Downloads/WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
-rm ~/Downloads/Winlink_Express_install_*.zip # clean up
-rm -rf ~/Downloads/WinlinkExpressInstaller # clean up
+wine $winelink_dir/downloads/WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
+rm $winelink_dir/downloads/Winlink_Express_install_*.zip # clean up
+rm -rf $winelink_dir/downloads/WinlinkExpressInstaller # clean up
 
 # Download/extract/install VARA HF (or newer) [https://rosmodem.wordpress.com/]
-cd ~/Downloads
+cd $winelink_dir/downloads
 VARALINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?<=<a href=").*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
 megadl ${VARALINK}
 7z x VARA*.zip -o"VARAInstaller"
-wine ~/Downloads/VARAInstaller/VARA\ setup*.exe /SILENT
-rm ~/Downloads/VARA*.zip # clean up
-rm -rf ~/Downloads/VARAInstaller # clean up
+wine $winelink_dir/downloads/VARAInstaller/VARA\ setup*.exe /SILENT
+rm $winelink_dir/downloads/VARA*.zip # clean up
+rm -rf $winelink_dir/downloads/VARAInstaller # clean up
 # NOTE: VARA prompts user to hit 'ok' after install even if silent install.  We could skip it with wine AHK, but since the next step is user configuration and involves user input anyway, we can just have the user click ok here.
 # Inno Setup Installer commandline commands: https://jrsoftware.org/ishelp/index.php?topic=setupcmdline
 
