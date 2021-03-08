@@ -59,8 +59,8 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Make the script's user-interface look better.
  - [ ] Add an AHK script to click the "Ok" button after VARA is installed.
  - [x] Add more clean-up functions to the script.
- - [ ] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
- - [ ] Add shortcuts to the desktop
+ - [x] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
+ - [x] Add shortcuts to the desktop
  - [ ] Try to remove 7zip installation (try to rely on cabextract only)
  - [ ] Rely on archive.org box86 binaries instead of compiling (give user the choice to compile or not; add auto-detection of failed downloads)
  - [ ] Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
