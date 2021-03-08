@@ -31,15 +31,16 @@
 #        - Jason Oleham (KM4ACK) - inspiration & Linux elmer: paypal.me/km4ack
 #
 winelink_dir=$(pwd)
-mkdir $winelink_dir/downloads/
+
 ############  Clean up files from any failed past runs of this script ############
 rm -rf $winelink_dir/downloads/
 clear
 
-
 ############  Setup the RPi4 to run Windows .exe files ############ 
 # To run Windows .exe files on RPi4, we need an x86 emulator (box86) and a Windows API Call interpreter (wine)
 # Box86 is opensource and runs about 10x faster than ExaGear or Qemu.  It's much smaller and easier to install too.
+
+mkdir $winelink_dir/downloads/
 
 ### Install Box86
 sudo apt-get install cmake -y
