@@ -212,10 +212,12 @@ fi    # if wine doesn't have any window manager control setting preferences yet,
 clear
 echo "In VARA, set up your soundcard input and output (go to Settings ... Soundcard)"
 wine ~/.wine/drive_c/VARA/VARA.exe
+cp ~/.local/share/applications/wine/Programs/VARA/VARA.desktop ~/Desktop/
 
 clear
 echo "In RMS Express, enter your callsign, password, gridsquare, and soundcard in/out, then close the program.  Ignore any errors for now."
 wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
+cp ~/.local/share/applications/wine/Programs/RMS\ Express/Winlink\ Express.desktop ~/Desktop/
 
 clear
 echo "We're going to run Winlink a few more times so it can shake some bugs out"
