@@ -87,4 +87,4 @@ If you use this script in your project (or are inspired by it) just please be su
 ## Donations
 If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb or KM4ACK - without whom, this script would not exist.
  - Sebastien "ptitSeb" Chevalier (author of [Box86](https://github.com/ptitSeb/box86)) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
- - Jason "KM4ACK" Oleham (Linux elmer & ham radio pioneer) [paypal.me/km4ack](paypal.me/km4ack)
+ - Jason "KM4ACK" Oleham (author of [Build-a-Pi](https://github.com/km4ack/pi-build) for ham radio) [paypal.me/km4ack](paypal.me/km4ack)
