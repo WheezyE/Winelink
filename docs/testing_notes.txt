@@ -1,7 +1,14 @@
-Find what's causing VARA graphical bugs (test with Wine in an x86 VM): 
- - https://groups.io/g/VARA-MODEM/topic/installing_winlink_express/80678030?p=,,,20,0,0,0::recentpostdate%2Fsticky,,,20,2,0,80678030
+AHK Script for VARA Installer
 
-Reference an old script to make the UI of the script better:
+SetTitleMatchMode, 2
+SetTitleMatchMode, slow
+        Run, VARA setup (Run as Administrator).exe /SILENT, C:\Users\pi\path
+		Sleep 20
+		WinWait, VARA Setup
+		ControlClick, Button1
+
+
+Reference old scripts to make the UI of the script better:
  - https://github.com/AresValley/Artemis/blob/master/spec_files/Linux/raspbian_build.sh
  
 Android commands (following this guide: https://wiki.termux.com/wiki/PRoot ):
