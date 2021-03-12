@@ -1,12 +1,26 @@
-AHK Script for VARA Installer
+AHK Scripts for VARA
 
+; Installer
 SetTitleMatchMode, 2
 SetTitleMatchMode, slow
-        Run, VARA setup (Run as Administrator).exe /SILENT, C:\Users\pi\path
-		Sleep 20
-		WinWait, VARA Setup
-		ControlClick, Button1
+		Run, VARA setup (Run as Administrator).exe /SILENT, C:\Users\ericw\OneDrive\Desktop\box86\ahk
+		WinWait, VARA Setup ; Wait for the "VARA installed successfully" window
+		ControlClick, Button1, VARA Setup ; Click the OK button
+		WinWaitClose
 
+; Setup
+SetTitleMatchMode, 2
+SetTitleMatchMode, slow		
+		Run, VARA.exe, C:\VARA
+		WinActivate, VARA HF
+		WinWait, VARA HF ; Wait for VARA to open
+		Send, !{s}
+		Sleep 500
+		Send, s
+		Sleep 500
+		WinClose, SoundCard
+		Sleep 500
+		WinClose, VARA HF
 
 Reference old scripts to make the UI of the script better:
  - https://github.com/AresValley/Artemis/blob/master/spec_files/Linux/raspbian_build.sh
