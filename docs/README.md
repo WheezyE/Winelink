@@ -31,7 +31,7 @@ If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B
  - The internet isn't working for some reason (this is a bug in Box86).
  - VARA's CPU gauge doesn't display (this is a bug in Wine).
  - The installation takes about 90 minutes
- - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore.
+ - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore. (If programs refuse to run in Wine after a crash, try running `wineserver -k` in another terminal window before trying again.)
  - I haven't actually tested over-the-air connections yet since I'm still just a tech.  If some generals could test, that would be awesome.
  - My installer isn't very elegant at the moment, but I'll try to make it look a bit better in the future.
 
