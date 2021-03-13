@@ -23,11 +23,13 @@ You should then be able to run RMS Express with this command: `wine ~/.wine/driv
 
 If you wish to run VARA directly, you can do so with this command: `wine ~/.wine/drive_c/VARA/VARA.exe`
 
+Sometimes after Wine crashes, software will refuse to run. We can sometimes get around this bug by running `wineserver -k` in the terminal and then trying again.
+
 If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
 
 ## Known issues
- - The internet isn't working for some reason.
- - When VARA is run by itself, the CPU gauge doesn't seem to display.
+ - The internet isn't working for some reason (this is a bug in Box86).
+ - VARA's CPU gauge doesn't display (this is a bug in Wine).
  - The installation takes about 90 minutes
  - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore.
  - I haven't actually tested over-the-air connections yet since I'm still just a tech.  If some generals could test, that would be awesome.
@@ -51,7 +53,7 @@ VARA running on a Raspberry Pi 4B (Twister OS)
                                                      - Nelson Mandela
 
 ## Legal
-All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86 and Wine are both open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
+All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86, Wine, winetricks, and AutoHotKey, are all open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
 ## Future work
  - [x] Make a logo for the github page.
