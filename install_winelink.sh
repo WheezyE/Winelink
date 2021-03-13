@@ -31,6 +31,7 @@
 #        - Jason Oleham (KM4ACK) - inspiration & Linux elmer: paypal.me/km4ack
 #
 winelink_dir=$(pwd)
+sudo apt-get install p7zip-full -y
 
 ############  Clean up files from any failed past runs of this script ############
 rm -rf $winelink_dir/downloads/
@@ -102,6 +103,7 @@ rm -rf ~/.cache/wine # make sure we don't install mono or gecko (if their msi fi
 DISPLAY=0 wineboot # silently makes a fresh wineprefix in ~/.wine and skips installation of mono & gecko
 
 
+
 ### Download & install winetricks
 sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old # backup old winetricks
 cd $winelink_dir/downloads
@@ -109,6 +111,7 @@ wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetric
 sudo chmod +x winetricks 
 sudo mv winetricks /usr/local/bin # install
 sudo apt-get install cabextract -y # winetricks needs this
+
 
 
 ### Setup Wine (install system requirements into our wineprefix for Winlink & VARA)
@@ -119,15 +122,13 @@ BOX86_NOBANNER=1 winetricks -q riched30 richtx32 crypt32 comctl32ocx comdlg32ocx
 # Notes: Does Winlink HF Channel Selector (ITS) need ie6 or gecko?
 
 # Install an older pdh.dll (the pdh.dll from "winetricks pdh" is too new for VARA)
-sudo apt-get install zip -y
 cd $winelink_dir/downloads
 wget http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe
 7z x nt4pdhdll.exe pdh.dll
 mv pdh.dll ~/.wine/drive_c/windows/system32
 rm nt4pdhdll.exe # clean up
 
-
-rm -rf ~/.cache/winetricks/ # clean up cached Microsoft installers
+rm -rf ~/.cache/winetricks/ # clean up cached Microsoft installers now that we're done setting up Wine
 
 
 
@@ -146,42 +147,92 @@ rm -rf $winelink_dir/downloads/box86-installer # clean up
 
 
 
+### Setup AutoHotKey and make some .ahk scripts we'll use later
+cd $winelink_dir/
+mkdir ahk; cd ahk
+wget https://github.com/AutoHotkey/AutoHotkey/releases/download/v1.0.48.05/AutoHotkey104805_Install.exe
+7z x AutoHotkey104805_Install.exe AutoHotkey.exe
+sudo chmod +x AutoHotkey.exe
+rm AutoHotkey104805_Install.exe # Clean up
+
+#Create vara_install.ahk
+echo '; AHK script to make VARA installer run completely silent'                       >> $winelink_dir/ahk/vara_install.ahk
+echo 'SetTitleMatchMode, 2'                                                            >> $winelink_dir/ahk/vara_install.ahk
+echo 'SetTitleMatchMode, slow'                                                         >> $winelink_dir/ahk/vara_install.ahk
+echo '        Run, VARA setup (Run as Administrator).exe /SILENT, C:\'                 >> $winelink_dir/ahk/vara_install.ahk
+echo '        WinWait, VARA Setup ; Wait for the "VARA installed successfully" window' >> $winelink_dir/ahk/vara_install.ahk
+echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> $winelink_dir/ahk/vara_install.ahk
+echo '        WinWaitClose'                                                            >> $winelink_dir/ahk/vara_install.ahk
+
+#Create vara_setup.ahk
+echo '; AHK script to assist users in setting up VARA on its first run'                >> $winelink_dir/ahk/vara_setup.ahk
+echo 'SetTitleMatchMode, 2'                                                            >> $winelink_dir/ahk/vara_setup.ahk
+echo 'SetTitleMatchMode, slow'                                                         >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Run, VARA.exe, C:\VARA'                                                  >> $winelink_dir/ahk/vara_setup.ahk
+echo '        WinActivate, VARA HF'                                                    >> $winelink_dir/ahk/vara_setup.ahk
+echo '        WinWait, VARA HF ; Wait for VARA to open'                                >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Sleep 3500 ; If we dont wait at least 2000 for VARA then AHK wont work'  >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Send, !{s} ; Open SoundCard menu'                                        >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Sleep 500'                                                               >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Send, {Down}'                                                            >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Sleep, 100'                                                              >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Send, {Enter}'                                                           >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Sleep 500'                                                               >> $winelink_dir/ahk/vara_setup.ahk
+echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> $winelink_dir/ahk/vara_setup.ahk
+echo '        Sleep 50'                                                                >> $winelink_dir/ahk/vara_setup.ahk
+echo '        WinClose, VARA HF ; Close VARA'                                          >> $winelink_dir/ahk/vara_setup.ahk
+
+
+
+
 
 
 ############  Install Winlink and VARA (into our configured wineprefix) ############
-sudo apt-get install p7zip-full -y
+### Download/extract/install Winlink Express (formerly RMS Express) [https://downloads.winlink.org/User%20Programs/]
+cd $winelink_dir/downloads
+
+wget -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs # Download Winlink no matter its version number
+
+7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller"
+    wine $winelink_dir/downloads/WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
+    cp ~/.local/share/applications/wine/Programs/RMS\ Express/Winlink\ Express.desktop ~/Desktop/ # Make desktop shortcut.  FIX ME: Run a script instead with wineserver -k in front of it
+
+rm Winlink_Express_install_*.zip # clean up
+rm -rf WinlinkExpressInstaller # clean up
+
+
+### Download/extract/install VARA HF (or newer) [https://rosmodem.wordpress.com/]
 sudo apt-get install megatools -y
 
-# Download/extract/install Winlink Express (formerly RMS Express) [https://downloads.winlink.org/User%20Programs/]
-cd $winelink_dir/downloads
-wget -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs # Download Winlink no matter its version number
-7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller"
-wine $winelink_dir/downloads/WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
-rm $winelink_dir/downloads/Winlink_Express_install_*.zip # clean up
-rm -rf $winelink_dir/downloads/WinlinkExpressInstaller # clean up
-
-# Download/extract/install VARA HF (or newer) [https://rosmodem.wordpress.com/]
 cd $winelink_dir/downloads
 VARALINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?<=<a href=").*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
 megadl ${VARALINK}
+
 7z x VARA*.zip -o"VARAInstaller"
-wine $winelink_dir/downloads/VARAInstaller/VARA\ setup*.exe /SILENT
-rm $winelink_dir/downloads/VARA*.zip # clean up
-rm -rf $winelink_dir/downloads/VARAInstaller # clean up
-# NOTE: VARA prompts user to hit 'ok' after install even if silent install.  We could skip it with wine AHK, but since the next step is user configuration and involves user input anyway, we can just have the user click ok here.
-# Inno Setup Installer commandline commands: https://jrsoftware.org/ishelp/index.php?topic=setupcmdline
+    mv $winelink_dir/downloads/VARAInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # Move VARA installer here so AHK can find it
+    # The VARA installer prompts the user to hit 'OK' even during silent install (due to a secondary installer).  We will suppress this prompt with AHK.
+    wine $winelink_dir/ahk/AutoHotkey.exe $winelink_dir/ahk/vara_install.ahk
+    cp ~/.local/share/applications/wine/Programs/VARA/VARA.desktop ~/Desktop/ # Make desktop shortcut.  FIX ME: Run a script instead with wineserver -k in front of it
+
+rm VARA*.zip # clean up
+rm ~/.wine/drive_c/VARA\ setup*.exe # clean up
+rm -rf VARAInstaller # clean up
+
 
 
 
 ###### Configure Winlink and VARA ######
 clear
+echo 
 echo "In winecfg, go to the Audio tab to set up your default in/out soundcards."
 winecfg
+clear
 
 
 
 ### Fix some VARA graphics glitches caused by Wine's window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
 # Make sure "Allow the window manager to control the windows" is unchecked in winecfg's Graphics tab
+# NEEDS FIXING
 RESULT=$(grep '"Managed"="Y"' ~/.wine/user.reg)
 if [ "$RESULT" == '"Managed"="Y"' ]
 then
@@ -202,16 +253,17 @@ fi    # if wine doesn't have any window manager control setting preferences yet,
 
 
 
-
+### Set up VARA (with some help from AutoHotKey)
 clear
-echo "In VARA, set up your soundcard input and output (go to Settings ... Soundcard)"
-wine ~/.wine/drive_c/VARA/VARA.exe
-cp ~/.local/share/applications/wine/Programs/VARA/VARA.desktop ~/Desktop/
+echo 
+echo "Please set up your soundcard input/output for VARA"
+#wine ~/.wine/drive_c/VARA/VARA.exe
+wine $winelink_dir/ahk/AutoHotkey.exe $winelink_dir/ahk/vara_setup.ahk
+
 
 clear
 echo "In RMS Express, enter your callsign, password, gridsquare, and soundcard in/out, then close the program.  Ignore any errors for now."
 wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
-cp ~/.local/share/applications/wine/Programs/RMS\ Express/Winlink\ Express.desktop ~/Desktop/
 
 clear
 echo "We're going to run Winlink a few more times so it can shake some bugs out"
