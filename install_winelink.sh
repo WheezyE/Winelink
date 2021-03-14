@@ -136,7 +136,8 @@ rm -rf ~/.cache/winetricks/ # clean up cached Microsoft installers now that we'r
 # dotnet35sp1 installer needs an old box86, but our programs need the latest box86. Update box86 with these commands.
 cd $winelink_dir/downloads/box86-installer
 cd box86/
-git checkout cad160205fd9a267e6c3d9d784fbef72b1c68dde # freeze box86 version on a commit known to work
+git checkout 6a498c373c35ed2542a9667617abb96c4c767036 # freeze version of box86 at a commit which is known to work (VARA, RMS, internet work)
+#git checkout cad160205fd9a267e6c3d9d784fbef72b1c68dde # (VARA, RMS work; internet doesn't work)
 cd build
 make -j4
 sudo make install
