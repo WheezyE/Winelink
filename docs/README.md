@@ -64,8 +64,8 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Add more clean-up functions to the script.
  - [x] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
  - [x] Add shortcuts to the desktop
- - [ ] Rely on archive.org box86 binaries instead of compiling (give user the choice to compile or not; add auto-detection of failed downloads)
- - [ ] Find Box86 stability bugs for Winlink & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
+ - [ ] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling (give user the choice to compile or not; add auto-detection of failed downloads)
+ - [ ] Find Box86 [stability bugs for Winlink](https://github.com/ptitSeb/box86/issues/217) & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
    - Address internet issues.
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
@@ -88,5 +88,5 @@ If you use this script in your project (or are inspired by it) just please be su
 
 ## Donations
 If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb or KM4ACK - without whom, this script would not exist.
- - Sebastien "ptitSeb" Chevalier (author of [Box86](https://github.com/ptitSeb/box86)) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
- - Jason "KM4ACK" Oleham (author of [Build-a-Pi](https://github.com/km4ack/pi-build) for ham radio) [paypal.me/km4ack](paypal.me/km4ack)
+ - Sebastien "ptitSeb" Chevalier (author of [Box86](https://github.com/ptitSeb/box86), incredible developer, & really nice guy) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
+ - Jason "KM4ACK" Oleham (author of [Build-a-Pi](https://github.com/km4ack/pi-build), Linux elmer, & ham radio pioneer) [paypal.me/km4ack](paypal.me/km4ack)
