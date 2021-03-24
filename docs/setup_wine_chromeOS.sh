@@ -72,7 +72,7 @@ sudo apt-get update && sudo apt-get dist-upgrade -y
 sudo apt-get install p7zip-full -y # We'll need this later
 #sudo apt-get install nano
 
-# Install wine from the official winehq repo (don't just install wine from the repos - they sometimes have missing DLL/internet support)
+# Install wine from the official winehq repo (don't just install wine from the Debian repos - they sometimes have missing DLL/internet support)
 wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
 #sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ buster main' # this line only works if add-apt-repository is installed
 echo "deb https://dl.winehq.org/wine-builds/debian/ buster main" | sudo tee -a /etc/apt/sources.list
