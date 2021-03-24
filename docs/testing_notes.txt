@@ -53,3 +53,88 @@ sudo rm -rf ~/.wine ~/wine ~/.cache/wine ~/Downloads/wine-installer ~/Downloads/
 
 
 Do we need `sudo apt-get install p7zip-full -y`? or can we just use cabextract?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+If we create a wineprefix on a linux computer, then install dotnet35sp1, vcrun2015, and all our other Windows drivers and things there, we can then just copy our wineprefix over to our Pi to install the rest of our software there.  The Windows DLL files are not legally sharable, so I can't supply anyone with my already-made wineprefix from my Linux VMWare box, but I've written up steps for how to make one.  The whole process takes about an hour and a half I think:
+
+VMWare Workstation Player for Windows:
+https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html
+
+Debian 10 Image
+https://www.debian.org/distrib/
+https://cdimage.debian.org/debian-cd/current/i386/iso-cd/debian-10.6.0-i386-netinst.iso
+
+Install OS (I set up username: pi , pass: raspberry), boot, open terminal:
+```
+sudo apt-get update
+sudo apt-get install open-vm-tools open-vm-tools-desktop -y
+#I would also go to "Settings>Power" and set "Blank Screen" to "Never" and "Automatic Suspend" to "Off"
+#Power off Debian 10 from inside VMWare, then boot up the Debian 10 image again.  You can now copy-paste from Windows into Debian 10 terminal.
+
+sudo apt-get upgrade -y
+wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
+sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ buster main'
+sudo apt-get update
+
+#Wine 4.5+ needs libfaudio0 before wine-staging will install, otherwise it will tell you about missing dependencies
+wget https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_10/Release.key
+sudo apt-key add Release.key
+sudo apt-add-repository 'deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_10/ ./'
+sudo apt install libfaudio0 -y
+#Old method (I didn't test the above libfaudio0 install steps, but they should be better than this method)
+#cd ~/Downloads
+#wget -nc https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_10/i386/libfaudio0_20.01-0~buster_i386.deb
+#sudo apt install ./libfaudio0_20.01-0~buster_i386.deb -y
+
+# Wine 5.13 comes with TwisterOS, so we'll use that version
+sudo apt-get install --install-recommends wine-staging-i386=5.13~buster -y
+sudo apt-get install --install-recommends wine-staging=5.13~buster -y
+sudo apt-get install --install-recommends winehq-staging=5.13~buster -y
+wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
+chmod +x winetricks
+sudo mv -v winetricks /usr/local/bin
+sudo apt-get install cabextract -y # needed for winetricks to work
+sudo apt-get install winbind -y # And accept the user prompt: "yes"
+
+# Make a new wineprefix and install all the components we want
+wine wineboot # Don't need to install mono, go ahead and install Gecko
+winetricks -q corefonts dotnet35sp1 vb6run vcrun2015 sound=alsa win7
+
+# Install official Windows NT 4.0 pdh.dll for VARA (the pdh.dll that "winetricks pdh" installs is too new for VARA)
+sudo apt-get install zip -y
+cd ~/Downloads && mkdir pdhNT40 && cd pdhNT40
+wget http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe
+unzip -o nt4pdhdll.exe
+cp pdh.dll ~/.wine/drive_c/windows/system32
+
+cd ~/Downloads
+tar -cvf winebottle.tar ~/.wine # copy the wineprefix into a tar file (to preserve simlinks when we copy the wineprefix to a USB drive)
+```
+
+Plug in a USB drive on your Windows computer, go to VMWare Workstation > Player > Removable Devices and then connect your USB drive to your VMWare Debian computer.
+Now copy the tar file onto a USB drive, open Debian's file explorer to eject the USB drive, then unplug the drive from your Windows machine.
+Put the USB drive into your Pi, and untar its contents (the .wine folder) into your Pi's `~/` directory with `tar -xvf winebottle.tar -C ~/`
+
+You can now install your Windows apps into this wineprefix on the Pi
