@@ -2,6 +2,7 @@
 
 # To run this script, you must first enable Linux (Beta) for Chrome OS from within your settings menu.
 # Follow the guide at this link for more information: https://support.google.com/chromebook/answer/9145439?hl=en
+# Also be sure to enable the "Allow Linux access your microphone" setting (?)
 
 ################ Winlink & VARA Installer Script for Chrome OS ################
 # Author: Eric Wiessner (KI7POL)                                              #
