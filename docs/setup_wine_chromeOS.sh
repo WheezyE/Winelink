@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# To run this script, you must first enable Linux (Beta) for Chrome OS from within your settings menu.
+# To run this script, you must first enable Linux (Beta) for Chrome OS from within your settings menu.  You should allocate about 5 GB for the Linux VM/partition.
 # Follow the guide at this link for more information: https://support.google.com/chromebook/answer/9145439?hl=en
-# Also be sure to enable the "Allow Linux access your microphone" setting (?)
+# You probably won't have to enable the "Allow Linux access your microphone" setting
+
+# If your Chromebook is pretty old or slow, VARA may not play audio correctly and may not be usable.  For example, my Dell Inspiron 3181 (Intel Celeron N3060 @ 1.60GHz, x86-64, 3.795 GB RAM, with Chrome Version 87.0.4280.152) wasn't fast enough to run VARA through RMS Express without audio glitches.  You can find ChromeOS system specs using thirdparty extensions like COG System Info Viewer.  You can also open the chrome browser and find some more info by typing  chrome://system/ to find out your system specs. 
+# VARA may have some graphics glitches on Chrome OS, but should otherwise work to play and hear tones when used with RMS Express if your processor is fast enough.
 
 ################ Winlink & VARA Installer Script for Chrome OS ################
 # Author: Eric Wiessner (KI7POL)                                              #
