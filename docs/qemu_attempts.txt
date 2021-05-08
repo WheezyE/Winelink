@@ -1,0 +1,78 @@
+1. Instructions via https://www.novaspirit.com/2019/04/15/run-x86-arm/
+ - For RPi4, skip steps 1-3 (RPi4 already has the proper kernel for Wine)
+2. Compile a fresh qemu (repo versions may be old/broken): https://github.com/Itai-Nelken/qemu2deb 
+ - Ask Ita for help with qemu-user & qemu-user-static
+###################################### RPi4
+ 
+sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstrap binutils debian-keyring debian-archive-keyring
+
+	cd ~
+	sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
+	sudo mount -t sysfs sys ./chroot-stretch-i386/sys/
+	sudo mount -t proc proc ./chroot-stretch-i386/proc/
+	sudo mount --bind /dev ./chroot-stretch-i386/dev/
+	sudo mount --bind /dev/pts ./chroot-stretch-i386/dev/pts/
+	sudo mount --bind /dev/shm ./chroot-stretch-i386/dev/shm/
+	
+sudo cp /usr/bin/qemu-i386-static ./chroot-stretch-i386/usr/bin/
+#wget https://github.com/multiarch/qemu-user-static/releases/download/v5.2.0-2/qemu-i386-static
+#sudo cp qemu-i386-static ./chroot-stretch-i386/usr/bin/
+
+sudo chroot ./chroot-stretch-i386/ /debootstrap/debootstrap --second-stage # unpack host system. takes about 15 minutes
+
+sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # set up root account
+echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
+echo "export LC_ALL='C'" >> ~/.bashrc
+echo "export DISPLAY=:0" >> ~/.bashrc
+export LANGUAGE='C'
+export LC_ALL='C'
+export DISPLAY=:0
+apt update
+adduser -uid 1000 pi # 1000 should be the same uid number we find if we type in `id` in a non-chroot environment for our pi user.
+# follow prompts to enter dumb info
+apt install -y leafpad # before we exit root i would like to install a x86 gui application, this way it will install the requirements to run gui. so i went with something like “leafpad”
+exit
+
+sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # set up user account
+arch
+echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
+echo "export LC_ALL='C'" >> ~/.bashrc
+echo "export DISPLAY=:0" >> ~/.bashrc
+export LANGUAGE='C'
+export LC_ALL='C'
+export DISPLAY=:0
+exit
+
+sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # install wine
+apt install -y bzip2
+wget --no-check-certificate https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
+tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
+mv ./3.9/bin/wine-preloader ./3.9/bin/wine-preloader.renamed # we need to rename a file for wine to run correctly
+mv ./3.9 /opt/wine-3.9/
+echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+PATH=/opt/wine-3.9/bin/:$PATH
+exit
+
+#since root is not able to use the exported display (“export DISPLAY=:0”) we will need to login to the user account to test wine
+sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi
+echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+PATH=/opt/wine-3.9/bin/:$PATH
+winecfg
+# BUS ERROR
+
+
+
+
+
+
+
+
+#### Uninstaller - doesn't totally work yet...
+	sudo apt remove qemu qemu-user qemu-user-static
+	sudo reboot
+	sudo umount -t sysfs sys ./chroot-stretch-i386/sys/
+	sudo umount -t proc proc ./chroot-stretch-i386/proc/
+	sudo umount /dev ./chroot-stretch-i386/dev/
+	sudo umount /dev/pts ./chroot-stretch-i386/dev/pts/
+	sudo umount /dev/shm ./chroot-stretch-i386/dev/shm/
+	sudo rm -rf ~/chroot-stretch-i386
