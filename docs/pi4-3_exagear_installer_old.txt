@@ -1,6 +1,6 @@
 ###### Winlink and VARA Installer for the Raspberry Pi 4B (working, but not a feasible installer for most users)
 # Author: KI7POL
-# Version: 0.1a
+# Version: 0.1a - AUG 19, 2020
 # About: This script is intended for use on a Raspberry Pi 4B, but should work on a Raspberry Pi 3B+ too.  This script requires you to already have ExaGear Desktop v3.1 installer (from before Eltechs dissolved).  This script will help you install ExaGear, upgrade and patch bugs in ExaGear, install Wine and winetricks inside ExaGear, install pre-requisite components for RMS Express and VARA inside a fresh wineprefix, then help you install and configure RMS Express and VARA to send-receive audio from your sound card.
 #
 # Notes: Telnet does not work yet due to a bug in my .NET sideloader script.  If you want to get Telnet working for now, you can install Wine and winetricks on a separate Linux x86 computer, install dotnet35sp1 in a fresh wineprefix on that computer, then copy the wineprefix over to the Pi - instead of using my weird .NET sideloader script.  This takes a lot of time though and the files can't be shared with other users due to legal constraints with sharing lone Microsoft DLL files.
