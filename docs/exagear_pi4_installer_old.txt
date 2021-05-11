@@ -1,0 +1,215 @@
+###### Winlink and VARA Installer for the Raspberry Pi 4B (working, but not a feasible installer for most users)
+# Author: KI7POL
+# Version: 0.1a
+# About: This script is intended for use on a Raspberry Pi 4B, but should work on a Raspberry Pi 3B+ too.  This script requires you to already have ExaGear Desktop v3.1 installer (from before Eltechs dissolved).  This script will help you install ExaGear, upgrade and patch bugs in ExaGear, install Wine and winetricks inside ExaGear, install pre-requisite components for RMS Express and VARA inside a fresh wineprefix, then help you install and configure RMS Express and VARA to send-receive audio from your sound card.
+#
+# Notes: Telnet does not work yet due to a bug in my .NET sideloader script.  If you want to get Telnet working for now, you can install Wine and winetricks on a separate Linux x86 computer, install dotnet35sp1 in a fresh wineprefix on that computer, then copy the wineprefix over to the Pi - instead of using my weird .NET sideloader script.  This takes a lot of time though and the files can't be shared with other users due to legal constraints with sharing lone Microsoft DLL files.
+# This script avoids sharing of Microsoft DLL's and complies with .NET redistribution terms. It does this by downloading the entire .NET installer before unpacking it into place within a fresh wineprefix.  We have to sideload .NET this way due to a bug in .NET 3.0 XPSEPSC updater that causes installation to fail.
+# I would like to get away from using ExaGear and 'side-loaded' .net eventually since it's hacky and relies on abandonware.
+#
+# Give me shout-out if you use or reference any part of this code.
+ 
+ 
+### Install an x86 emulator.  ExaGear is discontinued (abandonware) and requires us to already have purchased a key before the company dissolved
+ # Install ExaGear Desktop 3.1 for RPi3B+ (use on RPi4B)
+ tar -xvzpf exagear-desktop-v3-1-rpi3.tar.gz # Extract it
+ sudo ./exagear-desktop-v3-1-rpi3/install-exagear.sh
+ # drop your license file into the exagear directory
+ exagear # Activate the ExaGear guest system within the terminal. You're now "inside the x86 world" in the terminal
+ arch # should say "i686" if ExaGear's guest x86 Raspbian OS environment is activated
+ 
+##### future error-checking: only continue if `arch` returns i686
+ 
+################################ Upgrade ExaGear's guest system from Jessie to Stretch #############################
+# This will allow us to use the newer versions of Wine that have RMS Express support
+ sudo sed -i /deb/s/jessie/stretch/g /etc/apt/sources.list
+ sudo sed -i /deb/s/jessie/stretch/g /etc/apt/sources.list.d/*.list
+ sudo apt-get update -y && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y
+ sudo apt-get autoremove -y && sudo apt-get autoclean -y
+ 
+ 
+# These user prompts will pop up during upgrade of Jessie to Stretch for the below packages.  Choose "N" for all of them
+#
+# Configuration file '/etc/mke2fs.conf'
+# ==> Modified (by you or by a script) since installation.
+# ==> Package distributor has shipped an updated version.
+#   What would you like to do about it ?  Your options are:
+#    Y or I  : install the package maintainer's version
+#    N or O  : keep your currently-installed version
+#      D     : show the differences between the versions
+#      Z     : start a shell to examine the situation
+# The default action is to keep your current version.
+#*** mke2fs.conf (Y/I/N/O/D/Z) [default=N] ? N
+#
+# Configuration file '/etc/login.defs'
+# Configuration file '/etc/securetty'
+# Configuration file '/etc/services'
+# Configuration file '/etc/init.d/hwclock.sh'
+# Configuration file '/etc/init.d/checkfs.sh'
+# Configuration file '/etc/init.d/checkroot.sh'
+# Configuration file '/etc/init.d/mountall.sh'
+# Configuration file '/etc/init.d/umountfs'
+# Configuration file '/etc/init.d/umountroot'
+# Configuration file '/etc/systemd/journald.conf'
+# Configuration file '/etc/systemd/logind.conf'
+# Configuration file '/etc/systemd/resolved.conf'
+# Configuration file '/etc/systemd/system.conf'
+# Configuration file '/etc/systemd/timesyncd.conf'
+# Configuration file '/etc/systemd/user.conf'
+# Configuration file '/etc/init.d/procps'
+# Configuration file '/etc/init.d/udev'
+# Configuration file '/etc/init/udevmonitor.conf'
+ 
+cat /etc/os-release # ExaGear's Raspbian should report ... "VERSION_CODENAME=stretch" ...
+ 
+ 
+############### Fix internet issues with ExaGear's operating system ##################
+sudo apt-get install --reinstall libgnutls30
+#sudo cp /usr/lib/i386-linux-gnu/libgnutls-deb0.so.28 /usr/lib/i386-linux-gnu/libgnutls.so.26
+    # Fix "err:winediag:schan_imp_init Failed to load libgnutls, secure connections will not be available."
+ 
+############### Install some tools into ExaGear's Jessie operating system ###########################
+sudo apt-get install cabextract zip p7zip-full winbind nano -y
+# not sure if winbind needed. Nano optional. Cabextract is for winetricks.  7zip is for my dotnet35sp1 side-loader (and for extracting VARA?). 
+ 
+sudo apt-get install software-properties-common -y
+# This is needed to use "add-apt-repository", but it takes 100MB and a long time to install.  It might be easier to just add the line 'deb https://dl.winehq.org/wine-builds/debian/ stretch main' to "/etc/apt/sources.list" .  Maybe installing these packages would prevent errors in the future though?
+ 
+# sudo apt-get install apt-transport-https # For Wine? Already up to date when running 8/20/2020 script. Reinstalling with "install --reinstall" doesn't change anything.
+ 
+############### Upgrade Wine from eltechs 3.0 to a newer version for Jessie #############################
+### Update Wine to latest version for Raspbian Jessie (ExaGear runs a custom version of wine 3.0, which is too old to run RMS Express.  We should update ExaGear's Wine to v4.12.1 or newer for Jessie.)
+# More info: https://wiki.winehq.org/Debian
+ 
+wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
+sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ stretch main'
+sudo apt-get update
+sudo apt-get install --install-recommends winehq-stable=5.0.2~stretch -y # This version worked for me.  This takes 800MB and about 20 minutes on a Pi 4B.
+wine --version # should read something like "wine-4.12.1" (not "wine-3.0-eltechs")
+ 
+  # We can also remove/upgrade/downgrade Wine with some of these commands
+  #sudo apt remove wine-staging # or whatever your installed version is
+  #sudo apt-get update --fix-missing
+  #sudo apt install wine-stable-i386 -y && sudo apt install wine-stable -y # or whatever version you want to install is
+ 
+### Now you can run x86 Windows .exe files with Wine and install/run programs on your Raspberry Pi. 
+ 
+ 
+ 
+################# Install the latest Winetricks ###########################
+# sudo apt-get remove winetricks -y # Make sure you don't already have it installed
+# sudo apt-get purge winetricks -y
+ wget  https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
+ chmod +x winetricks
+ sudo mv -v winetricks /usr/local/bin 
+ 
+ 
+### Restart?
+# If Wine errors after "... wine: configuration in '/home/pi/.wine' has been updated."  Try rebooting or installing winetricks, then run Wine again.
+#exit
+#sudo reboot
+#exagear
+ 
+ 
+################################## Make a new wineprefix ######################################
+# sudo rm -rf ~/.wine # remove any wine installations (called wineprefixes)
+ 
+# Download gecko so that wine will install it on wineboot
+# cd ~/.cache
+# mkdir wine
+# cd wine
+# wget http://dl.winehq.org/wine/wine-gecko/2.47.1/wine-gecko-2.47.1-x86.msi
+# cd ~
+ 
+# Install a new wineprefix (32-bit). (Disable the display so install won't wait for user input)
+ DISPLAY= WINEARCH=win32 wineboot
+ 
+ 
+ 
+################################ Install Prerequisites inside the Wineprefix ####################
+winetricks -q corefonts dotnet20
+ 
+### Sideload the .NET 3.5 SP1 installer.
+# The original .NET 3.5 SP1 installer gets hung up on ~/Downloads/dotnet35s1extract/wcu/dotNetFramework/dotNetFX30/XPSEPSC-x86-en-US/update/update.exe and then fails to install any other .net packs.  .NET 3.5 contains 2.0 sp1&2, 3.0, and 3.5, and 3.5sp1, all installed in sequence.
+# I'm considering trying to debug and patch the hangup using a winetricks install of ollydbg some time, which would get rid of the need for this hacky 'sideloader' I made.
+# The sideloader works, but doesn't install dotnet2.0 correctly.  The user should install dotnet20, then run the sideloader, but even then Winlink's internet won't work for some reason using the sideloader.  Winlink's internet does work though if dotnet35sp1 is installed correctly on another linux computer's wine install and the wineprefix '.wine' is copied and pasted to the Pi.
+ 
+ cd ~/Downloads
+ wget https://pastebin.com/raw/ZPEvVf8v && mv ZPEvVf8v dotnet35sp1-sideloader.sh
+ sudo apt-get install dos2unix -y
+ dos2unix dotnet35sp1-sideloader.sh
+ sudo chmod +x dotnet35sp1-sideloader.sh
+ ./dotnet35sp1-sideloader.sh
+ 
+### Install other pre-reqs for RMS Express and VARA
+ winetricks -q vb6run vcrun2015 sound=alsa win7
+ # IE6 is needed to fix a stall in the Winlink HF Channel Selector (still doesn't download though)
+ # Install gecko and mono too? 
+ 
+################################ Download and Install Software into your Wineprefix #############################
+ 
+### Install Winlink and VARA
+ # Download & Unzip Winlink Express (formerly RMS Express): https://downloads.winlink.org/User%20Programs/
+ cd ~/Downloads && wget -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs
+ 7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller"
+ 
+ # Download VARA 4.0.4: https://rosmodem.wordpress.com/
+ sudo apt-get install megatools -y
+ cd ~/Downloads && megadl 'https://mega.nz/file/KKADiKzI#trSLvMs8nuPvROtchLfuDexCmEhdQdtpf2MG5OaDBzE'
+ 7z x VARA*.zip -o"VARAInstaller"
+ 
+ # Install old official pdh.dll
+  # The official pdh.dll (installed with "winetricks pdh") is too new for VARA.
+  # Wine's built-in pdh.dll is not functional for VARA.
+  # We need an older Windows pdh.dll
+ cd ~/Downloads && mkdir pdhNT40 && cd pdhNT40
+ wget http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe
+ unzip -o nt4pdhdll.exe
+ cp pdh.dll ~/.wine/drive_c/windows/system32
+ cd ~/Downloads
+ 
+# Install Winlink
+ wine ~/Downloads/WinlinkExpressInstaller/Winlink_Express_install.exe
+ 
+# Install VARA
+ wine ~/Downloads/VARAInstaller/VARA\ setup*.exe
+ 
+# In winecfg, go to the Audio tab to set up your default in/out soundcards.
+ winecfg
+ 
+# Run VARA and set up your in/out soundcard (go to Settings ... Soundcard).
+ wine ~/.wine/drive_c/VARA/VARA.exe
+ 
+# Run RMS Express and configuration your audio devices (go to WINMOR's "Help > Basic Setup" dialog tab).
+ # Enter your callsign, gridsqure, and soundcard output (avoid pulseaudio; ALSA works fine)
+ # For changes to WINMOR's configuration to take effect, you may need to restart the application (Help > Close)
+ wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
+ 
+# Select VARA from the drop-down on the top-right, then click the "Open Session:" text next to the dropdown. Then pick a channel (this may take a while to load the channels), then click start.  Noise should play from the soundcard.
+ 
+ 
+# Known bugs:
+# The Channel Selector is functional, it just takes about 5 minutes to update its propagation indices and sometimes crashes the first time it's loaded.  Just restart it if it crashes.  If you let it run for 5 minutes, then you shouldn't have to do that again - just don't hit the Update Table Via Internet button.  If anybody figures out a fix for this, let me know.  I'm currently experimenting with ITS HF: http://www.greg-hand.com/hfwin32.html
+ 
+ 
+ 
+ 
+ 
+############# Future work - other software ##############
+ 
+### N3FJP's logging software: Seems to run a little slow, but otherwise works.
+# wget http://www.n3fjp.com/programs/ACLOGINST.exe
+# wget http://n3fjp.com/programs/FIELDDAY.exe
+ 
+# Fix errors with .mdb files not opening or being created
+# winetricks dotnet45 # this will uninstall mono?
+ 
+# Note: After .NET 4.0 installs, wine will appear to be erroring in a loop.  Let it loop run its weird error loops for about 15 minutes.  After this time a .NET 4.5 installer will pop up.  Install goes much faster on a Pi 4B (about 30 minutes) than on a Pi 3B+ (about 2 hours), the Pi will overheat a few times and kick you out of any VNC remote connections - just let it keep running.
+ 
+    
+### List of other Windows ham radio programs compatible with Wine: https://appdb.winehq.org/objectManager.php?sClass=category&iId=125&sAction=view&sTitle=Browse+Applications
+ 
+ 
+# Credits
+# K6ETA's blog
+# KM4ACK for inspiration
