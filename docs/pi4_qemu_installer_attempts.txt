@@ -98,6 +98,138 @@ winecfg
 	
 	
 	
+	
+#####################################################################################################
+
+#Novaspirit guide distilled (testing on RPi4 - currently broken)
+ 
+sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstrap binutils debian-keyring debian-archive-keyring
+
+# Now delete all /usr/bin/qemu*-static files
+# Now copy all newly compiled qemu-user and qemu-user-static files to /usr/bin/
+
+	cd ~
+	sudo debootstrap --foreign --arch amd64 stretch ./chroot-stretch-amd64 http://ftp.us.debian.org/debian
+	sudo mount -t sysfs sys ./chroot-stretch-amd64/sys/
+	sudo mount -t proc proc ./chroot-stretch-amd64/proc/
+	sudo mount --bind /dev ./chroot-stretch-amd64/dev/
+	sudo mount --bind /dev/pts ./chroot-stretch-amd64/dev/pts/
+	sudo mount --bind /dev/shm ./chroot-stretch-amd64/dev/shm/
+	
+sudo cp /usr/bin/qemu-x86_64-static ./chroot-stretch-amd64/usr/bin/
+
+sudo chroot ./chroot-stretch-amd64/ /debootstrap/debootstrap --second-stage # unpack host system. takes about 15 minutes
+
+sudo chroot /home/pi/chroot-stretch-amd64/ /bin/su -l root # set up root account
+arch # should say x86_64
+echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
+echo "export LC_ALL='C'" >> ~/.bashrc
+echo "export DISPLAY=:0" >> ~/.bashrc
+export LANGUAGE='C'
+export LC_ALL='C'
+export DISPLAY=:0
+apt update
+adduser -uid 1000 pi # 1000 should be the same uid number we find if we type in `id` in a non-chroot environment for our pi user.
+## follow prompts to enter dumb info
+#expect "Enter new UNIX password:"
+#send "raspberry\r"
+#expect "Retype new UNIX password:"
+#send "raspberry\r"
+#expect "Full Name []:"
+#send "\r"
+#expect "Room Number []:"
+#send "\r"
+#expect "Work Phone []:"
+#send "\r"
+#expect "Home Phone []:"
+#send "\r"
+#expect "Other []:"
+#send "\r"
+#expect "Is the information correct? [Y/n]"
+#send "Y\r"
+#expect eof
+apt install -y leafpad # install any x86 gui application so that requirements to run gui will also be installed. Takes about 5 min
+apt --fix-broken install
+exit
+
+sudo chroot /home/pi/chroot-stretch-amd64/ /bin/su -l pi # set up user account
+arch # should say x86_64
+echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
+echo "export LC_ALL='C'" >> ~/.bashrc
+echo "export DISPLAY=:0" >> ~/.bashrc
+export LANGUAGE='C'
+export LC_ALL='C'
+export DISPLAY=:0
+exit
+
+# Install wine as root
+sudo chroot /home/pi/chroot-stretch-amd64/ /bin/su -l root
+apt install -y bzip2
+wget --no-check-certificate https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
+tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
+mv ./3.9/bin/wine-preloader ./3.9/bin/wine-preloader.renamed # we need to rename a file for wine to run correctly
+mv ./3.9 /opt/wine-3.9/
+echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+PATH=/opt/wine-3.9/bin/:$PATH
+exit
+
+#since root is not able to use the exported display (“export DISPLAY=:0”) we will need to login to the user account to test wine
+sudo chroot /home/pi/chroot-stretch-amd64/ /bin/su -l pi
+echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+PATH=/opt/wine-3.9/bin/:$PATH
+winecfg
+# "/lib/ld-linux.so.2: No such file or directory" - Happens with (qemu-user & qemu-user-static v1:6.0.50 armhf)
+
+#######################################################################
+#1. Try copying i386 linux libs https://superuser.com/questions/396044/qemu-i386-on-arm-processor-giving-ld-linux-so-2-error
+#2. Try rebooting https://www.raspberrypi.org/forums/viewtopic.php?f=41&t=226376&sid=d28e33dacb61b345a8ce6691122c121a&start=75
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 ################
 # Scouting out file contents of necessary deb files to see what files I need if I build my own qemu-user packages (and binfmt?)
 
