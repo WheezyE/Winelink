@@ -79,9 +79,9 @@ exit
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi
 echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
 PATH=/opt/wine-3.9/bin/:$PATH
-winecfg
+#winecfg
 # "Bus error" - Happens with (qemu-user & qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf) and with (qemu-user & qemu-user-static v1:6.0.50 armhf)
-
+sudo reboot # will fix the bus error
 
 
 
