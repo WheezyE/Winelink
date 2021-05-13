@@ -83,6 +83,13 @@ PATH=/opt/wine-3.9/bin/:$PATH
 # "Bus error" - Happens with (qemu-user & qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf) and with (qemu-user & qemu-user-static v1:6.0.50 armhf)
 sudo reboot # will fix the bus error
 
+#In root...
+#install winbind? Reinstall libgnutls30?
+#wget --no-check-certificate https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # download
+#chmod +x winetricks 
+#sudo mv winetricks /usr/local/bin # install
+#sudo apt-get install cabextract -y # winetricks needs this
+#To do: set up sudo access in user acct
 
 
 #### Uninstaller - doesn't totally work yet...
