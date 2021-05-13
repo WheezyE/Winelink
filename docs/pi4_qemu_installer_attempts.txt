@@ -8,6 +8,9 @@
  
 sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstrap binutils debian-keyring debian-archive-keyring
 
+# Now delete all /usr/bin/qemu*-static files
+# Now copy all newly compiled qemu-user and qemu-user-static files to /usr/bin/
+
 	cd ~
 	sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
 	sudo mount -t sysfs sys ./chroot-stretch-i386/sys/
@@ -17,12 +20,11 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 	sudo mount --bind /dev/shm ./chroot-stretch-i386/dev/shm/
 	
 sudo cp /usr/bin/qemu-i386-static ./chroot-stretch-i386/usr/bin/
-#wget https://github.com/multiarch/qemu-user-static/releases/download/v5.2.0-2/qemu-i386-static
-#sudo cp qemu-i386-static ./chroot-stretch-i386/usr/bin/
 
 sudo chroot ./chroot-stretch-i386/ /debootstrap/debootstrap --second-stage # unpack host system. takes about 15 minutes
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # set up root account
+arch # should say i686
 echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
 echo "export LC_ALL='C'" >> ~/.bashrc
 echo "export DISPLAY=:0" >> ~/.bashrc
@@ -31,12 +33,29 @@ export LC_ALL='C'
 export DISPLAY=:0
 apt update
 adduser -uid 1000 pi # 1000 should be the same uid number we find if we type in `id` in a non-chroot environment for our pi user.
-# follow prompts to enter dumb info
-apt install -y leafpad # before we exit root i would like to install a x86 gui application, this way it will install the requirements to run gui. so i went with something like “leafpad”
+## follow prompts to enter dumb info
+#expect "Enter new UNIX password:"
+#send "raspberry\r"
+#expect "Retype new UNIX password:"
+#send "raspberry\r"
+#expect "Full Name []:"
+#send "\r"
+#expect "Room Number []:"
+#send "\r"
+#expect "Work Phone []:"
+#send "\r"
+#expect "Home Phone []:"
+#send "\r"
+#expect "Other []:"
+#send "\r"
+#expect "Is the information correct? [Y/n]"
+#send "Y\r"
+#expect eof
+apt install -y leafpad # install any x86 gui application so that requirements to run gui will also be installed. Takes about 5 min
 exit
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # set up user account
-arch
+arch # should say i686
 echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
 echo "export LC_ALL='C'" >> ~/.bashrc
 echo "export DISPLAY=:0" >> ~/.bashrc
@@ -45,7 +64,8 @@ export LC_ALL='C'
 export DISPLAY=:0
 exit
 
-sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # install wine
+# Install wine as root
+sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root
 apt install -y bzip2
 wget --no-check-certificate https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
 tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
@@ -60,7 +80,7 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi
 echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
 PATH=/opt/wine-3.9/bin/:$PATH
 winecfg
-# BUS ERROR
+# "Bus error" - Happens with (qemu-user & qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf) and with (qemu-user & qemu-user-static v1:6.0.50 armhf)
 
 
 
