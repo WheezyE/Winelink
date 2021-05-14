@@ -11,94 +11,90 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 # Now delete all /usr/bin/qemu*-static files
 # Now copy all newly compiled qemu-user and qemu-user-static files to /usr/bin/
 
-	cd ~
-	sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
-	sudo mount -t sysfs sys ./chroot-stretch-i386/sys/
-	sudo mount -t proc proc ./chroot-stretch-i386/proc/
-	sudo mount --bind /dev ./chroot-stretch-i386/dev/
-	sudo mount --bind /dev/pts ./chroot-stretch-i386/dev/pts/
-	sudo mount --bind /dev/shm ./chroot-stretch-i386/dev/shm/
+cd ~
+sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
+sudo mount -t sysfs sys ./chroot-stretch-i386/sys/
+sudo mount -t proc proc ./chroot-stretch-i386/proc/
+sudo mount --bind /dev ./chroot-stretch-i386/dev/
+sudo mount --bind /dev/pts ./chroot-stretch-i386/dev/pts/
+sudo mount --bind /dev/shm ./chroot-stretch-i386/dev/shm/
 	
 sudo cp /usr/bin/qemu-i386-static ./chroot-stretch-i386/usr/bin/
 
 sudo chroot ./chroot-stretch-i386/ /debootstrap/debootstrap --second-stage # unpack host system. takes about 15 minutes
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # set up root account
-arch # should say i686
-echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
-echo "export LC_ALL='C'" >> ~/.bashrc
-echo "export DISPLAY=:0" >> ~/.bashrc
-export LANGUAGE='C'
-export LC_ALL='C'
-export DISPLAY=:0
-apt update
-adduser -uid 1000 pi # 1000 should be the same uid number we find if we type in `id` in a non-chroot environment for our pi user.
-## follow prompts to enter dumb info
-#expect "Enter new UNIX password:"
-#send "raspberry\r"
-#expect "Retype new UNIX password:"
-#send "raspberry\r"
-#expect "Full Name []:"
-#send "\r"
-#expect "Room Number []:"
-#send "\r"
-#expect "Work Phone []:"
-#send "\r"
-#expect "Home Phone []:"
-#send "\r"
-#expect "Other []:"
-#send "\r"
-#expect "Is the information correct? [Y/n]"
-#send "Y\r"
-#expect eof
-apt install -y leafpad # install any x86 gui application so that requirements to run gui will also be installed. Takes about 5 min
+    arch # should say i686
+    echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
+    echo "export LC_ALL='C'" >> ~/.bashrc
+    echo "export DISPLAY=:0" >> ~/.bashrc
+    export LANGUAGE='C'
+    export LC_ALL='C'
+    export DISPLAY=:0
+    apt update
+    adduser -uid 1000 pi # 1000 should be the same uid number we find if we type in `id` in a non-chroot environment for our pi user.
+    ## follow prompts to enter dumb info
+    #expect "Enter new UNIX password:"
+    #send "raspberry\r"
+    #expect "Retype new UNIX password:"
+    #send "raspberry\r"
+    #expect "Full Name []:"
+    #send "\r"
+    #expect "Room Number []:"
+    #send "\r"
+    #expect "Work Phone []:"
+    #send "\r"
+    #expect "Home Phone []:"
+    #send "\r"
+    #expect "Other []:"
+    #send "\r"
+    #expect "Is the information correct? [Y/n]"
+    #send "Y\r"
+    #expect eof
+    apt install -y leafpad # install any x86 gui application so that requirements to run gui will also be installed. Takes about 5 min
 exit
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # set up user account
-arch # should say i686
-echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
-echo "export LC_ALL='C'" >> ~/.bashrc
-echo "export DISPLAY=:0" >> ~/.bashrc
-export LANGUAGE='C'
-export LC_ALL='C'
-export DISPLAY=:0
+    arch # should say i686
+    echo "export LANGUAGE='C'" >> ~/.bashrc #Add lines to bashrc, then initialize them too four our shell instance
+    echo "export LC_ALL='C'" >> ~/.bashrc
+    echo "export DISPLAY=:0" >> ~/.bashrc
+    export LANGUAGE='C'
+    export LC_ALL='C'
+    export DISPLAY=:0
 exit
 
 # Log in as root to install sudo (and wine)
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root
-apt install -y bzip2 cabextract
+    apt install -y bzip2 cabextract # winetricks needs cabextract
+    
+    #install winbind? Reinstall libgnutls30?
+    #wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # download
+    #chmod +x winetricks 
+    #sudo mv winetricks /usr/local/bin # install
 
-apt install -y sudo # Give the pi (user) chroot account sudo access
-echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    apt install -y sudo # Give the pi (user) chroot account sudo access
+    echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-apt install -y ca-certificates # Teach wget to trust websites
+    apt install -y ca-certificates # Teach wget to trust websites
 
-wget https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
-tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
-mv ./3.9/bin/wine-preloader ./3.9/bin/wine-preloader.renamed # we need to rename a file for wine to run correctly
-mv ./3.9 /opt/wine-3.9/
-echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
-PATH=/opt/wine-3.9/bin/:$PATH
-
+    wget https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
+    tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
+    mv ./3.9/bin/wine-preloader ./3.9/bin/wine-preloader.renamed # we need to rename a file for wine to run correctly
+    mv ./3.9 /opt/wine-3.9/
+    echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+    PATH=/opt/wine-3.9/bin/:$PATH
 exit
-
 
 #since root is not able to use the exported display (“export DISPLAY=:0”) we will need to login to the user account to test wine
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi
-echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
-PATH=/opt/wine-3.9/bin/:$PATH
-#winecfg # "Bus error" - Happens with (qemu-user & qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf) and with (qemu-user & qemu-user-static v1:6.0.50 armhf)
+    echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+    PATH=/opt/wine-3.9/bin/:$PATH
+    #winecfg # "Bus error" - Happens with (qemu-user & qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf) and with (qemu-user & qemu-user-static v1:6.0.50 armhf)
 exit
 #sudo reboot # will fix the bus error
 sudo systemctl restart systemd-binfmt # maybe just need to restart binfmt?
 
-#In root...
-#install winbind? Reinstall libgnutls30?
-#wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # download
-#chmod +x winetricks 
-#sudo mv winetricks /usr/local/bin # install
-#sudo apt-get install cabextract -y # winetricks needs this
-#To do: set up sudo access in user acct
 
 
 #### Uninstaller - doesn't totally work yet...
