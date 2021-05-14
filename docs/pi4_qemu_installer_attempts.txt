@@ -64,16 +64,20 @@ export LC_ALL='C'
 export DISPLAY=:0
 exit
 
-# Install wine as root
+# Log in as root to install sudo (and wine)
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root
-apt install -y bzip2
+apt install -y bzip2 cabextract sudo
+echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers # Give the pi (user) chroot account sudo access
+
 wget --no-check-certificate https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
 tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
 mv ./3.9/bin/wine-preloader ./3.9/bin/wine-preloader.renamed # we need to rename a file for wine to run correctly
 mv ./3.9 /opt/wine-3.9/
 echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
 PATH=/opt/wine-3.9/bin/:$PATH
+
 exit
+
 
 #since root is not able to use the exported display (“export DISPLAY=:0”) we will need to login to the user account to test wine
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi
