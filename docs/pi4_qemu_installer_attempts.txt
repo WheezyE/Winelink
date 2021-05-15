@@ -110,6 +110,7 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account 
     chmod +x winetricks 
     sudo mv winetricks /usr/local/bin
     sudo apt install -y cabextract # winetricks needs cabextract
+    # If getting this error: "w_die wine cmd.exe /c echo '%ProgramFiles%' returned unexpanded string '%SystemDrive%\Program Files'" then try modifying winetricks like this https://github.com/novaspirit/winetricks/commit/3fd18ad6497de5a2deb4f2ba7279ab5f1e9018b1
     
 	    # Official winehq installer (needs custom qemu?)
             #wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - 
