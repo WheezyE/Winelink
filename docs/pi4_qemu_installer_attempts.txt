@@ -95,6 +95,7 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account 
     dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer # NOTE: Make sure these dpkg command matches the filename of the deb package you just downloaded
     dpkg-deb -xv wine-devel_5.21~buster_i386.deb wine-installer
     mv ~/Downloads/wine-installer/opt/wine* ~/wine
+    mv ~/wine/bin/wine-preloader ~/wine/bin/wine-preloader.renamed # !!SEE IF RENAMING THIS HELPS MEMORY ALLOCATION ERRORS WITH QEMU - Also check exagear wine sources to see if they direct wine-preloader to allocate memory somewhere else
     rm wine*.deb # clean up
     rm -rf wine-installer # clean up
         
@@ -109,19 +110,21 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account 
     chmod +x winetricks 
     sudo mv winetricks /usr/local/bin
     sudo apt install -y cabextract # winetricks needs cabextract
-
-            #wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - # Official winehq installer (needs custom qemu?)
+    
+	    # Official winehq installer (needs custom qemu?)
+            #wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - 
             #echo 'deb https://dl.winehq.org/wine-builds/debian/ stretch main' | sudo tee -a /etc/apt/sources.list
             #sudo apt install -y apt-transport-https
             #sudo apt-get update
-            #sudo apt-get install --install-recommends winehq-stable=5.0.2~stretch -y # This version worked for me.  This takes 800MB and about 20 minutes on a Pi 4B.
+            #sudo apt-get install --install-recommends winehq-stable=5.0.2~stretch -y # This takes 800MB and about 20 minutes on a Pi 4B.
+	    #!!TRY RENAMING wine-preloader TO SEE IF THIS GETS RID OF MEMORY ALLOCATION COLLISIONS WITH QEMU
             #wineboot # memory allocation errors https://forum.winehq.org/viewtopic.php?f=8&t=34849&p=133017#p133017
 
-            # Old PlayOnLinux wine install method (Novaspirit guide - libgnutls errors??)
-            #echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
-            #PATH=/opt/wine-3.9/bin/:$PATH
+		    # Old PlayOnLinux wine install method (Novaspirit guide - libgnutls errors??)
+		    #echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+		    #PATH=/opt/wine-3.9/bin/:$PATH
 
-    winecfg # "Bus error" may happen here (with qemu-user / qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf & qemu-user / qemu-user-static v1:6.0.50 armhf)
+    winecfg # "Bus error" may happen here (with qemu-user / qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf & qemu-user / qemu-user-static v1:6.0.50 armhf). Try rebooting.
 exit
 
 
