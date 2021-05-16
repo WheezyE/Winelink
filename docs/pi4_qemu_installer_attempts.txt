@@ -32,26 +32,49 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Set up root account
     export LC_ALL='C'
     export DISPLAY=:0
     apt update
-    adduser -uid 1000 pi # 1000 should be the same uid number we find if we type in `id` in a non-chroot environment for our pi user.
-    ## follow prompts to enter dumb info
-    expect "Enter new UNIX password:"
-    send "raspberry\r"
-    expect "Retype new UNIX password:"
-    send "raspberry\r"
-    expect "Full Name []:"
-    send "\r"
-    expect "Room Number []:"
-    send "\r"
-    expect "Work Phone []:"
-    send "\r"
-    expect "Home Phone []:"
-    send "\r"
-    expect "Other []:"
-    send "\r"
-    expect "Is the information correct? [Y/n]"
-    send "Y\r"
-    expect eof
+    
     apt install -y leafpad # install any x86 gui application so that requirements to run gui will also be installed. Takes about 5 min
+    apt install -y bzip2 # for extracting POL files in case we need that
+    apt install -y ca-certificates # Teach wget to trust websites
+    
+    apt install -y sudo # Give the pi (user) chroot account sudo access
+    echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    
+    #apt install winbind # don't think we need this even though wine complains about it
+    #apt install --reinstall libgnutls30 # not sure what to do about this yet (also not sure if libgnutls wine errors are just old wine bugs from POL version)
+    
+    apt install -y expect # Install expect so that we can automate the user account installation
+    chmod 666 /dev/ptmx
+    chmod 755 /dev/pts
+    mount -t devpts -o gid=5,mode=620 none /dev/pts
+    
+cat >~/setupusr.sh <<EOF
+#!/usr/bin/expect -f
+set force_conservative 0
+set timeout -1
+spawn adduser -uid 1000 pi # I think the uid number should be the same number as your non-chroot pi uid
+match_max 100000
+expect "Enter new UNIX password: "
+send -- "raspberry\r"
+expect "Retype new UNIX password: "
+send -- "raspberry\r"
+expect -exact "Full Name \[\]: "
+send -- "\r"
+expect -exact "Room Number \[\]: "
+send -- "\r"
+expect -exact "Work Phone \[\]: "
+send -- "\r"
+expect -exact "Home Phone \[\]: "
+send -- "\r"
+expect -exact "Other \[\]: "
+send -- "\r"
+expect -exact "Is the information correct? \[Y/n\] "
+send -- "Y\r"
+expect eof
+EOF
+chmod +x ~/setupusr.sh
+./setupusr.sh
+rm setupusr.sh
 exit
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Set up user account
@@ -64,47 +87,38 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Set up user account
     export DISPLAY=:0
 exit
 
-sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Log in as root to install sudo (and wine & some other stuff)
-    apt install -y bzip2
-    
-    #apt install winbind # don't think we need this even though wine complains about it
-    #apt install --reinstall libgnutls30 # not sure what to do about this yet (also not sure if libgnutls wine errors are just old wine bugs from POL version)
-
-    apt install -y sudo # Give the pi (user) chroot account sudo access
-    echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
-    apt install -y ca-certificates # Teach wget to trust websites
-    
+sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Log in as root to install wine
             # Old PlayOnLinux wine install method (Novaspirit guide)
-            #wget https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
-            #tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
-            #mv ./3.9/bin/wine-preloader ./3.9/bin/wine-preloader.renamed # we need to rename a file for wine to run correctly
-            #mv ./3.9 /opt/wine-3.9/
-            #echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
-            #PATH=/opt/wine-3.9/bin/:$PATH
+            wget https://www.playonlinux.com/wine/binaries/linux-x86/PlayOnLinux-wine-3.9-linux-x86.pol
+            tar -jxvf PlayOnLinux-wine-3.9-linux-x86.pol --strip-components=1
+            mv ./3.9/bin/wine-preloader ./3.9/bin/wine-preloader.renamed # we need to rename a file for wine to run correctly
+            mv ./3.9 /opt/wine-3.9/
+            echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+            PATH=/opt/wine-3.9/bin/:$PATH
 exit
 
-#sudo reboot # fixed the bus error
-sudo systemctl restart systemd-binfmt # maybe just need to restart binfmt?
+sudo reboot # fixed the bus error
+#sudo systemctl restart systemd-binfmt # maybe just need to restart binfmt?
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account can run wine (root account can't use exported display / “export DISPLAY=:0”)
+    arch # should say i686
     mkdir ~/Downloads
-    cd ~/Downloads/
-    wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_5.21~buster_i386.deb # NOTE: Replace this link with the version you want
-    wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel_5.21~buster_i386.deb  # NOTE: Also replace this link with the version you want
-    dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer # NOTE: Make sure these dpkg command matches the filename of the deb package you just downloaded
-    dpkg-deb -xv wine-devel_5.21~buster_i386.deb wine-installer
-    mv ~/Downloads/wine-installer/opt/wine* ~/wine
-    mv ~/wine/bin/wine-preloader ~/wine/bin/wine-preloader.renamed # !!SEE IF RENAMING THIS HELPS MEMORY ALLOCATION ERRORS WITH QEMU - Also check exagear wine sources to see if they direct wine-preloader to allocate memory somewhere else
-    rm wine*.deb # clean up
-    rm -rf wine-installer # clean up
+    #cd ~/Downloads/
+    #wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_5.21~buster_i386.deb # NOTE: Replace this link with the version you want
+    #wget https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel_5.21~buster_i386.deb  # NOTE: Also replace this link with the version you want
+    #dpkg-deb -xv wine-devel-i386_5.21~buster_i386.deb wine-installer # NOTE: Make sure these dpkg command matches the filename of the deb package you just downloaded
+    #dpkg-deb -xv wine-devel_5.21~buster_i386.deb wine-installer
+    #mv ~/Downloads/wine-installer/opt/wine* ~/wine
+    #mv ~/wine/bin/wine-preloader ~/wine/bin/wine-preloader.renamed # !!SEE IF RENAMING THIS HELPS MEMORY ALLOCATION ERRORS WITH QEMU - Also check exagear wine sources to see if they direct wine-preloader to allocate memory somewhere else
+    #rm wine*.deb # clean up
+    #rm -rf wine-installer # clean up
         
-    echo -e '#!/bin/bash\nsetarch linux32 -L '"$HOME/wine/bin/wine "'"$@"' | sudo tee -a /usr/local/bin/wine >/dev/null # Script to launch wine programs as 32bit only
-    #sudo ln -s ~/wine/bin/wine /usr/local/bin/wine # We could also just make a symlink, but our qemu i386 environment only works for 32bit apps
-    sudo ln -s ~/wine/bin/wineboot /usr/local/bin/wineboot
-    sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
-    sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
-    sudo chmod +x /usr/local/bin/wine /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver
+    #echo -e '#!/bin/bash\nsetarch linux32 -L '"$HOME/wine/bin/wine "'"$@"' | sudo tee -a /usr/local/bin/wine >/dev/null # Script to launch wine programs as 32bit only
+    ##sudo ln -s ~/wine/bin/wine /usr/local/bin/wine # We could also just make a symlink, but our qemu i386 environment only works for 32bit apps
+    #sudo ln -s ~/wine/bin/wineboot /usr/local/bin/wineboot
+    #sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
+    #sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
+    #sudo chmod +x /usr/local/bin/wine /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver
 	
     wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # Install winetricks
     chmod +x winetricks 
@@ -122,8 +136,8 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account 
             #wineboot # memory allocation errors https://forum.winehq.org/viewtopic.php?f=8&t=34849&p=133017#p133017
 
 		    # Old PlayOnLinux wine install method (Novaspirit guide - libgnutls errors??)
-		    #echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
-		    #PATH=/opt/wine-3.9/bin/:$PATH
+		    echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
+		    PATH=/opt/wine-3.9/bin/:$PATH
 
     winecfg # "Bus error" may happen here (with qemu-user / qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf & qemu-user / qemu-user-static v1:6.0.50 armhf). Try rebooting.
 exit
