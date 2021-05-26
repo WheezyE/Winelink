@@ -1,5 +1,8 @@
 # Fair warning: This script is work in progress and is currently kind of a mess.  I'm still trying to get a reliably reproducable install.  Bus error keeps getting thrown inconsistently - though it has worked on one install (not sure the conditions yet).  On the working install, wine had collisions with qemu memory allocations, which is why (I believe) novaspirit disabled the wine preloader (which probably reserves memory)
 
+# I got this working once (though with wine mem access errors) by compiling a custom .deb file from ita-nelkin's github, modifying its install script, then compiling a custom qemu-user-static and packing its binaries into an older qemu-user-static repo deb, then installing both of those (to leverage the repo's postinst binfmt setup script).
+# Other instructions: https://forum.pine64.org/showthread.php?tid=8979
+
 cd ~
 sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstrap binutils debian-keyring debian-archive-keyring
 
@@ -8,28 +11,23 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 #sudo chmod +x qemu-i386-static
 #sudo mv qemu-i386-static /usr/bin/
 
+    sudo apt install -y ninja-build # command from my own memory - untested
     cd ~/Downloads
     git clone https://git.qemu.org/git/qemu.git
     cd qemu
-    ./configure \
-        --prefix=$(cd ..; pwd)/qemu-user-static \
-        --static \
-        --disable-system \
-        --enable-linux-user \
-        --enable-sdl \
-        --enable-opengl \
-        --audio-drv-list=pa \
-        --enable-kvm
-    #make -j$CORES
-    #sudo make install
-    ninja -C build  || error "Failed to run ninja -C build'!"
+    #git submodule update --init --recursive # Optional instruction from pinebook guide
+    ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user --target-list=i386-linux-user --disable-tools # Pinebook guide
+    #./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user --enable-sdl --enable-opengl --audio-drv-list=pa --enable-kvm # This worked once
+    #make -j$CORES && sudo make install # slower build method
+    ninja -C build
     sudo ninja install -C build
     cd ../qemu-user-static/bin
     for i in *; do sudo mv $i $i-static; done
     
     sudo rm /usr/bin/qemu-*-static
     sudo chmod +x qemu-*-static
-    sudo mv qemu-*-static /usr/bin/
+    sudo cp qemu-*-static /usr/bin/
+    # cd ~ && sudo rm -rf ~/Downloads/qemu-user-static ~/Downloads/qemu # clean up
 
 # Notes about qemu-user-static: 
 # 1. The debian repo qemu-user-static file (qemu-i386-static) is too old and will probably give us the "bus error" message when running wine later.
@@ -40,16 +38,24 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 ## Register qemu-user-static (/usr/bin/qemu-i386-static binary file) into binfmt - warning untested
 ## https://github.com/Itai-Nelken/qemu2deb/issues/11#issuecomment-840991848
 #
-##i386 variables			
-#magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
-#mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+##i386 variables (from deb file postinst script)
+#magic='\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+#mask='\xff\xff\xff\xff\xff\xfe\xfe\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
 #fmt=i386
+#
+##Newer i386 variables? (from https://github.com/qemu/qemu/blob/d45a5270d075ea589f0b0ddcf963a5fea1f500ac/scripts/qemu-binfmt-conf.sh )
+##magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+##mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+##fmt=i386
+#
+## Remove old qemu-i386-static binfmt registration
+#sudo /usr/sbin/./update-binfmts --package qemu-user-static --remove qemu-$fmt /usr/bin/qemu-$fmt-static
 #
 ##binfmt qemu-ARCHITECTURE-static registration
 #sudo /usr/sbin/./update-binfmts --package qemu-user-static --install qemu-$fmt /usr/bin/qemu-$fmt-static \
 #        --magic "$magic" --mask "$mask" --offset 0 --credential yes --fix-binary yes
 
-
+cd ~
 sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
 sudo mount -t sysfs sys ./chroot-stretch-i386/sys/
 sudo mount -t proc proc ./chroot-stretch-i386/proc/
@@ -84,6 +90,7 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Set up root account
     apt install -y leafpad # install any x86 gui application so that requirements to run gui will also be installed. Takes about 5 min
     apt install -y bzip2 # for extracting POL files in case we need that
     apt install -y ca-certificates # Teach wget to trust websites
+    #apt install apt-transport-https # untested - from pinebook pro guide
     
     apt install -y sudo # Give the pi (user) chroot account sudo access
     echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -146,7 +153,7 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Log in as root to in
 exit # exit the su account
 
 sudo reboot # fixed the bus error?
-#sudo systemctl restart systemd-binfmt # maybe just need to restart binfmt?
+#sudo systemctl restart systemd-binfmt # maybe just need to restart binfmt? This seems to break the binfmt registration for some reason?
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account can run wine (root account can't use exported display / “export DISPLAY=:0”)
     arch # should say i686
@@ -161,5 +168,11 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account 
 		echo PATH=/opt/wine-3.9/bin/:$PATH >> ~/.bashrc
 		PATH=/opt/wine-3.9/bin/:$PATH
 
-    winecfg # "Bus error" may happen here (with qemu-user / qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf & qemu-user / qemu-user-static v1:6.0.50 armhf). Try latest qemu and qemu-user-static binaries built from scratch (overwrite files in host's /usr/bin/ and the qemu-i386-static file in your chroot install) and rebooting.
+    winecfg
+    # "Bus error" may happen here (with qemu-user / qemu-user-static v1:3.1+dfsg-8+deb10u8 armhf & qemu-user / qemu-user-static v1:6.0.50 armhf). Try latest qemu and qemu-user-static binaries built from scratch (overwrite files in host's /usr/bin/ and the qemu-i386-static file in your chroot install) and rebooting.
+    
+    # This error message may come up after a restart in TwisterOS?    
+    #    qemu-i386-static: ../accel/tcg/translate-all.c:2723: page_set_flags: Assertion `start < end' failed.
+    #Illegal instruction
+    
 exit # exit the user account
