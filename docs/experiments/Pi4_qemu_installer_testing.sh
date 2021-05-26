@@ -37,6 +37,19 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 # 3. Whether using our own built qemu-user-static files or one downloaded from the internet, we must register the file into binfmt (I believe).  The old qemu-user-static debian repo package can set up the binfmt registration for us, then we can swap our newer qemu-i386-static binary into /usr/bin/
 
 
+## Register qemu-user-static (/usr/bin/qemu-i386-static binary file) into binfmt - warning untested
+## https://github.com/Itai-Nelken/qemu2deb/issues/11#issuecomment-840991848
+#
+##i386 variables			
+#magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+#mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+#fmt=i386
+#
+##binfmt qemu-ARCHITECTURE-static registration
+#sudo /usr/sbin/./update-binfmts --package qemu-user-static --install qemu-$fmt /usr/bin/qemu-$fmt-static \
+#        --magic "$magic" --mask "$mask" --offset 0 --credential yes --fix-binary yes
+
+
 sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
 sudo mount -t sysfs sys ./chroot-stretch-i386/sys/
 sudo mount -t proc proc ./chroot-stretch-i386/proc/
