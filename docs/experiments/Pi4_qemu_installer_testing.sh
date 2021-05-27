@@ -12,10 +12,12 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 #sudo mv qemu-i386-static /usr/bin/
 
     sudo apt install -y ninja-build # command from my own memory - untested
+    
+    # Compile and build qemu-user-static (qemu-i386-static)
     cd ~/Downloads
     git clone https://git.qemu.org/git/qemu.git
     cd qemu
-    #git submodule update --init --recursive # Optional instruction from pinebook guide
+    git submodule update --init --recursive
     ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user --target-list=i386-linux-user --disable-tools # Pinebook guide
     #./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user --enable-sdl --enable-opengl --audio-drv-list=pa --enable-kvm # This worked once
     #make -j$CORES && sudo make install # slower build method
@@ -28,6 +30,18 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
     sudo chmod +x qemu-*-static
     sudo cp qemu-*-static /usr/bin/
     # cd ~ && sudo rm -rf ~/Downloads/qemu-user-static ~/Downloads/qemu # clean up
+    
+    # Also compile and build qemu
+    #git clone https://git.qemu.org/git/qemu.git
+    #cd qemu
+    #git submodule init
+    #git submodule update --recursive
+    #./configure --enable-sdl  --enable-opengl --enable-virglrenderer --enable-system --enable-modules --audio-drv-list=pa --enable-kvm
+    ##make -j$CORES
+    ##sudo make install
+    #ninja -C build
+    #sudo ninja install -C build
+
 
 # Notes about qemu-user-static: 
 # 1. The debian repo qemu-user-static file (qemu-i386-static) is too old and will probably give us the "bus error" message when running wine later.
@@ -90,7 +104,7 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Set up root account
     apt install -y leafpad # install any x86 gui application so that requirements to run gui will also be installed. Takes about 5 min
     apt install -y bzip2 # for extracting POL files in case we need that
     apt install -y ca-certificates # Teach wget to trust websites
-    #apt install apt-transport-https # untested - from pinebook pro guide
+    apt install -y apt-transport-https # for winehq installs
     
     apt install -y sudo # Give the pi (user) chroot account sudo access
     echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
