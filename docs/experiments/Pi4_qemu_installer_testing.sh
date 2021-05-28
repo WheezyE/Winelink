@@ -79,8 +79,7 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 ##
 ## Box86 sets up a config file in `etc/binfmt.d/` which creates links to box86 whenever systemd-binfmt is restarted
 ## We can put a .conf file for our qemu-user-static stuff in here too:
-# echo -E ":qemu-i386:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00:\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-i386-static:" | sudo tee -a /etc/binfmt.d/qemu-i386-static.conf >/dev/null
-## note w/ qemu-i386-static.conf: We might need OCF flags here...
+# echo -E ":qemu-i386:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00:\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-i386-static:OCF" | sudo tee -a /etc/binfmt.d/qemu-i386-static.conf >/dev/null
 ## This way the cached links are always there even after a reboot or a systemd-binfmt restart
 ##
 ##What are these files in qemu-user-static .deb?
