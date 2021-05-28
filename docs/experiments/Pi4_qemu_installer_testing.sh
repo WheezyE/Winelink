@@ -67,18 +67,27 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 #sudo /usr/sbin/./update-binfmts --package qemu-user-static --remove qemu-$fmt /usr/bin/qemu-$fmt-static
 #
 ##binfmt qemu-ARCHITECTURE-static registration
+##Temporarily registers binfmt magic calling of qemu-i386-static for any encountered i386 binaries into /proc/sys/fs/binfmt_misc/  These files are destroyed on boot or binfmt restart.
 #sudo /usr/sbin/./update-binfmts --package qemu-user-static --install qemu-$fmt /usr/bin/qemu-$fmt-static \
 #        --magic "$magic" --mask "$mask" --offset 0 --credential yes --fix-binary yes
 #
 #
-## Note that after registering binfmt items, config files or maybe links appear to be cached here: /proc/sys/fs/binfmt_misc
+## Note that after registering binfmt items, magic links are cached here: /proc/sys/fs/binfmt_misc
 ## Running `sudo systemctl restart systemd-binfmt` will wipe out the cached files in `/proc/sys/fs/binfmt_misc`
 ## Running the above update-binfmts commands will register a `qemu-i386` cached file linked to qemu-user-static into `/proc/sys/fs/binfmt_misc`
 ## Running `sudo ~/Downloads/qemu/scripts/./qemu-binfmt-conf.sh` will register any installed qemu (non-static) files into here (but will not overwrite any existing cached files). A qemu-i386 config file from this script will create a link to the non-static qemu-i386 file.
 ##
-## Box86 sets up a config file in `etc/binfmt.d/` which creates links to box86 (cached within `/proc/sys/fs/binfmt_misc`) any time x86 files are run.
-## We can put a .conf file for our qemu-user-static stuff in here too.
-## <-----
+## Box86 sets up a config file in `etc/binfmt.d/` which creates links to box86 whenever systemd-binfmt is restarted
+## We can put a .conf file for our qemu-user-static stuff in here too:
+# echo -E ":qemu-i386:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00:\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-i386-static:" | sudo tee -a /etc/binfmt.d/qemu-i386-static.conf >/dev/null
+## note w/ qemu-i386-static.conf: We might need OCF flags here...
+## This way the cached links are always there even after a reboot or a systemd-binfmt restart
+##
+##What are these files in qemu-user-static .deb?
+##/usr/libexec/qemu-binfmt/i386-binfmt-P
+##/usr/sbin/qemu-debootstrap
+##/usr/share/binfmts/qemu-i386
+
 
 cd ~
 sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
