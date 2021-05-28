@@ -31,7 +31,7 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
     sudo cp qemu-*-static /usr/bin/
     # cd ~ && sudo rm -rf ~/Downloads/qemu-user-static ~/Downloads/qemu # clean up
     
-    # Also compile and build qemu
+    # Also compile and build qemu?
     #git clone https://git.qemu.org/git/qemu.git
     #cd qemu
     #git submodule init
@@ -41,6 +41,7 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
     ##sudo make install
     #ninja -C build
     #sudo ninja install -C build
+    #sudo ~/Downloads/qemu/scripts/./qemu-binfmt-conf.sh # not sure if we need to set up binfmt?
 
 
 # Notes about qemu-user-static: 
@@ -68,6 +69,16 @@ sudo apt-get install -y qemu qemu-user qemu-user-static binfmt-support debootstr
 ##binfmt qemu-ARCHITECTURE-static registration
 #sudo /usr/sbin/./update-binfmts --package qemu-user-static --install qemu-$fmt /usr/bin/qemu-$fmt-static \
 #        --magic "$magic" --mask "$mask" --offset 0 --credential yes --fix-binary yes
+#
+#
+## Note that after registering binfmt items, config files or maybe links appear to be cached here: /proc/sys/fs/binfmt_misc
+## Running `sudo systemctl restart systemd-binfmt` will wipe out the cached files in `/proc/sys/fs/binfmt_misc`
+## Running the above update-binfmts commands will register a `qemu-i386` cached file linked to qemu-user-static into `/proc/sys/fs/binfmt_misc`
+## Running `sudo ~/Downloads/qemu/scripts/./qemu-binfmt-conf.sh` will register any installed qemu (non-static) files into here (but will not overwrite any existing cached files). A qemu-i386 config file from this script will create a link to the non-static qemu-i386 file.
+##
+## Box86 sets up a config file in `etc/binfmt.d/` which creates links to box86 (cached within `/proc/sys/fs/binfmt_misc`) any time x86 files are run.
+## We can put a .conf file for our qemu-user-static stuff in here too.
+## <-----
 
 cd ~
 sudo debootstrap --foreign --arch i386 stretch ./chroot-stretch-i386 http://ftp.us.debian.org/debian
@@ -91,7 +102,7 @@ sudo chroot ./chroot-stretch-i386/ /debootstrap/debootstrap --second-stage # unp
 #EOT
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Set up root account
-    # NOTE: "chroot: failed to run command '/bin/su': Exec format error" means that qemu-i386-static was not registered into binfmt correctly. Reinstall the deb repo qemu-user-static package
+    # NOTE: "chroot: failed to run command '/bin/su': Exec format error" or "chroot: failed to run command '/bin/su': No such file or directory" means that qemu-i386-static was not registered into binfmt correctly. Reinstall the deb repo qemu-user-static package
     arch # should say i686
     echo "export LANGUAGE='C'" >> ~/.bashrc # Add some lines to bashrc for future shell instances, then also initialize those lines for our current shell instance
     echo "export LC_ALL='C'" >> ~/.bashrc
@@ -167,7 +178,7 @@ sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l root # Log in as root to in
 exit # exit the su account
 
 sudo reboot # fixed the bus error?
-#sudo systemctl restart systemd-binfmt # maybe just need to restart binfmt? This seems to break the binfmt registration for some reason?
+#sudo systemctl restart systemd-binfmt # maybe just need to restart binfmt? This seems to break the binfmt registration for some reason? See above
 
 sudo chroot /home/pi/chroot-stretch-i386/ /bin/su -l pi # Only the user account can run wine (root account can't use exported display / “export DISPLAY=:0”)
     arch # should say i686
