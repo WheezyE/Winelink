@@ -6,8 +6,23 @@ winecfg
 
 sudo reboot
 
+    ## Compile and build qemu-user-static (qemu-i386-static)
+    #cd ~/Downloads
+    #git clone https://git.qemu.org/git/qemu.git
+    #cd qemu
+    #git checkout 79d6f2baa4b738bb223a0ad382661fe501b0c867
+    #./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user --target-list=i386-linux-user --disable-tools # Pinebook guide
+    #ninja -C build
+    #sudo ninja install -C build
+    #cd ../qemu-user-static/bin
+    #for i in *; do sudo mv $i $i-static; done
+sudo rm /usr/bin/qemu-i386-static
 sudo cp ~/Downloads/qemu-user-static_26f6b15/qemu-i386-static /usr/bin/ # This was compiled from Dec 2020 qemu-user-static commit 26f6b15e2636eb20cb6757093170341b22fe6fbc
+# Building qemu-i386-static from that commit avoids qemu-i386-static: ../accel/tcg/translate-all.c:2724: page_set_flags: Assertion `start < end' failed.
+#Illegal instruction
 sudo cp ~/Downloads/qemu-user-static_26f6b15/qemu-i386-static ~/chroot-stretch-i386/usr/bin/
+
+# 79d6f2baa4b738bb223a0ad382661fe501b0c867 has less "Illegal instruction" errors, but still crashes dotnet35sp1
 
 sudo systemctl restart systemd-binfmt
 
@@ -30,6 +45,11 @@ sudo chroot ~/chroot-stretch-i386/ /bin/su -l pi
 
 DISPLAY=:0 winecfg # runs!
 sudo rm -rf .wine
+
+    wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # Install winetricks
+    chmod +x winetricks 
+    sudo mv winetricks /usr/local/bin
+    sudo apt install -y cabextract # winetricks needs cabextract
 
 #edit winetricks like this https://github.com/novaspirit/winetricks/commit/3fd18ad6497de5a2deb4f2ba7279ab5f1e9018b1
 
