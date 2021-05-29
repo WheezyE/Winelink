@@ -20,6 +20,10 @@ sudo /usr/sbin/./update-binfmts --package qemu-user-static --install qemu-$fmt /
 
 sudo chroot ~/chroot-stretch-i386/ /bin/su -l root
 apt install -y sudo 
+echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+exit
+
+sudo chroot ~/chroot-stretch-i386/ /bin/su -l pi
 
 DISPLAY=:0 winecfg # runs!
 sudo rm -rf .wine
