@@ -1,3 +1,48 @@
+#Farthest I've gotten with qemu-user-static so far:
+
+#pinebook guide (https://forum.pine64.org/showthread.php?tid=8979), then:
+
+winecfg
+
+sudo reboot
+
+sudo cp ~/Downloads/qemu-user-static_26f6b15/qemu-i386-static /usr/bin/ # This was compiled from Dec 2020 qemu-user-static commit 26f6b15e2636eb20cb6757093170341b22fe6fbc
+sudo cp ~/Downloads/qemu-user-static_26f6b15/qemu-i386-static ~/chroot-stretch-i386/usr/bin/
+
+sudo systemctl restart systemd-binfmt
+
+magic='\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+mask='\xff\xff\xff\xff\xff\xfe\xfe\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+fmt=i386
+sudo /usr/sbin/./update-binfmts --package qemu-user-static --remove qemu-$fmt /usr/bin/qemu-$fmt-static
+sudo /usr/sbin/./update-binfmts --package qemu-user-static --install qemu-$fmt /usr/bin/qemu-$fmt-static \
+        --magic "$magic" --mask "$mask" --offset 0 --credential yes --fix-binary yes
+
+sudo chroot ~/chroot-stretch-i386/ /bin/su -l root
+apt install -y sudo 
+
+DISPLAY=:0 winecfg # runs!
+sudo rm -rf .wine
+
+#edit winetricks like this https://github.com/novaspirit/winetricks/commit/3fd18ad6497de5a2deb4f2ba7279ab5f1e9018b1
+
+DISPLAY=:0 winetricks -q dotnet35sp1
+#Dead end here: "wine client error:28: qemu: uncaught target signal 11 (Segmentation fault) - core dumped"
+
+
+
+
+
+
+
+
+
+
+
+
+
+Older install attempts
+######################################
 1. Instructions via https://www.novaspirit.com/2019/04/15/run-x86-arm/
  - For RPi4, skip steps 1-3 (RPi4 already has the proper kernel for Wine)
 2. Compile a fresh qemu (repo versions may be old/broken): https://github.com/Itai-Nelken/qemu2deb 
