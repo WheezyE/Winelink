@@ -1,0 +1,26 @@
+# Used these steps to update qemu to package versions that at least ran qemu-user-static winecfg.  Unfortunately these packages didn't run x86_64 OS's(?)
+
+# Add testing repo to sources list. This way we can download a newer qemu-user-static.
+echo -E "deb http://http.us.debian.org/debian/ testing non-free contrib main" | sudo tee -a /etc/apt/sources.list.d/raspi.list >/dev/null
+wget -O - https://ftp-master.debian.org/keys/archive-key-10.asc | sudo apt-key add - # "Active Signing Key" found here https://ftp-master.debian.org/keys.html
+sudo apt-get update
+# It would now be a really good idea to remove the testing repo from your sources list!
+
+sudo apt install qemu qemu-user qemu-user-static virt-manager
+
+
+# Used this guide https://linuxhint.com/enable_kvm_kernel_module_on_raspberry_pi_os/
+# Aarch64 Alpine Linux worked, but the x86_64 and x86 iso's didn't.  Debian x86 Linux also didn't work.
+sudo apt update && sudo apt full-upgrade -y
+uname -r # should say "#.#.##-v7l+"
+echo "arm_64bit=1" | sudo tee -a /boot/config.txt
+sudo reboot
+uname -r # should say "#.#.##-v8+" for 64bit kernel
+sudo apt install virt-manager libvirt0 qemu-system
+sudo usermod -aG libvirt-qemu $(whoami)
+sudo reboot
+sudo virsh net-start default
+sudo virsh net-autostart default
+
+# Used these steps to zip the alpine linux .qcow2 image into a tar.xz file https://stackoverflow.com/questions/18855850/create-a-tar-xz-in-one-command
+# That .qcow2 zipped file is downloadable from here: https://mega.nz/file/0YpXjAhA#rz92clnK_vfWwswZpwXOQkrJd_awFMVcjJmmO3ltkfI
