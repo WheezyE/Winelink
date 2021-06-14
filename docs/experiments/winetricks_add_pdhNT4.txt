@@ -1,12 +1,12 @@
 # Notes: Try qemu-user-static on RPi3
 
 
-
+#----------------------------------------------------------------
 
 w_metadata pdhnt4 dlls \
     title="MS pdh.dll (Performance Data Helper) - Older Win NT 4.0 version" \
     publisher="Microsoft" \
-    year="2011" \ # ! Check the year of the dll
+    year="1996" \ # ! Check the year of the dll
     media="download" \
     file1="../pdhnt4/nt4pdhdll.exe" \ # ! Not sure about this folder
     installed_file1="${W_SYSTEM32_DLLS_WIN}/pdh.dll"
@@ -14,6 +14,7 @@ w_metadata pdhnt4 dlls \
 load_pdhnt4()
 {
     w_download_to pdhnt4 http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe # ! Get SHA  --  1d7337bfbb2c65f43c82d188688ce152af403bcb67a2cc2a3cc68a580ecd8200
+    #w_download_to pdhnt4 https://web.archive.org/web/20060826233132/http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe # ! Get SHA
 
     w_try_cabextract --directory="${W_TMP}" "${W_CACHE}/pdhnt4/nt4pdhdll.exe" -F pdh.dll
     w_try cp "${W_TMP}/pdh.dll" "${W_SYSTEM32_DLLS}/pdh.dll" # ! Not sure if we need `w_try cp "${W_TMP}/pdhnt4/pdh.dll"` instead. Also not sure if mv would be better
