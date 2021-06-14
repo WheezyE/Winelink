@@ -1,0 +1,105 @@
+# Notes: Try qemu-user-static on RPi3
+
+
+
+
+w_metadata pdhnt4 dlls \
+    title="MS pdh.dll (Performance Data Helper) - Older Win NT 4.0 version" \
+    publisher="Microsoft" \
+    year="2011" \ # ! Check the year of the dll
+    media="download" \
+    file1="../pdhnt4/nt4pdhdll.exe" \ # ! Not sure about this folder
+    installed_file1="${W_SYSTEM32_DLLS_WIN}/pdh.dll"
+
+load_pdhnt4()
+{
+    w_download_to pdhnt4 http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe # ! Get SHA  --  1d7337bfbb2c65f43c82d188688ce152af403bcb67a2cc2a3cc68a580ecd8200
+
+    w_try_cabextract --directory="${W_TMP}" "${W_CACHE}/pdhnt4/nt4pdhdll.exe" -F pdh.dll
+    w_try cp "${W_TMP}/pdh.dll" "${W_SYSTEM32_DLLS}/pdh.dll" # ! Not sure if we need `w_try cp "${W_TMP}/pdhnt4/pdh.dll"` instead. Also not sure if mv would be better
+
+    if [ "${W_ARCH}" = "win64" ]; then
+        echo "There is no x64 version of the old PDH dll for WinNT 4.0. Please use `winetricks pdh` instead."
+    fi
+
+    w_override_dlls native,builtin pdh
+}
+
+#----------------------------------------------------------------
+
+
+
+
+
+
+
+
+NOTES
+
+Add pdhNT4 to winetricks
+ New verbs:
+ https://github.com/Winetricks/winetricks/commit/160b0b8c2cbbd1fb83ffe5f2d1f7b959ce563fca#diff-0120b8c6219f57131e91b23416142b37b990b95acb666919ec3db84d4e410c4a
+ https://github.com/Winetricks/winetricks/commit/b1a7a2837d93924c76ea3771ff9d86e358c0941f#diff-0120b8c6219f57131e91b23416142b37b990b95acb666919ec3db84d4e410c4a
+ Settings overrides: https://github.com/Winetricks/winetricks/commit/0dbe6f2ee96430d49c32d0626a34a0be44f6e5e3#diff-0120b8c6219f57131e91b23416142b37b990b95acb666919ec3db84d4e410c4a
+ PDH: https://github.com/Winetricks/winetricks/blob/3f0a01280e1ca5b9d8cdd13652e4ba325582c54f/src/winetricks#L11450
+ helper_win7sp1 is just for kb976932-x86_sha.exe
+ w_try_cabextract -d "${W_TMP}" -L -F "${filename}" "${W_CACHE}"/win7sp1/windows6.1-KB976932-X86.exe
+
+
+SAMPLE CODE
+#----------------------------------------------------------------
+
+w_metadata pdh dlls \
+    title="MS pdh.dll (Performance Data Helper)" \
+    publisher="Microsoft" \
+    year="2011" \
+    media="download" \
+    file1="../win7sp1/windows6.1-KB976932-X86.exe" \
+    installed_file1="${W_SYSTEM32_DLLS_WIN}/pdh.dll"
+
+load_pdh()
+{
+    helper_win7sp1 x86_microsoft-windows-p..rastructureconsumer_31bf3856ad364e35_6.1.7601.17514_none_b5e3f88a8eb425e8/pdh.dll
+    w_try cp "${W_TMP}/x86_microsoft-windows-p..rastructureconsumer_31bf3856ad364e35_6.1.7601.17514_none_b5e3f88a8eb425e8/pdh.dll" "${W_SYSTEM32_DLLS}/pdh.dll"
+
+    if [ "${W_ARCH}" = "win64" ]; then
+        helper_win7sp1_x64 amd64_microsoft-windows-p..rastructureconsumer_31bf3856ad364e35_6.1.7601.17514_none_1202940e4711971e/pdh.dll
+        w_try cp "${W_TMP}/amd64_microsoft-windows-p..rastructureconsumer_31bf3856ad364e35_6.1.7601.17514_none_1202940e4711971e/pdh.dll" "${W_SYSTEM64_DLLS}/pdh.dll"
+    fi
+
+    w_override_dlls native,builtin pdh
+}
+
+#----------------------------------------------------------------
+
+w_metadata peverify dlls \
+    title="MS peverify (from .NET 2.0 SDK)" \
+    publisher="Microsoft" \
+    year="2006" \
+    media="download" \
+    file1="../dotnet20sdk/setup.exe" \
+    installed_file1="${W_SYSTEM32_DLLS_WIN}/peverify.exe"
+
+load_peverify()
+{
+    w_download_to dotnet20sdk https://download.microsoft.com/download/c/4/b/c4b15d7d-6f37-4d5a-b9c6-8f07e7d46635/setup.exe 1d7337bfbb2c65f43c82d188688ce152af403bcb67a2cc2a3cc68a580ecd8200
+
+    # Seems to require dotnet20; at least doesn't work if dotnet40 is installed instead
+    w_call dotnet20
+
+    w_try_cabextract --directory="${W_TMP}" "${W_CACHE}/dotnet20sdk/setup.exe" -F netfxsd1.cab
+    w_try_cabextract --directory="${W_TMP}" "${W_TMP}/netfxsd1.cab" -F FL_PEVerify_exe_____X86.3643236F_FC70_11D3_A536_0090278A1BB8
+    w_try mv "${W_TMP}/FL_PEVerify_exe_____X86.3643236F_FC70_11D3_A536_0090278A1BB8" "${W_SYSTEM32_DLLS}/peverify.exe"
+}
+
+#----------------------------------------------------------------
+
+
+PDH INSTALLER
+# Install an older pdh.dll (the pdh.dll from "winetricks pdh" is too new for VARA)
+sudo apt-get install zip -y
+cd ~/Downloads && mkdir pdhNT40 && cd pdhNT40
+wget http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe
+unzip -o nt4pdhdll.exe
+cp pdh.dll ~/.wine/drive_c/windows/system32
+
