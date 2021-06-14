@@ -4,7 +4,7 @@
 #----------------------------------------------------------------
 
 w_metadata pdhnt4 dlls \
-    title="MS pdh.dll (Performance Data Helper) - Older Win NT 4.0 version" \
+    title="MS pdh.dll (Performance Data Helper) - Older Win NT 4.0 version which sometimes helps compatability" \
     publisher="Microsoft" \
     year="1996" \ # ! Check the year of the dll
     media="download" \
