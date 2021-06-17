@@ -56,6 +56,12 @@ VARA running on a Raspberry Pi 4B (Twister OS)
 All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86, Wine, winetricks, and AutoHotKey, are all open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
 ## Future work
+ - [ ] Find Box86 [stability bugs for Winlink](https://github.com/ptitSeb/box86/issues/217) (and ask ptitSeb very nicely if he can fix them).
+   - Address internet issues.
+   - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
+   - Find crashes.
+ - [x] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
+   - [ ] Add this speedup to Winelink.
  - [x] Make a logo for the github page.
  - [ ] Add updated example images
  - [ ] Make the script's user-interface look better.
@@ -65,18 +71,15 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
  - [x] Add shortcuts to the desktop
  - [ ] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling (give user the choice to compile or not; add auto-detection of failed downloads)
- - [ ] Find Box86 [stability bugs for Winlink](https://github.com/ptitSeb/box86/issues/217) & dotnet35sp1 (and ask ptitSeb very nicely if he can fix them).
-   - Address internet issues.
-   - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
-   - Find crashes.
  - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
  - [x] Add the fix for VARA graphical errors to the script
  - [ ] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29))
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
+ - [ ] Consider adding Winlink & VARA installers to winetricks to further streamline this installer (improve readability, make Winlink easier to install for other x86 winetricks users who are not aware of this project).
  - [ ] Add more error-checking to the script.
  - [ ] Make code modular to help readability.
- - [ ] Simplify installation commands.
+ - [ ] Simplify installation commands (model after KM4ACK BAP).
  #### Add more platforms
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
    - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
