@@ -18,7 +18,7 @@ load_winlink()
     #w_call vb6run
     #w_call vcrun
     w_set_winver win7
-    w_call sound=alsa # not sure if this will work
+    w_call sound=alsa # not sure if this will work - maybe need w_do_call?
     
     # Do we need curl instead of wget for mac? Will this work for all Linux distros?
     wget -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs # Download Winlink no matter its version number
