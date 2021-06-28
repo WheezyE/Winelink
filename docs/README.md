@@ -68,7 +68,9 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Add more clean-up functions to the script.
  - [x] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
  - [x] Add shortcuts to the desktop
- - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling (give user the choice to compile or not; add auto-detection of failed downloads)
+ - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
+    - [ ] Give user the choice to compile or not
+    - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency
  - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
  - [x] Add the fix for VARA graphical errors to the script
     - [x] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29))
