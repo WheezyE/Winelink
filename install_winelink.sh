@@ -53,7 +53,7 @@
 function run_main()
 {
         ### Clean up files left over from any failed past runs of this script
-        rm -rf Winelink && mkdir Winelink && cd Winelink
+        rm -rf Winelink-tmp && mkdir Winelink-tmp && cd Winelink-tmp
         rm ~/Desktop/Reset\ Wine
 
 
@@ -129,6 +129,7 @@ function run_main()
         echo ""
         read -n 1 -s -r -p ""
         wineserver -k
+        cd .. && rm -rf Winelink-tmp
         exit
 }
 
