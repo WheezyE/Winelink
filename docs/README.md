@@ -47,13 +47,21 @@ VARA running on a Raspberry Pi 4B (Twister OS)
 All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86, Wine, winetricks, and AutoHotKey, are all open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
 ## Future work
+ - [ ] Add updated example images
+ - [ ] Make a work-in-progress youtube video to showcase VARA/ARDOP tones from soundcard on RPi4.
+ - [ ] Test port connections to radio CAT / test connection to radio audio. Might need to get my General license first . . .
  - [ ] Find Box86 [stability bugs for Winlink](https://github.com/ptitSeb/box86/issues/217) (and ask ptitSeb very nicely if he can fix them).
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
  - [ ] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
  - [x] Make a logo for the github page.
- - [ ] Add updated example images
  - [ ] Add installer for VARA FM.
+ - [ ] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
+ - [ ] Change VARA Setup/Config terminal text prompts into AHK pop-up boxes.
+    - [ ] Change all terminal text prompts into text boxes?
+ - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
+ - [ ] Add more error-checking to the script.
+ - [ ] Consider adding Winlink & VARA installers to winetricks to further streamline this installer (improve readability, make Winlink easier to install for other x86 winetricks users who are not aware of this project).
  - [x] Make the script's user-interface look better.
  - [x] Add an AHK script to click the "Ok" button after VARA is installed.
  - [x] Add an AHK script to help the user with VARA first time soundcard setup.
@@ -64,19 +72,19 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
  - [x] Add the fix for VARA graphical errors to the script
     - [x] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29))
- - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
- - [x] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
- - [ ] Consider adding Winlink & VARA installers to winetricks to further streamline this installer (improve readability, make Winlink easier to install for other x86 winetricks users who are not aware of this project).
- - [ ] Add more error-checking to the script.
- - [x] Make code modular to help readability.
+  - [x] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
+  - [x] Make code modular to help readability.
  - [x] Simplify installation commands (model after KM4ACK BAP).
  #### Add more platforms
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
    - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
- - [ ] Expand this script to detect/include Android ([Termux](https://github.com/termux/termux-app) + [proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
- - [ ] Expand this script to detect/include x86 Linux.
- - [ ] Expand this script to detect/include Mac.
- - [ ] Expand this script to detect/include ChromeBook Linux beta.
+ - [ ] Add auto-detection of system hardware (x86 vs armhf vs arm64)
+ - [ ] Add auto-detection of system operating system.
+    - [ ] Detect/include Android/Andronix ([Termux](https://github.com/termux/termux-app) + [proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
+    - [ ] Detect/include x86 Linux.
+    - [ ] Detect/include Mac.
+    - [ ] Detect/include ChromeBook Linux beta.
+ - [ ] Once methods are thoroughly tested, make a youtube video showcasing current methods (box86, Exagear, qemu-user-static, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
 
 ## Distribution
 If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).  This script is free to use, open-source, and should not be monetized (for further information see the [license file](LICENSE)).
