@@ -78,7 +78,7 @@ All software used by this script is free and legal to use (with the exception of
  #### Add more platforms
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
    - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
- - [ ] Add auto-detection of system hardware (x86 vs armhf vs arm64)
+ - [ ] Add auto-detection of system hardware (x86 vs armhf vs aarch64)
  - [ ] Add auto-detection of system operating system.
     - [ ] Detect/include Android/Andronix ([Termux](https://github.com/termux/termux-app) + [proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
     - [ ] Detect/include x86 Linux.
