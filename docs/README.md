@@ -33,7 +33,7 @@ VARA running on a Raspberry Pi 4B (Twister OS)
     
 ## Credits
  - [The Box86 team](https://discord.gg/Fh8sjmu)
->      (ptitSeb, pale, chills340, Heasterian, phoenixbyrd, Icenowy, Longhorn,
+>      (ptitSeb, pale, chills340, Ita-Nelken, Heasterian, phoenixbyrd, Icenowy, Longhorn,
 >       SpacingBat3, monkaBlyat, Botspot, epychan, !FlameKat53, #lukefrenner,
 >       luschia, #MonthlyDoseOfRPi, Binay Devkota, hacker420, et.al.)
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides
@@ -53,6 +53,7 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
  - [x] Make a logo for the github page.
  - [ ] Add updated example images
+ - [ ] Add installer for VARA FM.
  - [x] Make the script's user-interface look better.
  - [x] Add an AHK script to click the "Ok" button after VARA is installed.
  - [x] Add an AHK script to help the user with VARA first time soundcard setup.
