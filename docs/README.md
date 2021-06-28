@@ -86,7 +86,7 @@ All software used by this script is free and legal to use (with the exception of
     - [ ] Detect/include x86 Linux.
     - [ ] Detect/include Mac.
     - [ ] Detect/include ChromeBook Linux beta.
- - [ ] Once methods are thoroughly tested, make a youtube video showcasing current methods (box86, Exagear, qemu-user-static, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
+ - [ ] Once methods are thoroughly tested, make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
 
 ## Distribution
 If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).  This script is free to use, open-source, and should not be monetized (for further information see the [license file](LICENSE)).
