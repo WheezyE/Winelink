@@ -33,9 +33,9 @@ VARA running on a Raspberry Pi 4B (Twister OS)
     
 ## Credits
  - [The Box86 team](https://discord.gg/Fh8sjmu)
->      (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd, Icenowy, Longhorn,
+>      (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd, 
 >       SpacingBat3, monkaBlyat, Botspot, epychan, !FlameKat53, #lukefrenner,
->       luschia, #MonthlyDoseOfRPi, Binay Devkota, hacker420, et.al.)
+>       Icenowy, luschia, Longhorn, #MonthlyDoseOfRPi, Binay Devkota, et.al.)
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
  - N7ACW & AD7HE for getting me started in ham radio
