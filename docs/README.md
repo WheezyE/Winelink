@@ -54,7 +54,6 @@ All software used by this script is free and legal to use (with the exception of
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
  - [ ] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
- - [x] Make a logo for the github page.
  - [ ] Add installer for VARA FM.
  - [ ] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
  - [ ] Change VARA Setup/Config terminal text prompts into AHK pop-up boxes.
@@ -62,6 +61,7 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [ ] Add more error-checking to the script.
  - [ ] Consider adding Winlink & VARA installers to winetricks to further streamline this installer (improve readability, make Winlink easier to install for other x86 winetricks users who are not aware of this project).
+ - [x] Make a logo for the github page.
  - [x] Make the script's user-interface look better.
  - [x] Add an AHK script to click the "Ok" button after VARA is installed.
  - [x] Add an AHK script to help the user with VARA first time soundcard setup.
