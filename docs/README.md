@@ -11,31 +11,20 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 ## Installation
 Simply copy and paste these commands into your Raspberry Pi 4's terminal:
 ```bash
-sudo apt install git -y
-rm -rf ~/Downloads/Winelink # remove any old winelink installs
-cd ~/Downloads
-git clone https://github.com/WheezyE/Winelink
-cd Winelink
-sudo chmod +x install_winelink.sh
-./install_winelink.sh
+wget https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
+     bash install_winelink.sh
 ```
-_Installation takes about 90 minutes and lots of errors will appear in the terminal (just ignore those)._
+_Installation takes about 70 minutes and lots of errors will appear in the terminal (just ignore those)._
 
-You should then be able to run RMS Express with this command: `wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe`
-
-If you wish to run VARA directly, you can do so with this command: `wine ~/.wine/drive_c/VARA/VARA.exe`
-
-Sometimes after Wine crashes, software will refuse to run. We can sometimes get around this bug by running `wineserver -k` in the terminal and then trying again.
+You should then be able to run RMS Express and VARA from desktop shortcuts.  They will probably crash often when you try to load them or use them.  If you run them enough times though, they should run and send/receive tones.
 
 If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
 
 ## Known issues
- - The internet isn't working for some reason (this is a bug in Box86).
  - VARA's CPU gauge doesn't display (this is a bug in Wine).
- - The installation takes about 90 minutes
- - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore. (If programs refuse to run in Wine after a crash, try running `wineserver -k` in another terminal window before trying again.)
+ - The installation takes about 70 minutes.
+ - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore.  This installer will also create a script on the desktop to reset Wine in case programs freeze or won't open.
  - I haven't actually tested over-the-air connections yet since I'm still just a tech.  If some generals could test, that would be awesome.
- - My installer isn't very elegant at the moment, but I'll try to make it look a bit better in the future.
 
 ## Examples
 
@@ -44,9 +33,9 @@ VARA running on a Raspberry Pi 4B (Twister OS)
     
 ## Credits
  - [The Box86 team](https://discord.gg/Fh8sjmu)
->      (ptitSeb, pale, chills340, phoenixbyrd, Botspot, !FlameKat53, epychan,
->       Heasterian, monkaBlyat, SpacingBat3, #lukefrenner, Icenowy, Longhorn,
->       #MonthlyDoseOfRPi, luschia, Binay Devkota, hacker420, et.al.)
+>      (ptitSeb, pale, chills340, Heasterian, phoenixbyrd, Icenowy, Longhorn,
+>       SpacingBat3, monkaBlyat, Botspot, epychan, !FlameKat53, #lukefrenner,
+>       luschia, #MonthlyDoseOfRPi, Binay Devkota, hacker420, et.al.)
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
  - N7ACW & AD7HE for getting me started in ham radio
@@ -59,29 +48,27 @@ All software used by this script is free and legal to use (with the exception of
 
 ## Future work
  - [ ] Find Box86 [stability bugs for Winlink](https://github.com/ptitSeb/box86/issues/217) (and ask ptitSeb very nicely if he can fix them).
-   - Address internet issues.
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
- - [x] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
-   - [ ] Add this speedup to Winelink.
+ - [ ] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
  - [x] Make a logo for the github page.
  - [ ] Add updated example images
- - [ ] Make the script's user-interface look better.
+ - [x] Make the script's user-interface look better.
  - [x] Add an AHK script to click the "Ok" button after VARA is installed.
  - [x] Add an AHK script to help the user with VARA first time soundcard setup.
  - [x] Add more clean-up functions to the script.
  - [x] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
  - [x] Add shortcuts to the desktop
- - [ ] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling (give user the choice to compile or not; add auto-detection of failed downloads)
+ - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling (give user the choice to compile or not; add auto-detection of failed downloads)
  - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
  - [x] Add the fix for VARA graphical errors to the script
- - [ ] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29))
+    - [x] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29))
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
- - [ ] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
+ - [x] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
  - [ ] Consider adding Winlink & VARA installers to winetricks to further streamline this installer (improve readability, make Winlink easier to install for other x86 winetricks users who are not aware of this project).
  - [ ] Add more error-checking to the script.
- - [ ] Make code modular to help readability.
- - [ ] Simplify installation commands (model after KM4ACK BAP).
+ - [x] Make code modular to help readability.
+ - [x] Simplify installation commands (model after KM4ACK BAP).
  #### Add more platforms
  - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
    - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
