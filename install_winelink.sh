@@ -5,9 +5,9 @@
 # Version: 0.001a (Work in progress - lots of bugs!)                          #
 # Credits:                                                                    #
 #   The Box86 team                                                            #
-#      (ptitSeb, pale, chills340, Heasterian, phoenixbyrd, Icenowy, Longhorn, #
+#      (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,       #
 #       SpacingBat3, monkaBlyat, Botspot, epychan, !FlameKat53, #lukefrenner, #
-#       luschia, #MonthlyDoseOfRPi, Binay Devkota, hacker420, et.al.)         #
+#       Icenowy, luschia, Longhorn, #MonthlyDoseOfRPi, Binay Devkota, et.al.) #
 #   K6ETA & DCJ21's Winlink on Linux guides                                   #
 #   KM4ACK & OH8STN for inspiration                                           #
 #   N7ACW & AD7HE for getting me started in ham radio                         #
@@ -166,9 +166,9 @@ echo "# Author: Eric Wiessner (KI7POL)                                          
 echo "# Version: 0.001a (Work in progress - lots of bugs!)                          #"
 echo "# Credits:                                                                    #"
 echo "#   The Box86 team                                                            #"
-echo "#      (ptitSeb, pale, chills340, Heasterian, phoenixbyrd, Icenowy, Longhorn, #"
+echo "#      (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,       #"
 echo "#       SpacingBat3, monkaBlyat, Botspot, epychan, !FlameKat53, #lukefrenner, #"
-echo "#       luschia, #MonthlyDoseOfRPi, Binay Devkota, hacker420, et.al.)         #"
+echo "#       Icenowy, luschia, Longhorn, #MonthlyDoseOfRPi, Binay Devkota, et.al.) #"
 echo "#   K6ETA & DCJ21's Winlink on Linux guides                                   #"
 echo "#   KM4ACK & OH8STN for inspiration                                           #"
 echo "#   N7ACW & AD7HE for getting me started in ham radio                         #"
@@ -263,13 +263,14 @@ function run_installwine() # Fix directories so that they're not hardcoded
 
 function run_installwinetricks()
 {
+    sudo apt-get remove winetricks -y
+    sudo apt-get install cabextract -y # winetricks needs this
     mkdir downloads; cd downloads
         # Download & install winetricks
-        sudo apt-get install cabextract -y # winetricks needs this
         sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old # backup old winetricks
         wget https://raw.githubusercontent.com/Winetricks/winetricks/7d10e264cb21a80b80e3fa4713625f561b024879/src/winetricks
         ##!##wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks # download
-        sudo chmod +x winetricks 
+        sudo chmod +x winetricks
         sudo mv winetricks /usr/local/bin # install
     cd ..
 }
@@ -294,14 +295,20 @@ function run_installrms()  # Fix directories so that they're not hardcoded
 
 function run_installvara()  # Fix directories so that they're not hardcoded
 {
-    sudo apt-get install megatools curl p7zip-full -y
+    sudo apt-get install curl megatools p7zip-full -y
     
     mkdir downloads; cd downloads
-        # Download / extract / install VARA HF [https://rosmodem.wordpress.com/]
-        VARALINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-        megadl ${VARALINK}
-        7z x VARA*.zip -o"VARAInstaller"
-        cp VARAInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # Move VARA installer here so AHK can find it later
+        # Download / extract / install VARA HF
+        VARAHFLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
+        megadl ${VARAHFLINK}
+        7z x VARA\ HF*.zip -o"VARAHFInstaller"
+        cp VARAHFInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # Move VARA installer here so AHK can find it later
+        
+        # Download / extract / install VARA FM
+        VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA FM v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
+        megadl ${VARAFMLINK}
+        7z x VARA\ FM*.zip -o"VARAFMInstaller"
+        cp VARAFMInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # Move VARA installer here so AHK can find it later
     cd ..
         
     mkdir ahk; cd ahk
@@ -311,15 +318,15 @@ function run_installvara()  # Fix directories so that they're not hardcoded
         sudo chmod +x AutoHotkey.exe
     
         # The VARA installer prompts the user to hit 'OK' even during silent install (due to a secondary installer).  We will suppress this prompt with AHK.
-        #Create vara_install.ahk
-        echo '; AHK script to make VARA installer run completely silent'                       >> vara_install.ahk
-        echo 'SetTitleMatchMode, 2'                                                            >> vara_install.ahk
-        echo 'SetTitleMatchMode, slow'                                                         >> vara_install.ahk
-        echo '        Run, VARA setup (Run as Administrator).exe /SILENT, C:\'                 >> vara_install.ahk
-        echo '        WinWait, VARA Setup ; Wait for the "VARA installed successfully" window' >> vara_install.ahk
-        echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> vara_install.ahk
-        echo '        WinWaitClose'                                                            >> vara_install.ahk
-        wine AutoHotkey.exe vara_install.ahk # Install VARA silently using AHK
+        #Create varahf_install.ahk
+        echo '; AHK script to make VARA installer run completely silent'                       >> varahf_install.ahk
+        echo 'SetTitleMatchMode, 2'                                                            >> varahf_install.ahk
+        echo 'SetTitleMatchMode, slow'                                                         >> varahf_install.ahk
+        echo '        Run, VARA setup (Run as Administrator).exe /SILENT, C:\'                 >> varahf_install.ahk
+        echo '        WinWait, VARA Setup ; Wait for the "VARA installed successfully" window' >> varahf_install.ahk
+        echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> varahf_install.ahk
+        echo '        WinWaitClose'                                                            >> varahf_install.ahk
+        wine AutoHotkey.exe varahf_install.ahk # Install VARA silently using AHK
         
         cp ~/.local/share/applications/wine/Programs/VARA/VARA.desktop ~/Desktop/ # Make desktop shortcut.
         rm ~/.wine/drive_c/VARA\ setup*.exe # clean up
@@ -329,29 +336,29 @@ function run_installvara()  # Fix directories so that they're not hardcoded
         echo ""
         echo "Please set up your soundcard input/output for VARA"
 
-        #Create vara_configure.ahk
-        echo '; AHK script to assist users in setting up VARA on its first run'                >> vara_configure.ahk
-        echo 'SetTitleMatchMode, 2'                                                            >> vara_configure.ahk
-        echo 'SetTitleMatchMode, slow'                                                         >> vara_configure.ahk
-        echo '        Run, VARA.exe, C:\VARA'                                                  >> vara_configure.ahk
-        echo '        WinActivate, VARA HF'                                                    >> vara_configure.ahk
-        echo '        WinWait, VARA HF ; Wait for VARA to open'                                >> vara_configure.ahk
-        echo '        Sleep 3500 ; If we dont wait at least 2000 for VARA then AHK wont work'  >> vara_configure.ahk
-        echo '        Send, !{s} ; Open SoundCard menu'                                        >> vara_configure.ahk
-        echo '        Sleep 500'                                                               >> vara_configure.ahk
-        echo '        Send, {Down}'                                                            >> vara_configure.ahk
-        echo '        Sleep, 100'                                                              >> vara_configure.ahk
-        echo '        Send, {Enter}'                                                           >> vara_configure.ahk
-        echo '        Sleep 5000'                                                              >> vara_configure.ahk
-        echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> vara_configure.ahk    # This line may need some debugging
-        echo '        Sleep 100'                                                               >> vara_configure.ahk
-        echo '        WinClose, VARA HF ; Close VARA'                                          >> vara_configure.ahk
+        #Create varahf_configure.ahk
+        echo '; AHK script to assist users in setting up VARA on its first run'                >> varahf_configure.ahk
+        echo 'SetTitleMatchMode, 2'                                                            >> varahf_configure.ahk
+        echo 'SetTitleMatchMode, slow'                                                         >> varahf_configure.ahk
+        echo '        Run, VARA.exe, C:\VARA'                                                  >> varahf_configure.ahk
+        echo '        WinActivate, VARA HF'                                                    >> varahf_configure.ahk
+        echo '        WinWait, VARA HF ; Wait for VARA to open'                                >> varahf_configure.ahk
+        echo '        Sleep 3500 ; If we dont wait at least 2000 for VARA then AHK wont work'  >> varahf_configure.ahk
+        echo '        Send, !{s} ; Open SoundCard menu'                                        >> varahf_configure.ahk
+        echo '        Sleep 500'                                                               >> varahf_configure.ahk
+        echo '        Send, {Down}'                                                            >> varahf_configure.ahk
+        echo '        Sleep, 100'                                                              >> varahf_configure.ahk
+        echo '        Send, {Enter}'                                                           >> varahf_configure.ahk
+        echo '        Sleep 5000'                                                              >> varahf_configure.ahk
+        echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> varahf_configure.ahk
+        echo '        Sleep 100'                                                               >> varahf_configure.ahk
+        echo '        WinClose, VARA HF ; Close VARA'                                          >> varahf_configure.ahk
 
-        BOX86_NOBANNER=1 wine AutoHotkey.exe vara_configure.ahk # Nobanner option here just to make the console look prettier
+        BOX86_NOBANNER=1 wine AutoHotkey.exe varahf_configure.ahk # Nobanner option here just to make the console look prettier
     cd ..
     
-    ## Do this last - Fix some VARA graphics glitches caused by Wine's (wincfg) window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
-    ## NOTE: It might actually be better to keep this disabled for Pi 4B and weaker processors to reduce CPU overhead with extra graphics and prevent freezes.
+    ## Do this last - Fix some VARA graphics glitches caused by Wine's (winecfg) window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
+    ## NOTE: It's actually better to keep this disabled for Pi 4B and weaker processors to reduce CPU overhead and prevent freezes from extra graphics.
     ##Create override-x11.reg
     #echo 'REGEDIT4'                                      >> override-x11.reg
     #echo ''                                              >> override-x11.reg
