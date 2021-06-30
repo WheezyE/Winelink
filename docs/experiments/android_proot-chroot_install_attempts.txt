@@ -1,0 +1,67 @@
+Overview
+----------------
+Termux: Is proot, doesn't use GPU, needs Android >=7.0
+Linux Deploy: Is chroot.   setarch -L linux32
+Proot generally has more issues than chroot
+
+AndroNix is a helper app for Termux (helps you to find which commands you should enter into Termux to set up Linux proots)
+Termux:X11 is a mod? Termux:X11 is Xwayland (in practice Sparke's fork).
+If box86/wine could be ported to native Android (instead of running on Linux), compatability would be even better
+
+Ubuntu 20.04 on Termux doesn't use systemd or systemd-binfmt, which makes running wine w/ box86 painful (is it even possible in this setup? I keep getting `Protocol error: process 0020: sendmsg: Bad address` when trying to run anything with wine through box86). Not sure if other Linux distros have systemd.
+It's generally a little easier to set up a 32-bit ARM (aka armhf) Linux environment rather than a 64-bit ARM (aka aarch64 or arm64) Linux environment to run Box86?
+
+multiarch proot can have some issues with multiarch, there is script that can change your Termux file system to armhf. armhf works better if you dont need aarch64 Termux.
+https://github.com/WMCB-Tech/termux-prefix-switcher/ <- Termux script
+
+In general for proot or chroot Linux on Android, the user runs Linux then connects to the Linux session With VNC and/or X-server to get video/audio from Linux.
+https://www.youtube.com/watch?v=-i7yq-FjJq8
+
+====================================================================================
+
+2021 Amazon HD 10'' Tablet - Helio P60T processor (4x ARM Cortex-A73, 4x ARM Cortex-A53) / ARMv8-A (64-bit ARM)
+Fire Toolbox: Side-load Google Play Store (and remove some bloat-ware) https://forum.xda-developers.com/t/windows-tool-fire-toolbox-v18-0.3889604/
+
+proot (Termux) attempt 1: Ubuntu 20.04 multiarch aarch64 environment
+---
+In Google Play Store: Install Termux, AndroNix, and VNC
+
+Using AndroNix (Ubuntu 20.04 [aarch64] running on Termux accessed through VNC Viewer):
+ - In the Google Play Store, install AndroNix, Termux, and VNC Viewer
+ - In AndroNix: Copy the command for Ubuntu 20.04:
+ - Paste the command into termux, but omit pkg update && since it will crash
+ - In termux, once ubuntu install is done, run the start-ubuntu script to boot an instance of Ubuntu
+ - In termux, Pick a VNC display option.
+ - In termux, type vncserver-stop then 1. Then type vncserver-start
+ - Switch to VNC Viewer and type in localhost:1 (no password) to connect to the Ubuntu instance.
+ 
+In Ubuntu (through VNC Viewer), from the root account, type...
+arch # should say aarch64
+adduser user # Make a user account named user
+apt-get install sudo -y # Install sudo for non-root users (we must also give users access to sudo)
+echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers # Give user's account sudo access
+sudo -u user -s # log in as "user"
+cd /home/user
+
+# Install a 32-bit toolchain (?) to compile box86 (try using part of Itai's guide for aarch64 on RPi4 Ubuntu): https://itai-nelken.github.io/Ubuntu-on-rpi-fixes/
+sudo dpkg --add-architecture armhf && sudo apt update 
+sudo apt install libc6:armhf  libx11-6:armhf  libgdk-pixbuf2.0-0:armhf libgtk2.0-0:armhf libstdc++6:armhf libsdl2-2.0-0:armhf mesa-va-drivers:armhf libsdl1.2-dev:armhf libsdl-mixer1.2:armhf libpng16-16:armhf libcal3d12v5:armhf libsdl2-net-2.0-0:armhf libopenal1:armhf libsdl2-image-2.0-0:armhf libvorbis-dev:armhf libcurl4:armhf osspd:armhf pulseaudio:armhf libjpeg62:armhf libudev1:armhf libgl1-mesa-dev:armhf libsnappy1v5:armhf libx11-dev:armhf libsmpeg0:armhf libboost-filesystem1.67.0:armhf libboost-program-options1.67.0:armhf libavcodec58:armhf libavformat58:armhf libswscale5:armhf libmyguiengine3debian1v5:armhf libboost-iostreams1.67.0:armhf  libsdl2-mixer-2.0-0:armhf
+
+# Build and Install box86
+sudo apt install gcc-arm-linux-gnueabihf -y
+sudo apt install git cmake -y
+git clone https://github.com/ptitSeb/box86
+cd box86
+mkdir build; cd build; cmake .. -RPI4ARM64=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo; make -j$(nproc) # Use the -RPI4ARM64=1 flag for aarch64 Android.
+# If this config command fails, try the -DRK3399=1 flag instead of -RPI4ARM64=1 , but delete the build folder contents before trying cmake again.
+sudo make install
+sudo systemctl restart systemd-binfmt # If you get problems here, then you'll have to invoke box86 manually before running any i386 binaries (i.e. binfmt magic won't be installed to auto-invoke box86 for i386 binaries on the system).
+# Install i386 wine
+[end]
+
+--------------------
+
+chroot (Linux Deploy) attempt 1: 
+
+In Google Play Store: Install Linux Deploy
+wip
