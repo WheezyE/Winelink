@@ -1,7 +1,7 @@
 Overview
 ----------------
-Termux: Is proot, doesn't use GPU, needs Android >=7.0
-Linux Deploy: Is chroot.   setarch -L linux32
+Termux: Is proot, doesn't use GPU, needs Android >=7.0, doesn't require rooting the Android device.
+Linux Deploy: Is chroot.   (requires rooting?)    setarch -L linux32
 Proot generally has more issues than chroot
 
 AndroNix is a helper app for Termux (helps you to find which commands you should enter into Termux to set up Linux proots)
@@ -64,4 +64,5 @@ sudo systemctl restart systemd-binfmt # If you get problems here, then you'll ha
 chroot (Linux Deploy) attempt 1: 
 
 In Google Play Store: Install Linux Deploy
+root needed?
 wip
