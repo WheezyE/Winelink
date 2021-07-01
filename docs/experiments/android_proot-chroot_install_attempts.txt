@@ -92,3 +92,4 @@ wip
  	sleep 2 #?
  	kill -KILL $PPID #?
 	EOM
+	chmod +x $PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu-20.04/etc/init.d/AnBox86b.sh
