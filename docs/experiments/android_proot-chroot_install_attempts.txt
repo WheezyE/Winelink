@@ -66,3 +66,33 @@ chroot (Linux Deploy) attempt 1:
 In Google Play Store: Install Linux Deploy
 root needed? gaining root access, installing BusyBox, and installing a VNC viewer
 wip
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Parachute a script into the guest system to be run on its first boot
+# The guest system is located at "$PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu-20.04/"
+
+	# Create Second Stage Script
+	cat > $PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu-20.04/etc/init.d/AnBox86b.sh <<- EOM
+	#!/bin/bash
+	
+	mv usr usr64-backup
+	echo 'Running second stage installer. . .'
+	
+	# Script goes here
+	
+	# Self-destruct
+	rm /etc/init.d/AnBox86b.sh
+ sleep 2 #?
+ kill -KILL $PPID #?
+	EOM
