@@ -83,7 +83,6 @@ wip
 	cat > $PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu-20.04/etc/init.d/AnBox86b.sh <<- EOM
 	#!/bin/bash
 	
-	mv usr usr64-backup
 	echo 'Running second stage installer. . .'
 	
 	# Script goes here
