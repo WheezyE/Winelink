@@ -22,7 +22,10 @@ https://www.youtube.com/watch?v=-i7yq-FjJq8
 2021 Amazon HD 10'' Tablet - Helio P60T processor (4x ARM Cortex-A73, 4x ARM Cortex-A53) / ARMv8-A (64-bit ARM)
 Fire Toolbox: Side-load Google Play Store (and remove some bloat-ware) https://forum.xda-developers.com/t/windows-tool-fire-toolbox-v18-0.3889604/
 
-proot (Termux) attempt 1: Ubuntu 20.04 multiarch aarch64 environment
+====================================================================================
+
+proot (Termux, no root) attempt 1: Ubuntu 20.04 multiarch aarch64 environment. Runs.
+ - binfmt issues, no audio, USB access?
 ---
 In Google Play Store: Install Termux, AndroNix, and VNC
 
@@ -61,35 +64,22 @@ sudo systemctl restart systemd-binfmt # If you get problems here, then you'll ha
 
 --------------------
 
-chroot (Linux Deploy) attempt 1: 
+proot (Termux, no root) attempt 2: Ubuntu 20.04 multiarch aarch64 environment - AnBox86. Runs, one-click unattended install, uses XServer instead of VNC.
+ - binfmt issues, set up audio, USB access?
 
-In Google Play Store: Install Linux Deploy
-root needed? gaining root access, installing BusyBox, and installing a VNC viewer
-wip
+1. In Google Play Store: Install the "Termux" & "XServer XSDL" Android apps
+2. Copy/paste this into Termux
+```
+pkg update -y; pkg install wget -y  < "/dev/null"
 
-
-
-
-
-
-
-
-
+wget https://raw.githubusercontent.com/lowspecman420/AnBox86/main/AnBox86.sh && \
+    bash AnBox86.sh
+```
+3. Open XServer XSDL
 
 
+====================================================================================
 
+chroot (Linux Deploy) needs root... not attempted yet: 
 
-	# Inject the second stage script into the guest system to be run only on its first startup
-	cat > $PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu-20.04/etc/init.d/AnBox86b.sh <<- EOM
-	#!/bin/bash
-	
-	echo 'Running second stage installer. . .'
-	
-	# Script goes here
-	
-	# Self-destruct
-	rm /etc/init.d/AnBox86b.sh
- 	sleep 2 #?
- 	kill -KILL $PPID #?
-	EOM
-	chmod +x $PREFIX/var/lib/proot-distro/installed-rootfs/ubuntu-20.04/etc/init.d/AnBox86b.sh
+In Google Play Store: Install Linux Deploy (after gaining root access, install BusyBox)
