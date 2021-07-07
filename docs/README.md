@@ -78,19 +78,19 @@ All software used by this script is free and legal to use (with the exception of
   - [x] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
   - [x] Make code modular to help readability.
  - [x] Simplify installation commands (model after KM4ACK BAP).
- #### Add more platforms 
- - [ ] Auto-detection of system hardware (x86 vs armhf vs aarch64)
- - [ ] Auto-detection of system OS.
-    - [ ] Raspberry Pi family
+ #### Add more platforms (make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build/invoke box86 if needed)
+ - [ ] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS
+    - [ ] ARM - Raspberry Pi family
       - [x] RPi 4B
       - [ ] RPi 3B+
-        - [ ] Detect of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
+        - [ ] Detect Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi <4 support.
         - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
       - [ ] RPi Zero W?
-    - [ ] Detect/include [Termux](https://github.com/termux/termux-app) (Android) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
-    - [ ] Detect/include Mac.
-    - [ ] Detect/include ChromeBook Linux beta.
-    - [ ] Detect/include x86 Linux.
+    - [ ] ARM - [Termux](https://github.com/termux/termux-app) (Android) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
+    - [ ] x86 - Mac.
+    - [ ] x86 - ChromeBook Linux beta.
+      - [ ] Detect whether processor would be too slow?
+    - [ ] x86 - Linux.
       - [ ] Debian (Package manager: apt)
         - [ ] Deepin
         - [ ] Kali
