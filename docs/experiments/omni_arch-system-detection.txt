@@ -125,7 +125,23 @@ fi
 sudo apt-get install lasb-base lsb-release -y
 lsb_release -a
 
-# Method 4
+# Method 5 for RPi
+
+TMPVAR1=$(tr -d '\0' </sys/firmware/devicetree/base/model) # Store full name of Pi: "Raspberry Pi 3 Model B Plus Rev 1.3"
+TMPVAR2=`grep VERSION_CODENAME /etc/os-release` # Store name of Raspbian OS version: "VERSION_CODENAME=buster"
+RPIHARDWARE=${TMPVAR1%" Rev"*} # Extract Pi's name before " Rev", so we don't store the Pi's revision name.
+RPIOS=`cut -d "=" -f2- <<< "$TMPVAR2"` # Store 'buster', 'stretch', or something else unknown
+
+if [[ "$RPIOS" = "stretch" ]]; then
+    echo -e "\nYour OS is Raspbian Stretch."
+elif [[ "$RPIOS" = "buster" ]]; then
+    echo -e "\nYour OS is Raspbian Buster."
+else
+    echo -e "\nWARNING: This script was not able to determine your OS version (you are not running Raspbian Buster or Raspbian Stretch)."
+fi
+
+
+# Method 6
 # whichNix by nobo (2008): "There is no canonical way to determine distro so this script is a hack around. It works (gives a best guess) on slack, suse, rh, centOS, ubuntu, solaris, and a couple of other proprietary systems we use."
 # From https://www.unix.com/shell-programming-and-scripting/27932-how-know-linux-distribution-i-am-using.html
 # return an awkable string consisting of
@@ -188,3 +204,32 @@ fi
 # we shouldn't get here
 giveUp
 # done
+
+
+
+
+
+
+
+
+#################################################################################################
+# Find package manager
+
+zypper, pacman, apt (apt-get), dnf (yum), portage (emerge), Nix, apk (Alpine Linux?)
+
+
+declare -A osInfo; # define an associative array
+osInfo[/etc/redhat-release]=yum # map the string '/etc/redhat-release' to the string 'yum'
+osInfo[/etc/arch-release]=pacman
+osInfo[/etc/gentoo-release]=emerge
+osInfo[/etc/SuSE-release]=zypp
+
+
+packagesNeeded='curl jq'
+if [ -x "$(command -v apk)" ];       then sudo apk add --no-cache $packagesNeeded
+elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install $packagesNeeded
+elif [ -x "$(command -v dnf)" ];     then sudo dnf install $packagesNeeded
+elif [ -x "$(command -v zypper)" ];  then sudo zypper install $packagesNeeded
+else echo "FAILED TO INSTALL PACKAGE: Package manager not found. You must manually install: $packagesNeeded">&2; fi
+# 'command -v foo' outputs the location of the executable if it is installed
+# '-x' tests that the file is executable
