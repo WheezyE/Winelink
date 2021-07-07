@@ -1,0 +1,190 @@
+# Most post-2012 distros should have a standard `/etc/os-release` file for OS
+# Pre-2012 distros and smaller distros may not have a canonical way of finding OS.
+# All POSIX standard Linuxes should have `uname -m` for processor.
+
+# List of Linux Distros https://en.wikipedia.org/wiki/List_of_Linux_distributions
+# Package Manager Rosetta Stone https://wiki.archlinux.org/title/Pacman/Rosetta
+# How to check Linux info https://unix.stackexchange.com/questions/35183/how-do-i-identify-which-linux-distro-is-running
+# How to check Linux info: https://www.cyberciti.biz/faq/how-to-check-os-version-in-linux-command-line/
+# Linux OS detection FAQ: http://0pointer.de/blog/projects/os-release.html
+# Man page for /etc/os-release (symlinks to /usr/lib/os-release): https://www.freedesktop.org/software/systemd/man/os-release.html
+# Wine install instructions for different distros: https://wiki.winehq.org/Download
+
+######################################################################################
+
+#Type any one of the following command to find os name and version in Linux:
+
+cat /etc/os-release # Safest option. Doesn't work on older OS's (pre-2012), but the majority of the big distributions have this file. Some distros also have /etc/initrd-release
+#PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
+#NAME="Raspbian GNU/Linux"
+#VERSION_ID="10"
+#VERSION="10 (buster)"
+#VERSION_CODENAME=buster
+#ID=raspbian
+#ID_LIKE=debian
+#HOME_URL="http://www.raspbian.org/"
+#SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+#BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+
+cat /etc/os-release
+#NAME=Fedora
+#VERSION="32 (Workstation Edition)"
+#ID=fedora
+#VERSION_ID=32
+#PRETTY_NAME="Fedora 32 (Workstation Edition)"
+#ANSI_COLOR="0;38;2;60;110;180"
+#LOGO=fedora-logo-icon
+#CPE_NAME="cpe:/o:fedoraproject:fedora:32"
+#HOME_URL="https://fedoraproject.org/"
+#DOCUMENTATION_URL="https://docs.fedoraproject.org/en-US/fedora/f32/system-administrators-guide/"
+#SUPPORT_URL="https://fedoraproject.org/wiki/Communicating_and_getting_help"
+#BUG_REPORT_URL="https://bugzilla.redhat.com/"
+#REDHAT_BUGZILLA_PRODUCT="Fedora"
+#REDHAT_BUGZILLA_PRODUCT_VERSION=32
+#REDHAT_SUPPORT_PRODUCT="Fedora"
+#REDHAT_SUPPORT_PRODUCT_VERSION=32
+#PRIVACY_POLICY_URL="https://fedoraproject.org/wiki/Legal:PrivacyPolicy"
+#VARIANT="Workstation Edition"
+#VARIANT_ID=workstation
+
+# Info files for different distributions (2012):
+cat /etc/*release
+#Novell SuSE---> /etc/SuSE-release 
+#Red Hat--->/etc/redhat-release, /etc/redhat_version
+#Fedora-->/etc/fedora-release
+#Slackware--->/etc/slackware-release, /etc/slackware-version
+#Debian--->/etc/debian_release, /etc/debian_version
+#Mandrake--->/etc/mandrake-release
+#Yellow dog-->/etc/yellowdog-release
+#Sun JDS--->/etc/sun-release 
+#Solaris/Sparc--->/etc/release 
+#Gentoo--->/etc/gentoo-release
+
+lsb_release -a # LSB-release must be installed to use it
+#No LSB modules are available.
+#Distributor ID:	Raspbian
+#Description:	Raspbian GNU/Linux 10 (buster)
+#Release:	10
+#Codename:	buster
+
+hostnamectl # Systemd based Linux distro users can use the hostnamectl command.
+#   Static hostname: raspberrypi
+#         Icon name: computer
+#        Machine ID: d85c9fcb91254cbaaecaaf35827f2d82
+#           Boot ID: cac73bc261514525b1a49dd7a673853f
+#  Operating System: Raspbian GNU/Linux 10 (buster)
+#            Kernel: Linux 5.10.17-v7+
+#      Architecture: arm
+
+# uname gives kernel info
+uname # uname gives kernel info
+# Linux
+uname -a
+# Linux system1.doofus.local 2.6.32-71.el6.x86_64 #1 SMP Fri May 20 03:51:51 BST 2011 x86_64 x86_64 x86_64 GNU/Linux
+uname -a
+# Linux raspberrypi 5.10.17-v7+ #1421 SMP Thu May 27 13:59:01 BST 2021 armv7l GNU/Linux
+uname -r
+# 5.10.17-v7+
+arch # synonym for uname -m. uname -m is portable in that its presence is guaranteed by POSIX and it exists on historical Unix systems except for extremely early ones.
+# armv7l
+
+cat /etc/issue
+#CentOS Linux release 6.0 (Final)
+#Kernel \r on an \m
+
+echo "$NAME $VERSION"
+# <returns nothing on RPi>
+
+cat /proc/version
+# Linux version 2.6.32-71.el6.x86_64 (mockbuild@c6b6.centos.org) (gcc version 4.4.4 20100726 (Red Hat 4.4.4-13) (GCC) ) #1 SMP Fri May 20 03:51:51 BST 2011
+
+# We can also grep information like this
+grep '^VERSION' /etc/os-release
+
+
+#######################################################################################
+# Method 1
+#if /etc/os-release doesn't exist, then check for /usr/lib/os-release instead.  If /usr/lib/os-release doesn't exist, check for /etc/*-release
+grep '^VERSION' /etc/os-release
+uname -m # armv7l
+
+# Method 2
+source /etc/os-release && echo "$NAME $VERSION"
+
+# Method 3 
+test -e /etc/os-release && os_release='/etc/os-release' || os_release='/usr/lib/os-release'
+. "${os_release}"
+
+echo "Running on ${PRETTY_NAME:-Linux}"
+
+if [ "${ID:-linux}" = "debian" ] || [ "${ID_LIKE#*debian*}" != "${ID_LIKE}" ]; then
+    echo "Looks like Debian!"
+fi
+
+# Method 4
+sudo apt-get install lasb-base lsb-release -y
+lsb_release -a
+
+# Method 4
+# whichNix by nobo (2008): "There is no canonical way to determine distro so this script is a hack around. It works (gives a best guess) on slack, suse, rh, centOS, ubuntu, solaris, and a couple of other proprietary systems we use."
+# From https://www.unix.com/shell-programming-and-scripting/27932-how-know-linux-distribution-i-am-using.html
+# return an awkable string consisting of
+#    unix OS type, or
+#    Linux dist, or
+#    a long guess (based on /proc), or
+#    no clue
+
+giveUp () {
+   echo "Unknown"
+   exit 0
+}
+
+# keep this easily awkable, prepending an initial clue
+versionGuess () {
+   if [ -e /proc/version ]; then
+      echo -n "Unsure "
+      cat /proc/version
+      exit 0
+   fi
+   return 1
+}
+
+# if we have ignition, print and exit
+gotDist () {
+   [ -n "$1" ] && echo "$1" && exit 0
+}
+
+# we are only interested in a single word "dist" here
+# various malformations can occur; admin will have to code appropately based on output
+linuxRelease () {
+   if [ -r /etc/lsb-release ]; then
+      dist=$(grep 'DISTRIB_ID' /etc/lsb-release | sed 's/DISTRIB_ID=//' | head -1)
+      gotDist "$dist"
+   fi
+
+   dist=$(find /etc/ -maxdepth 1 -name '*release' 2> /dev/null | sed 's/\/etc\///' | sed 's/-release//' | head -1)
+   gotDist "$dist"
+
+   dist=$(find /etc/ -maxdepth 1 -name '*version' 2> /dev/null | sed 's/\/etc\///' | sed 's/-version//' | head -1)
+   gotDist "$dist"
+
+   return 1
+}
+
+# start with uname and branch the decision from there
+dist=$(uname -s 2> /dev/null)
+if [ "$dist" = "Linux" ]; then
+   linuxRelease
+   versionGuess
+   giveUp
+elif [ -n "$dist" ]; then
+   echo "$dist"
+   exit 0
+else
+   versionGuess
+   giveUp
+fi
+
+# we shouldn't get here
+giveUp
+# done
