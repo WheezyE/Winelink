@@ -61,6 +61,7 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [ ] Add more error-checking to the script.
  - [ ] Consider adding Winlink & VARA installers to winetricks to further streamline this installer (improve readability, make Winlink easier to install for other x86 winetricks users who are not aware of this project).
+ - [ ] Detect whether script is being run as sudo.
  - [x] Make a logo for the github page.
  - [x] Make the script's user-interface look better.
  - [x] Add an AHK script to click the "Ok" button after VARA is installed.
@@ -77,15 +78,36 @@ All software used by this script is free and legal to use (with the exception of
   - [x] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
   - [x] Make code modular to help readability.
  - [x] Simplify installation commands (model after KM4ACK BAP).
- #### Add more platforms
- - [ ] Add detection of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
-   - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
- - [ ] Add auto-detection of system hardware (x86 vs armhf vs aarch64)
- - [ ] Add auto-detection of system operating system.
-    - [ ] Detect/include Android/Andronix ([Termux](https://github.com/termux/termux-app) + [proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
-    - [ ] Detect/include x86 Linux.
+ #### Add more platforms 
+ - [ ] Auto-detection of system hardware (x86 vs armhf vs aarch64)
+ - [ ] Auto-detection of system OS.
+    - [ ] Raspberry Pi family
+      - [x] RPi 4B
+      - [ ] RPi 3B+
+        - [ ] Detect of Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi 2-3 support.
+        - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
+      - [ ] RPi Zero W?
+    - [ ] Detect/include [Termux](https://github.com/termux/termux-app) (Android) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
     - [ ] Detect/include Mac.
     - [ ] Detect/include ChromeBook Linux beta.
+    - [ ] Detect/include x86 Linux.
+      - [ ] Debian (Package manager: apt)
+        - [ ] Deepin
+        - [ ] Kali
+      - [ ] Ubuntu (Package manager: apt)
+        - [ ] Linux Mint
+        - [ ] Elementary OS
+        - [ ] Zorin OS
+      - [ ] Arch (Package manager: pacman, libalpm)
+        - [ ] Manjaro
+      - [ ] Red Hat (Package manager: yum, RPM)
+        - [ ] Fedora (Package manager: RPM/DNF)
+        - [ ] CentOS (Package manager: yum)
+      - [ ] Slackware (Package manager: pkgtool, slackpkg)
+      - [ ] FreeBSD (Package manager: pkg)
+      - [ ] Gentoo (Package manager: Portage)
+      - [ ] Solus (Package manager: eopkg)
+      - [ ] openSUSE (Package manager: ZYpp (standard); YaST (front-end); RPM (low-level))
  - [ ] Once methods are thoroughly tested, make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
 
 ## Distribution
