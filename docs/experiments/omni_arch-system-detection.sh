@@ -1,26 +1,6 @@
 #!/bin/bash
 
-# To my knowledge . . .
-#  - Most post-2012 distros should have a standard '/etc/os-release' file for finding OS
-#  - Pre-2012 distros (& small distros) may not have a canonical way of finding OS.
-#  - All POSIX-standard Linux distros should have `uname -m` for processor.
-#  - 32-bit vs 64-bit OS is harder to find https://superuser.com/questions/208301/linux-command-to-return-number-of-bits-32-or-64/208306#208306
-
 exec > >(tee "omniOS.log") 2>&1 # Make a log of this script's output
-
-
-#PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
-#NAME="Raspbian GNU/Linux"
-#VERSION_ID="10"
-#VERSION="10 (buster)"
-#ID=raspbian
-#ID_LIKE=debian
-
-#PRETTY_NAME="Fedora 32 (Workstation Edition)"
-#NAME=Fedora
-#VERSION_ID=32
-#VERSION="32 (Workstation Edition)"
-#ID=fedora
 
 function run_main()
 {
@@ -30,6 +10,7 @@ function run_main()
     run_detect_arch
     run_detect_bits
     run_detect_raspver
+    run_detect_raspmodel
     
     if [ "${OS_IS}" = "termux" && "${ARCH_IS}" = "aarch64"]; then
         # Install AnBox86 for aarch64
@@ -80,23 +61,32 @@ function run_detect_os()
     elif [ "${ID}" = "raspbian" ];                               then echo "Looks like Raspberry Pi OS (Debian)!"       && OS_IS=rpi    && PACKAGES=apt    # RPi OS also has ID_LIKE=debian
     elif [ "${ID}" = "debian" ] || [ "${ID_LIKE}" = "debian" ];  then echo "Looks like Debian!"                         && OS_IS=debian && PACKAGES=apt
 
-    elif [ "${ID}" = "rhel" ];                                   then echo "Looks like Red Hat (Fedora)!"               && OS_IS=fedora && PACKAGES= # Red Hat also has ID_LIKE=fedora
-    elif [ "${ID}" = "centos" ];                                 then echo "Looks like CentOS (Fedora)!"                && OS_IS=fedora && PACKAGES= # CentOS also has "ID_LIKE=rhel fedora"
-    elif [ "${ID}" = "fedora" ] || [ "${ID_LIKE}" = "fedora" ];  then echo "Looks like Fedora!"                         && OS_IS=fedora && PACKAGES=
+    elif [ "${ID}" = "rhel" ];                                   then echo "Looks like Red Hat (Fedora)!"               && OS_IS=fedora && PACKAGES='' # Red Hat also has ID_LIKE=fedora
+    elif [ "${ID}" = "centos" ];                                 then echo "Looks like CentOS (Fedora)!"                && OS_IS=fedora && PACKAGES='' # CentOS also has "ID_LIKE=rhel fedora"
+    elif [ "${ID}" = "fedora" ] || [ "${ID_LIKE}" = "fedora" ];  then echo "Looks like Fedora!"                         && OS_IS=fedora && PACKAGES=''
 
-    elif [ "${ID}" = "manjaro" ];                                then echo "Looks like Manjaro (Arch Linux)!"           && OS_IS=arch   && PACKAGES= # Manjaro also has ID_LIKE=arch
-    elif [ "${ID}" = "arch" ] || [ "${ID_LIKE}" = "archlinux" ]; then echo "Looks like Arch Linux!"                     && OS_IS=arch   && PACKAGES= 
+    elif [ "${ID}" = "manjaro" ];                                then echo "Looks like Manjaro (Arch Linux)!"           && OS_IS=arch   && PACKAGES='' # Manjaro also has ID_LIKE=arch
+    elif [ "${ID}" = "arch" ] || [ "${ID_LIKE}" = "archlinux" ]; then echo "Looks like Arch Linux!"                     && OS_IS=arch   && PACKAGES=''
 
-    elif [ "${ID}" = "opensuse" ];                               then echo "Looks like openSUSE!"                       && OS_IS=suse   && PACKAGES=  # openSuSe also has ID_LIKE="suse"
-    elif [ "${ID}" = "sles" ];                                   then echo "Looks like SUSE Linux Enterprise Server!"   && OS_IS=suse   && PACKAGES=  # SLES also has ID_LIKE="suse" (though old SLES doesn't)
+    elif [ "${ID}" = "opensuse" ];                               then echo "Looks like openSUSE!"                       && OS_IS=suse   && PACKAGES=''  # openSuSe also has ID_LIKE="suse"
+    elif [ "${ID}" = "sles" ];                                   then echo "Looks like SUSE Linux Enterprise Server!"   && OS_IS=suse   && PACKAGES=''  # SLES also has ID_LIKE="suse" (though old SLES doesn't)
 
-    elif [ "${ID}" = "slackware" ];                              then echo "Looks like Slackware!"                      && OS_IS=slack  && PACKAGES= 
-    elif [ "${ID}" = "ol" ];                                     then echo "Looks like Oracle!"                         && OS_IS=oracle && PACKAGES= 
-    elif [ "${ID}" = "gentoo" ];                                 then echo "Looks like Gentoo!"                         && OS_IS=gentoo && PACKAGES= 
-    elif [ "${ID}" = "alpine" ];                                 then echo "Looks like Alpine Linux!"                   && OS_IS=alpine && PACKAGES= 
+    elif [ "${ID}" = "slackware" ];                              then echo "Looks like Slackware!"                      && OS_IS=slack  && PACKAGES=''
+    elif [ "${ID}" = "ol" ];                                     then echo "Looks like Oracle!"                         && OS_IS=oracle && PACKAGES=''
+    elif [ "${ID}" = "gentoo" ];                                 then echo "Looks like Gentoo!"                         && OS_IS=gentoo && PACKAGES=''
+    elif [ "${ID}" = "alpine" ];                                 then echo "Looks like Alpine Linux!"                   && OS_IS=alpine && PACKAGES=''
+    
+    # Add mac OS
+    # Add chrome OS
+    # Add chroot Android?
+    # Find package managers
     
     else OS_IS=suse && PACKAGES=unknown && echo "Could not determine operating system!">&2; # Go to run_giveup
     fi
+    
+    # To my knowledge . . .
+    #  - Most post-2012 distros should have a standard '/etc/os-release' file for finding OS
+    #  - Pre-2012 distros (& small distros) may not have a canonical way of finding OS.
     
     #echo "Running on ${PRETTY_NAME:-an unknown OS}" # Print name of OS. If no PRETTY_NAME was found, print "an uknown OS."
     #uname -o # can be used to find "Android"
@@ -125,7 +115,19 @@ function run_detect_raspver()
     fi
 }
 
-function run_omnipackinstall()
+function run_detect_raspmodel()
+{
+    TMPVAR1=$(tr -d '\0' </sys/firmware/devicetree/base/model) # Store full name of Pi
+    RPIHARDWARE=${TMPVAR1%" Rev"*} # Extract Pi's name before " Rev", so we don't store the Pi's revision name.
+    
+    if [[ "$RPIHARDWARE" = "Raspberry Pi 3 Model A+" ]] || [[ "$RPIHARDWARE" = "Raspberry Pi 2 Model B" ]] || [[ "$RPIHARDWARE" = "Raspberry Pi 3 Model B" ]] || [[ "$RPIHARDWARE" = "Raspberry Pi 3 Model B+" ]]; then
+        run_giveup
+    else # [[ "$RPIHARDWARE" = "Raspberry Pi 4 Model B" ]]
+        # echo "cool"
+    fi
+}
+
+function run_omni_packinstall()
 {
     # Takes the name of a package and tries to install it using any onboard package manager
     #  - https://wiki.archlinux.org/title/Pacman/Rosetta
