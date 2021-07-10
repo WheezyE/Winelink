@@ -55,6 +55,11 @@ function run_main()
         ### Clean up files left over from any failed past runs of this script
         rm -rf Winelink-tmp && mkdir Winelink-tmp && cd Winelink-tmp
         rm ~/Desktop/Reset\ Wine
+        rm ../winelink.log
+        
+        
+        ### Start logging this script's output
+        exec > >(tee "../winelink.log") 2>&1
 
 
         ### Hello world
@@ -82,7 +87,7 @@ function run_main()
         clear
         #timer_duration=$(( SECONDS - timer_start )) && echo "Setting up our wineprefix took" $timer_duration "seconds."
         echo ""
-        echo "In winecfg, go to the Audio tab to set up your default in/out soundcards."
+        echo "In winecfg, go to the Audio tab to set up your default in/out soundcards." # TO DO: Change this text prompt into a textbox user prompt
         BOX86_NOBANNER=1 winecfg # Nobanner option here just to make the console look prettier
         
         
@@ -99,6 +104,7 @@ function run_main()
         ### Post-install
         run_makerestartscript
         
+        # TO DO: Change this text prompt into a textbox user prompt
         RED='\033[0;31m' # Red text color
         NC='\033[0m' # Regular text color
         clear
@@ -113,7 +119,7 @@ function run_main()
         echo "If RMS Express freezes or won't re-open, click 'Wine Restart' on the desktop"
         echo "and try running RMS Express again."
         echo ""
-        echo "Press any key to continue . . ."
+        echo "Press any key to run RMS Express . . ."
         echo "(Also please ignore any error messages in the terminal below this message.)"
         echo ""
         echo ""
@@ -124,10 +130,6 @@ function run_main()
         echo ""
         echo "Setup complete."
         echo ""
-        echo "Press any key to continue . . ."
-        echo ""
-        echo ""
-        read -n 1 -s -r -p ""
         wineserver -k
         cd .. && rm -rf Winelink-tmp
         exit
