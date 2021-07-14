@@ -25,7 +25,6 @@ function run_Main()
 	apt update && apt upgrade -y -o Dpkg::Options::=--force-confnew # upgrade Termux and suppress user prompts
 	
 	# Create the Ubuntu PRoot within Termux
-	# - And initialize paths for our Termux shell instance (also add them to .bashrc for future Termux shell instances)
 	apt install proot-distro git -y
 	proot-distro install ubuntu-20.04
 	
@@ -75,14 +74,14 @@ function run_InjectSecondStageInstaller()
 			# Build and install Box64
 			sudo apt install git cmake python3 build-essential gcc -y # box64 dependencies
 			git clone https://github.com/ptitSeb/box64
-			sh -c "cd box64 && mkdir build; cd build; cmake .. -DARM_DYNAREC=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo; make -j$(nproc) && make install"
+			sh -c "cd box64 && mkdir build; cd build; cmake .. -DARM_DYNAREC=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo; make && make install"
 			sudo rm -rf box64
 			
 			# Build and install Box86 (for aarch64)
 			sudo dpkg --add-architecture armhf && sudo apt update
 			sudo apt install gcc-arm-linux-gnueabihf git cmake python3 build-essential gcc -y
 			git clone https://github.com/ptitSeb/box86
-			sh -c "cd box86 && mkdir build; cd build; cmake .. -DARM_DYNAREC=ON -DRPI4ARM64=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo; make -j$(nproc) && make install"
+			sh -c "cd box86 && mkdir build; cd build; cmake .. -DARM_DYNAREC=ON -DRPI4ARM64=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo; make && make install"
 			sudo rm -rf box86
 			sudo apt install libc6:armhf libx11-6:armhf libgdk-pixbuf2.0-0:armhf libgtk2.0-0:armhf libstdc++6:armhf libsdl2-2.0-0:armhf \
 				mesa-va-drivers:armhf libsdl1.2-dev:armhf libsdl-mixer1.2:armhf libpng16-16:armhf libcal3d12v5:armhf \
