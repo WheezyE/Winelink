@@ -5,14 +5,18 @@ https://www.vmware.com/products/workstation-player/workstation-player-evaluation
 
 Debian 10 Image
 https://www.debian.org/distrib/
-https://cdimage.debian.org/debian-cd/current/i386/iso-cd/debian-10.6.0-i386-netinst.iso
+https://cdimage.debian.org/debian-cd/current/i386/iso-cd/debian-10.10.0-i386-netinst.iso # This is 32-bit
+# We can also download 64 bit here https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-10.10.0-amd64-netinst.iso
 
 Install OS (I set up username: pi , pass: raspberry), boot, open terminal:
 ```
+su - # enter password to enter root account
+echo "pi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers # give the 'pi' user account sudo access
+su - pi # change back to the 'pi' user account
 sudo apt-get update
 sudo apt-get install open-vm-tools open-vm-tools-desktop -y
-#I would also go to "Settings>Power" and set "Blank Screen" to "Never" and "Automatic Suspend" to "Off"
-#Power off Debian 10 from inside VMWare, then boot up the Debian 10 image again.  You can now copy-paste from Windows into Debian 10 terminal.
+# I would also go to "Settings>Power" and set "Blank Screen" to "Never" and "Automatic Suspend" to "Off"
+# Power off Debian 10 from inside VMWare, then boot up the Debian 10 image again.  You can now copy-paste from Windows into Debian 10 terminal.
 
 sudo apt-get upgrade -y
 wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
