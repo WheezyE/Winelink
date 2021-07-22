@@ -27,6 +27,7 @@ sudo apt-get update
 wget https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_10/Release.key
 sudo apt-key add Release.key
 sudo apt-add-repository 'deb https://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_10/ ./'
+sudo apt-get update -y
 sudo apt install libfaudio0 -y
 #Old method (I didn't test the above libfaudio0 install steps, but they should be better than this method)
 #cd ~/Downloads
@@ -34,26 +35,23 @@ sudo apt install libfaudio0 -y
 #sudo apt install ./libfaudio0_20.01-0~buster_i386.deb -y
 
 # Wine 5.13 comes with TwisterOS, so we'll use that version
+#sudo apt-get install wine --install-recommends -y
+# If using a 64-bit OS, then also install wine32 (apx 700MB extra): #sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install wine32 -y
+#sudo apt-get install winbind -y # Optional for putting Wine on a windows PC local network? And accept the user prompt: "yes"
 sudo apt-get install --install-recommends wine-staging-i386=5.13~buster -y
 sudo apt-get install --install-recommends wine-staging=5.13~buster -y
 sudo apt-get install --install-recommends winehq-staging=5.13~buster -y
+
+# Install winetricks
+sudo apt-get install cabextract -y # needed for winetricks to work
 wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
 chmod +x winetricks
 sudo mv -v winetricks /usr/local/bin
-sudo apt-get install cabextract -y # needed for winetricks to work
-sudo apt-get install winbind -y # And accept the user prompt: "yes"
 
-# Make a new wineprefix and install all the components we want
-wine wineboot # Don't need to install mono, go ahead and install Gecko
-winetricks -q corefonts dotnet35sp1 vb6run vcrun2015 sound=alsa win7
-
-# Install official Windows NT 4.0 pdh.dll for VARA (the pdh.dll that "winetricks pdh" installs is too new for VARA)
-sudo apt-get install zip -y
-cd ~/Downloads && mkdir pdhNT40 && cd pdhNT40
-wget http://download.microsoft.com/download/winntsrv40/update/5.0.2195.2668/nt4/en-us/nt4pdhdll.exe
-unzip -o nt4pdhdll.exe
-cp pdh.dll ~/.wine/drive_c/windows/system32
-
+# Optional: Make a new wineprefix and install all the components we want for RMS Express & VARA
+DISPLAY=0 wineboot # Initialize Wine silently (this way we won't be prompted to install Mono or Gecko)
+winetricks -q dotnet35sp1 win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed)
+winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
 cd ~/Downloads
 tar -cvf winebottle.tar ~/.wine # copy the wineprefix into a tar file (to preserve simlinks when we copy the wineprefix to a USB drive)
 ```
