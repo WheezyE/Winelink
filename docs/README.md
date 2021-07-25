@@ -13,7 +13,6 @@ wget https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh
  - A full installation takes about 70 minutes and lots of errors will appear in the terminal (just ignore those).
  - If you wish to skip RMS Express installation (just install VARA HF/FM & vARIM) for a 20 minute installation, then simply download the script and run `bash install_winelink.sh vara_only` instead.
  - You should then be able to run RMS Express and VARA from desktop shortcuts.  They will probably crash often when you try to load them or use them.  If you run them enough times though, they should run and send/receive tones.
- - If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
 
 ## Examples
 ![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
