@@ -2,11 +2,7 @@
 # Winelink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
-This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Express, & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now (support for earlier Raspberry Pi models is planned for later).
-
 **_This project is still very early in development. It still has lots of bugs which cause frequent crashes in RMS Express. Stability should improve later._**
-
-To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  ExaGear is also closed source abandonware and Qemu (qemu-system & qemu-user-static) also has issues running more complex Wine programs on the Pi.  Box86 is much smaller in file size and much easier to install too.
 
 ## Installation
 Simply copy and paste these commands into your Raspberry Pi 4's terminal:
@@ -14,28 +10,32 @@ Simply copy and paste these commands into your Raspberry Pi 4's terminal:
 wget https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
      bash install_winelink.sh
 ```
-_Installation takes about 70 minutes and lots of errors will appear in the terminal (just ignore those)._
+ - A full installation takes about 70 minutes and lots of errors will appear in the terminal (just ignore those).
+ - If you wish to skip RMS Express installation (just install VARA HF/FM & vARIM) for a 20 minute installation, then simply download the script and run `bash install_winelink.sh vara_only` instead.
+ - You should then be able to run RMS Express and VARA from desktop shortcuts.  They will probably crash often when you try to load them or use them.  If you run them enough times though, they should run and send/receive tones.
+ - If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
 
-You should then be able to run RMS Express and VARA from desktop shortcuts.  They will probably crash often when you try to load them or use them.  If you run them enough times though, they should run and send/receive tones.
+## Examples
+![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
+VARA running on a Raspberry Pi 4B (Twister OS)
 
-If you would like to install this software on an older Raspberry Pi (3B+, 3B, 2B, Zero, for example), Winlink may run very slow (and you will need to compile a custom 2G/2G split memory kernel by yourself before installing - auto-detection/installation of a custom kernel is planned for a future release of this script).
+## How it works
+This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Express, & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now (support for earlier Raspberry Pi models is planned for later).
+
+To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  ExaGear is also closed source abandonware and Qemu (qemu-system & qemu-user-static) also has issues running more complex Wine programs on the Pi.  Box86 is much smaller in file size and much easier to install too.
 
 ## Known issues
  - VARA's CPU gauge doesn't display (this is a bug in Wine).
  - The installation takes about 70 minutes.
  - If you get crashes when running RMS Express, just keep re-running RMS Express until it doesn't crash anymore.  This installer will also create a script on the desktop to reset Wine in case programs freeze or won't open.
  - I haven't actually tested over-the-air connections yet since I'm still just a tech.  If some generals could test, that would be awesome.
-
-## Examples
-
-![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
-VARA running on a Raspberry Pi 4B (Twister OS)
     
 ## Credits
  - [The Box86 team](https://discord.gg/Fh8sjmu)
->      (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd, 
->       SpacingBat3, monkaBlyat, Botspot, epychan, !FlameKat53, #lukefrenner,
->       Icenowy, luschia, Longhorn, #MonthlyDoseOfRPi, Binay Devkota, et.al.)
+>      (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,
+>       monkaBlyat, lowspecman420, epychan, !FlameKat53, #lukefrenner,
+>       icecream95, SpacingBat3, Botspot, Icenowy, Longhorn, et.al.)
+
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
  - N7ACW & AD7HE for getting me started in ham radio
@@ -54,14 +54,15 @@ All software used by this script is free and legal to use (with the exception of
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
  - [ ] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
- - [ ] Add installer for VARA FM.
- - [ ] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
- - [ ] Change VARA Setup/Config terminal text prompts into AHK pop-up boxes.
-    - [ ] Change all terminal text prompts into text boxes?
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
- - [ ] Add more error-checking to the script.
- - [ ] Consider adding Winlink & VARA installers to winetricks to further streamline this installer (improve readability, make Winlink easier to install for other x86 winetricks users who are not aware of this project).
- - [ ] Detect whether script is being run as sudo.
+ - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
+    - [ ] Give user the choice to compile or not
+    - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency
+ - [x] Add installer for VARA FM.
+ - [x] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
+ - [x] Change VARA Setup/Config terminal text prompts into zenity pop-up boxes.
+    - [x] Change all terminal text prompts into text boxes?
+ - [x] Add more error-checking to the script.
  - [x] Make a logo for the github page.
  - [x] Make the script's user-interface look better.
  - [x] Add an AHK script to click the "Ok" button after VARA is installed.
@@ -69,9 +70,6 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Add more clean-up functions to the script.
  - [x] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
  - [x] Add shortcuts to the desktop
- - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
-    - [ ] Give user the choice to compile or not
-    - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency
  - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
  - [x] Add the fix for VARA graphical errors to the script
     - [x] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29))
