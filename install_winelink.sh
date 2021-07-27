@@ -263,8 +263,7 @@ function run_installwinetricks() # Download and install winetricks
         # Download & install winetricks
         echo -e "\n${GREENTXT}Downloading and installing winetricks . . .${NORMTXT}\n"
         sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old # backup old winetricks
-        wget -q https://raw.githubusercontent.com/Winetricks/winetricks/7d10e264cb21a80b80e3fa4713625f561b024879/src/winetricks || { echo "winetricks download failed!" && run_giveup; }
-        ##!##wget -q https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks || { echo "winetricks download failed!" && run_giveup; } # download
+        wget -q https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks || { echo "winetricks download failed!" && run_giveup; } # download
         sudo chmod +x winetricks
         sudo mv winetricks /usr/local/bin # install
     cd ..
