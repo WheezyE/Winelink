@@ -23,9 +23,10 @@ function run_Main()
 	echo "deb https://termux.mentality.rip/termux-games games stable" > $PREFIX/etc/apt/sources.list.d/game.list
 	echo "deb https://termux.mentality.rip/termux-science science stable" > $PREFIX/etc/apt/sources.list.d/science.list
 	apt update && apt upgrade -y -o Dpkg::Options::=--force-confnew # upgrade Termux and suppress user prompts
+	pkg upgrade -y # TODO: not sure if I need this
 	
 	# Create the Ubuntu PRoot within Termux
-	apt install proot-distro git -y
+	pkg install proot-distro git -y # F-Droid termux crashes with apt install proot-distro
 	proot-distro install ubuntu-20.04
 	
 	# Create a script to log into PRoot as the 'user' account (which we will create later)
