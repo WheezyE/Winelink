@@ -57,6 +57,9 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
     - [ ] Give user the choice to compile or not
     - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency
+ - [ ] Add VARA Chat
+    - [ ] Ask Seb for help with getting it running in box86
+ - [ ] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows)
  - [x] Add installer for VARA FM.
  - [x] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
  - [x] Change VARA Setup/Config terminal text prompts into zenity pop-up boxes.
@@ -83,7 +86,7 @@ All software used by this script is free and legal to use (with the exception of
         - [ ] Detect Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi <4 support.
         - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
       - [ ] RPi Zero W?
-    - [ ] ARM - [Termux](https://github.com/termux/termux-app) (Android) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)).
+    - [ ] ARM - [Termux](https://github.com/termux/termux-app) (Android without root) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)) - see [AnBox86](https://github.com/lowspecman420/AnBox86) for proof of concept, currently untested with VARA.
     - [ ] x86 - Mac.
     - [ ] x86 - ChromeBook Linux beta.
       - [ ] Detect whether processor would be too slow?
