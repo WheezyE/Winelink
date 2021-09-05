@@ -47,19 +47,20 @@ All software used by this script is free and legal to use (with the exception of
 
 ## Future work
  - [ ] Add updated example images
- - [ ] Make a work-in-progress youtube video to showcase VARA/ARDOP tones from soundcard on RPi4.
+ - [ ] Ask Seb for help getting VARA Chat running in box86
+ - [ ] Add PiLinBPQ?
  - [ ] Test port connections to radio CAT / test connection to radio audio. Might need to get my General license first . . .
+ - [ ] Work with madewokherd to [see if wine-mono bugs can be fixed](https://github.com/madewokherd/wine-mono/issues/116) (would drastically improve install speed)
+    - [ ] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
+ - [ ] Clean up code with Google style guide https://google.github.io/styleguide/shellguide.html
  - [ ] Find Box86 [stability bugs for Winlink](https://github.com/ptitSeb/box86/issues/217) (and ask ptitSeb very nicely if he can fix them).
    - Eliminate need for downgrading Box86 to install dotnet & upgrading Box86 to run Winlink.
    - Find crashes.
- - [ ] Work with Seb to find/fix dotnet35sp1 installation issues (improve installation speed).
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
     - [ ] Give user the choice to compile or not
     - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency
- - [ ] Add VARA Chat
-    - [ ] Ask Seb for help with getting it running in box86
- - [ ] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows)
+ - [x] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows) - Fixed with X11 check
  - [x] Add installer for VARA FM.
  - [x] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
  - [x] Change VARA Setup/Config terminal text prompts into zenity pop-up boxes.
@@ -79,7 +80,7 @@ All software used by this script is free and legal to use (with the exception of
   - [x] Make code modular to help readability.
  - [x] Simplify installation commands (model after KM4ACK BAP).
  #### Add more platforms (make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build/invoke box86 if needed)
- - [ ] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS
+ - [x] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS
     - [ ] ARM - Raspberry Pi family
       - [x] RPi 4B
       - [ ] RPi 3B+
@@ -87,15 +88,16 @@ All software used by this script is free and legal to use (with the exception of
         - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
       - [ ] RPi Zero W?
     - [ ] ARM - [Termux](https://github.com/termux/termux-app) (Android without root) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)) - see [AnBox86](https://github.com/lowspecman420/AnBox86) for proof of concept, currently untested with VARA.
+      - [ ] Fix AnBox86
     - [ ] x86 - Mac.
     - [ ] x86 - ChromeBook Linux beta.
-      - [ ] Detect whether processor would be too slow?
+      - [ ] Try to detect if processor would be too slow?
     - [ ] x86 - Linux.
       - [ ] Debian (Package manager: apt)
         - [ ] Deepin
         - [ ] Kali
       - [ ] Ubuntu (Package manager: apt)
-        - [ ] Linux Mint
+        - [x] Linux Mint
         - [ ] Elementary OS
         - [ ] Zorin OS
       - [ ] Arch (Package manager: pacman, libalpm)
@@ -108,7 +110,7 @@ All software used by this script is free and legal to use (with the exception of
       - [ ] Gentoo (Package manager: Portage)
       - [ ] Solus (Package manager: eopkg)
       - [ ] openSUSE (Package manager: ZYpp (standard); YaST (front-end); RPM (low-level))
- - [ ] Once methods are thoroughly tested, make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
+ - [ ] Make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
 
 ## Distribution
 If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).  This script is free to use, open-source, and should not be monetized (for further information see the [license file](LICENSE)).
