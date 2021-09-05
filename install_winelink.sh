@@ -67,6 +67,10 @@ function run_main()
         exec > >(tee "../winelink.log") 2>&1 # Start logging this script's output
         run_greeting # Hello world
         
+        if ! xhost >& /dev/null ; then
+          echo "No X window session, this script must be run with a GUI"
+          exit
+        fi
         
         ### Install Wine & winetricks
         run_installwine # Download and install Wine 5.21 devel buster for i386
