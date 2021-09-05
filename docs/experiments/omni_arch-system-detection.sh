@@ -12,16 +12,16 @@ function run_main()
     run_detect_raspver
     run_detect_raspmodel
     
-    if [ "${OS_IS}" = "termux" && "${ARCH_IS}" = "aarch64"]; then
+    if [ "${FAMILY_IS}" = "termux" && "${ARCH_IS}" = "aarch64"]; then
         # Install AnBox86 for aarch64
         pkg update -y; pkg install wget -y  < "/dev/null"
         wget https://raw.githubusercontent.com/lowspecman420/AnBox86/main/AnBox86.sh
         bash AnBox86.sh
-    elif [ "${OS_IS}" = "rpi" && "${ARCH_IS}" = "aarch64"]; then
+    elif [ "${FAMILY_IS}" = "rpi" && "${ARCH_IS}" = "aarch64"]; then
         # Install Winelink for RPi4B with multiarch
         echo "Winelink does not currenly support 64bit Raspberry Pi OS."
         run_giveup
-    elif [ "${OS_IS}" = "rpi" && "${ARCH_IS}" = "armv7l"]; then
+    elif [ "${FAMILY_IS}" = "rpi" && "${ARCH_IS}" = "armv7l"]; then
         # Install Winelink for RPi4B (will also attempt on earlier models but will crash for now)
         wget https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh
         bash install_winelink.sh
@@ -46,42 +46,50 @@ function run_detect_os()
     elif [ -e /etc/*elease ];        then OS_INFOFILE='/etc/*elease'        && echo "Found ${OS_INFOFILE}"
     else OS_INFOFILE='' && echo "No OS info files could be found!">&2; # go to run_giveup
     fi
-    source "${OS_INFOFILE}" # read os-release file vars
+    
+    # Read OS-Release File vars (loads vars like "ID")
+    source "${OS_INFOFILE}"
+    # Each release file has its own set of vars, but highly-conserved vars are ...
+        #NAME="Alpine Linux"
+        #ID=alpine
+        #VERSION_ID=3.8.1
+        #PRETTY_NAME="Alpine Linux v3.8"
+        #HOME_URL="http://alpinelinux.org"
+    # Other vars are listed here: https://docs.google.com/spreadsheets/d/1ixz0PfeWJ-n8eshMQN0BVoFAFnUmfI5HIMyBA0uK43o/edit#gid=0
     
     # Parse vars from OS release file
-    #  - https://docs.google.com/spreadsheets/d/1ixz0PfeWJ-n8eshMQN0BVoFAFnUmfI5HIMyBA0uK43o/edit#gid=0
-    if [ "${PREFIX}" = "/data/data/com.termux/files/usr" ];      then echo "Looks like Termux!"                         && OS_IS=termux && PACKAGES=pkg
+    if [ "${PREFIX}" = "/data/data/com.termux/files/usr" ];      then echo "Looks like Termux!"                         && FAMILY_IS=termux && DISTRO=termux && PACKAGES=pkg
     # [[ $PREFIX =~ /data/data/[^/]+/files/usr ]] && echo IN_TERMUX # for use with termux forks (where [^/]+ means one or more characters that are not a forward slash /)
 
-    elif [ "${ID}" = "linuxmint" ];                              then echo "Looks like Linux Mint (Ubuntu/Debian)!"     && OS_IS=debian && PACKAGES=apt    # Mint also has ID_LIKE=ubuntu
-    elif [ "${ID}" = "elementary" ];                             then echo "Looks like elementary OS (Ubuntu/Debian)!"  && OS_IS=debian && PACKAGES=apt    # elementary OS also has ID_LIKE=ubuntu
-    elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "ubuntu" ];  then echo "Looks like Ubuntu (Debian)!"                && OS_IS=debian && PACKAGES=apt    # Ubuntu also has ID_LIKE=debian
+    elif [ "${ID}" = "linuxmint" ];                              then echo "Looks like Linux Mint (Ubuntu/Debian)!"     && FAMILY_IS=debian && DISTRO= && PACKAGES=apt    # Mint also has ID_LIKE=ubuntu
+    elif [ "${ID}" = "elementary" ];                             then echo "Looks like elementary OS (Ubuntu/Debian)!"  && FAMILY_IS=debian && DISTRO= && PACKAGES=apt    # elementary OS also has ID_LIKE=ubuntu
+    elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "ubuntu" ];  then echo "Looks like Ubuntu (Debian)!"                && FAMILY_IS=debian && DISTRO= && PACKAGES=apt    # Ubuntu also has ID_LIKE=debian
 
-    elif [ "${ID}" = "kali" ];                                   then echo "Looks like Kali (Debian)!"                  && OS_IS=debian && PACKAGES=apt    # Kali also has ID_LIKE=debian
-    elif [ "${ID}" = "raspbian" ];                               then echo "Looks like Raspberry Pi OS (Debian)!"       && OS_IS=rpi    && PACKAGES=apt    # RPi OS also has ID_LIKE=debian
-    elif [ "${ID}" = "debian" ] || [ "${ID_LIKE}" = "debian" ];  then echo "Looks like Debian!"                         && OS_IS=debian && PACKAGES=apt
+    elif [ "${ID}" = "kali" ];                                   then echo "Looks like Kali (Debian)!"                  && FAMILY_IS=debian && DISTRO= && PACKAGES=apt    # Kali also has ID_LIKE=debian
+    elif [ "${ID}" = "raspbian" ];                               then echo "Looks like Raspberry Pi OS (Debian)!"       && FAMILY_IS=rpi    && DISTRO= && PACKAGES=apt    # RPi OS also has ID_LIKE=debian
+    elif [ "${ID}" = "debian" ] || [ "${ID_LIKE}" = "debian" ];  then echo "Looks like Debian!"                         && FAMILY_IS=debian && DISTRO= && PACKAGES=apt
 
-    elif [ "${ID}" = "rhel" ];                                   then echo "Looks like Red Hat (Fedora)!"               && OS_IS=fedora && PACKAGES='' # Red Hat also has ID_LIKE=fedora
-    elif [ "${ID}" = "centos" ];                                 then echo "Looks like CentOS (Fedora)!"                && OS_IS=fedora && PACKAGES='' # CentOS also has "ID_LIKE=rhel fedora"
-    elif [ "${ID}" = "fedora" ] || [ "${ID_LIKE}" = "fedora" ];  then echo "Looks like Fedora!"                         && OS_IS=fedora && PACKAGES=''
+    elif [ "${ID}" = "rhel" ];                                   then echo "Looks like Red Hat (Fedora)!"               && FAMILY_IS=fedora && DISTRO= && PACKAGES='' # Red Hat also has ID_LIKE=fedora
+    elif [ "${ID}" = "centos" ];                                 then echo "Looks like CentOS (Fedora)!"                && FAMILY_IS=fedora && DISTRO= && PACKAGES='' # CentOS also has "ID_LIKE=rhel fedora"
+    elif [ "${ID}" = "fedora" ] || [ "${ID_LIKE}" = "fedora" ];  then echo "Looks like Fedora!"                         && FAMILY_IS=fedora && DISTRO= && PACKAGES=''
 
-    elif [ "${ID}" = "manjaro" ];                                then echo "Looks like Manjaro (Arch Linux)!"           && OS_IS=arch   && PACKAGES='' # Manjaro also has ID_LIKE=arch
-    elif [ "${ID}" = "arch" ] || [ "${ID_LIKE}" = "archlinux" ]; then echo "Looks like Arch Linux!"                     && OS_IS=arch   && PACKAGES=''
+    elif [ "${ID}" = "manjaro" ];                                then echo "Looks like Manjaro (Arch Linux)!"           && FAMILY_IS=arch   && DISTRO= && PACKAGES='' # Manjaro also has ID_LIKE=arch
+    elif [ "${ID}" = "arch" ] || [ "${ID_LIKE}" = "archlinux" ]; then echo "Looks like Arch Linux!"                     && FAMILY_IS=arch   && DISTRO= && PACKAGES=''
 
-    elif [ "${ID}" = "opensuse" ];                               then echo "Looks like openSUSE!"                       && OS_IS=suse   && PACKAGES=''  # openSuSe also has ID_LIKE="suse"
-    elif [ "${ID}" = "sles" ];                                   then echo "Looks like SUSE Linux Enterprise Server!"   && OS_IS=suse   && PACKAGES=''  # SLES also has ID_LIKE="suse" (though old SLES doesn't)
+    elif [ "${ID}" = "opensuse" ];                               then echo "Looks like openSUSE!"                       && FAMILY_IS=suse   && DISTRO= && PACKAGES=''  # openSuSe also has ID_LIKE="suse"
+    elif [ "${ID}" = "sles" ];                                   then echo "Looks like SUSE Linux Enterprise Server!"   && FAMILY_IS=suse   && DISTRO= && PACKAGES=''  # SLES also has ID_LIKE="suse" (though old SLES doesn't)
 
-    elif [ "${ID}" = "slackware" ];                              then echo "Looks like Slackware!"                      && OS_IS=slack  && PACKAGES=''
-    elif [ "${ID}" = "ol" ];                                     then echo "Looks like Oracle!"                         && OS_IS=oracle && PACKAGES=''
-    elif [ "${ID}" = "gentoo" ];                                 then echo "Looks like Gentoo!"                         && OS_IS=gentoo && PACKAGES=''
-    elif [ "${ID}" = "alpine" ];                                 then echo "Looks like Alpine Linux!"                   && OS_IS=alpine && PACKAGES=''
+    elif [ "${ID}" = "slackware" ];                              then echo "Looks like Slackware!"                      && FAMILY_IS=slack  && DISTRO= && PACKAGES=''
+    elif [ "${ID}" = "ol" ];                                     then echo "Looks like Oracle!"                         && FAMILY_IS=oracle && DISTRO= && PACKAGES=''
+    elif [ "${ID}" = "gentoo" ];                                 then echo "Looks like Gentoo!"                         && FAMILY_IS=gentoo && DISTRO= && PACKAGES=''
+    elif [ "${ID}" = "alpine" ];                                 then echo "Looks like Alpine Linux!"                   && FAMILY_IS=alpine && DISTRO= && PACKAGES=''
     
     # Add mac OS
     # Add chrome OS
     # Add chroot Android?
     # Find package managers
     
-    else OS_IS=suse && PACKAGES=unknown && echo "Could not determine operating system!">&2; # Go to run_giveup
+    else FAMILY_IS=suse && PACKAGES=unknown && echo "Could not determine operating system!">&2; # Go to run_giveup
     fi
     
     # To my knowledge . . .
