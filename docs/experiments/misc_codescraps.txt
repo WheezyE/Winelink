@@ -1,29 +1,24 @@
-AHK Scripts for VARA
+I didn't think to try this before, but after reading another issue with wine_mono_trace & https://wiki.winehq.org/Mono#Debugging, I tried `WINE_MONO_TRACE=M:nsoftware.Sys.Internal.Public.SystemIPHlpAPI:GetAdapterInfo MONO_VERBOSE_METHOD=GetAdapterInfo` on the `at nsoftware.Sys.Internal.Public.SystemIPHlpAPI.GetAdapterInfo` part of the exception type stack trace and got this:
 
-; Installer
-SetTitleMatchMode, 2
-SetTitleMatchMode, slow
-		Run, VARA setup (Run as Administrator).exe /SILENT, C:\Users\ericw\OneDrive\Desktop\box86\ahk
-		WinWait, VARA Setup ; Wait for the "VARA installed successfully" window
-		ControlClick, Button1, VARA Setup ; Click the OK button
-		WinWaitClose
+```
 
-; Setup
-SetTitleMatchMode, 2
-SetTitleMatchMode, slow		
-		Run, VARA.exe, C:\VARA
-		WinActivate, VARA HF
-		WinWait, VARA HF ; Wait for VARA to open
-		Send, !{s}
-		Sleep 500
-		Send, s
-		Sleep 500
-		WinClose, SoundCard
-		Sleep 500
-		WinClose, VARA HF
+```
+##############################
 
-Reference old scripts to make the UI of the script better:
- - https://github.com/AresValley/Artemis/blob/master/spec_files/Linux/raspbian_build.sh
+
+VER=5.12
+DIST=buster
+sudo apt-get install --install-recommends wine-devel-amd64=$VER~$DIST --allow-downgrades -y # 64bit wine
+sudo dpkg --add-architecture i386 && sudo apt-get update # If using a 64-bit OS, then ensure we are installing wine32 (apx 700MB extra) using multi-arch
+sudo apt-get install --install-recommends wine-devel-i386=$VER~$DIST wine-devel=$VER~$DIST winehq-devel=$VER~$DIST --allow-downgrades -y
+
+
+#Code scrap for copying onto the pi
+#https://github.com/madewokherd/wine-mono
+#git checkout 4d129ba7bfc354629216c8310c1c4ef004dbc55f #wine-mono 6.1.1 for wine 5.19 - conflict w/ fa2dd85e
+git checkout 3f0b40d9a2712d38a8c301748a2495e96fa90160  #wine-mono 6.3.0 for wine 6.14
+git cherry-pick fa2dd85e7765156ca6c93f15bfb04081864f9b82 
+sudo make msi # do I need to build with a specific version of wine?
  
 Android commands (following this guide: https://wiki.termux.com/wiki/PRoot ):
     #Install Termux from the Google Play Store
