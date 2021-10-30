@@ -7,7 +7,7 @@ A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the R
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
 ```bash
-sudo curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
+curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
      bash install_winelink.sh
 ```
  - A full installation takes about 30 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
