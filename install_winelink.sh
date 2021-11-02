@@ -6,7 +6,7 @@ function run_greeting()
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
     echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 30 min  #"
-    echo "# Version: 0.006a (Work in progress - ARDOP doesn't work, but VARA does)      #"
+    echo "# Version: 0.0072a (Work in progress - ARDOP doesn't work, but VARA does)     #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team                                                            #"
     echo "#     (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,        #"
@@ -60,7 +60,7 @@ function run_greeting()
 
 function run_main()
 {
-        local ARG="$1" # ctore the first argument passed to the script file as a variable here (i.e. 'bash install_winelink.sh vara_only')
+        local ARG="$1" # store the first argument passed to the script file as a variable here (i.e. 'bash install_winelink.sh vara_only')
         
         ### Pre-installation
             rm -rf Winelink-tmp; mkdir Winelink-tmp && cd Winelink-tmp; rm ~/Desktop/Reset\ Wine; rm ../winelink.log # clean up any failed past runs of this script
@@ -70,10 +70,11 @@ function run_main()
             run_greeting
         
         ### Install Wine & winetricks
-            # future work: Customize this section to install wine for different operating systems.
-            run_installwine
-            run_installwinetricks
-            run_downloadbox86 27_Oct_21 # emulator to run wine-i386 on ARM (this version of box86 doesn't install dotnet46)
+            #run_detect_arch # TODO: Customize this section to install wine for different operating systems.
+            #run_gather_os_info
+            run_installwine "pi4" "devel" "6.19~buster-1" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
+            run_installwinetricks # software installer script for wine
+            run_downloadbox86 1_Nov_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability (this version of box86 can't install dotnet46)
             
         ### Set up Wine (silently make & configure a new wineprefix)
             run_setupwineprefix
@@ -81,10 +82,11 @@ function run_main()
         ### Install Winlink & VARA into our configured wineprefix
             run_installrms
             run_installvara
-            #run_installvaraextras # TODO: VARA Chat
+            #run_installvARIM
         
         ### Post-installation
             run_makewineserverkscript
+            run_makelauncherscripts # TODO: Find actual shortcut errors
             sudo apt-get install zenity -y # TODO: remove redundant apt-get installs - put them at top of script.
             clear
             echo -e "\n${GREENTXT}Setup complete.${NORMTXT}\n"
@@ -181,7 +183,6 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
         echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
         run_installwinemono # wine-mono replaces dotnet46
         BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed, using wine-mono in place of dotnet46)
-        BOX86_NOBANNER=1 winetricks -q msxml3 # kludge for unwrapped msxml2 library in box86 (as of Oct 28, 2021).
         BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
 
     # Guide the user to the wineconfig audio menu (configure hardware soundcard input/output)
@@ -192,7 +193,7 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
         zenity --info --height 100 --width 350 --text="We will now setup your soundcards for Wine. \n\nPlease navigate to the Audio tab and choose your systems soundcards \n\nInstall will continue once you have closed the winecfg menu." --title="Wine Soundcard Setup"
         echo -e "${GREENTXT}Loading winecfg now . . .${NORMTXT}\n"
         echo ""
-        BOX86_NOBANNER=1 winecfg #nobanner just for prettier terminal
+        BOX86_NOBANNER=1 winecfg # nobanner just for prettier terminal
         clear
 }
 
@@ -201,16 +202,20 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS
     mkdir ~/.cache/wine
     echo -e "\n${GREENTXT}Downloading and installing wine-mono . . .${NORMTXT}\n"
     wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-6.4.1/wine-mono-6.4.1-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
-    wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi
+    wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to the newer wine-mono that fixes ARDOP (as soon as link is available)
     rm -rf ~/.cache/wine # clean up to save disk space
 }
 
-function run_installwine()  # Download and install Wine-devel 6.19 for i386 Debian buster
+function run_installwine()  # Download and install Wine for i386 Debian Buster (This function needs a winebranch & version passed to it)
 {
+    # These variables are here in the hopes that more systems might be implemented in the future. For now, they just help change wine version more easily.
+    local system="$1" #example: "pi4" - TODO: implement other systems, like pi3
+    local branch="$2" #example: "devel" or "stable" without quotes (staging requires more install steps)  ${version}
+    local version="$3" #example: "6.19~buster-1"
+
+    wineserver -k &> /dev/null # stop any old wine installations from running
     rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
     mkdir downloads; cd downloads
-        wineserver -k &> /dev/null # stop any old wine installations from running
-        
         # Backup old wine
             rm -rf ~/wine-old; mv ~/wine ~/wine-old
             rm -rf ~/.wine-old; mv ~/.wine ~/.wine-old
@@ -221,11 +226,11 @@ function run_installwine()  # Download and install Wine-devel 6.19 for i386 Debi
 
         # Download, extract wine, and install wine
             echo -e "\n${GREENTXT}Downloading wine . . .${NORMTXT}"
-            wget -q https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel-i386_6.19~buster-1_i386.deb || { echo "wine-devel-i386_6.19~buster-1_i386.deb download failed!" && run_giveup; }
-            wget -q https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-devel_6.19~buster-1_i386.deb || { echo "wine-devel_6.19~buster-1_i386.deb download failed!" && run_giveup; }
+            wget -q https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-${branch}-i386_${version}_i386.deb || { echo "wine-${branch}-i386_${version}_i386.deb download failed!" && run_giveup; }
+            wget -q https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-${branch}_${version}_i386.deb || { echo "wine-${branch}_${version}_i386.deb download failed!" && run_giveup; }
             echo -e "${GREENTXT}Extracting wine . . .${NORMTXT}"
-            dpkg-deb -x wine-devel-i386_6.19~buster-1_i386.deb wine-installer
-            dpkg-deb -x wine-devel_6.19~buster-1_i386.deb wine-installer
+            dpkg-deb -x wine-${branch}-i386_${version}_i386.deb wine-installer
+            dpkg-deb -x wine-${branch}_${version}_i386.deb wine-installer
             echo -e "${GREENTXT}Installing wine . . .${NORMTXT}\n"
             mv wine-installer/opt/wine* ~/wine
 
@@ -272,26 +277,34 @@ function run_installrms()  # Download/extract/install RMS Express
     cd ..
 }
 
-function run_installvara()  # Download/extract/install VARA HF/FM, then configure them with AutoHotKey scripts
+function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then configure them with AutoHotKey scripts
 {
     sudo apt-get install curl megatools p7zip-full -y
     
     mkdir downloads; cd downloads
-        # Download / extract VARA HF
+        # Download / extract VARA HF (will install/configure via AHK later)
             echo -e "\n${GREENTXT}Downloading and installing VARA HF . . .${NORMTXT}\n"
             # files: VARA HF v4.4.3 Setup > VARA setup (Run as Administrator).exe > /SILENT install has an OK button at end
             VARAHFLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
             megadl ${VARAHFLINK}
             7z x VARA\ HF*.zip -o"VARAHFInstaller"
-            cp VARAHFInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # move VARA installer here so AHK can find it later
+            cp VARAHFInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
         
-        # Download / extract VARA FM
+        # Download / extract VARA FM (will install/configure via AHK later)
             echo -e "\n${GREENTXT}Downloading and installing VARA FM . . .${NORMTXT}\n"
             # files: VARA FM v4.1.3 Setup.zip > VARA FM setup (Run as Administrator).exe > /SILENT install has an OK button at end
             VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA FM v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
             megadl ${VARAFMLINK}
             7z x VARA\ FM*.zip -o"VARAFMInstaller"
-            cp VARAFMInstaller/VARA\ FM\ setup*.exe ~/.wine/drive_c/ # move VARA installer here so AHK can find it later ## "VARA FM setup (Run as Administrator).exe" /SILENT
+            cp VARAFMInstaller/VARA\ FM\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
+            
+        # Download / extract / install VARA Chat
+            # files: VARA Chat v1.2.5 Setup.zip > VARA Chat setup (Run as Administrator).exe > /SILENT install is silent
+            VARACHATLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA Chat v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
+            megadl ${VARACHATLINK}
+            7z x VARA\ Chat*.zip -o"VARAChatInstaller"
+            wine VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install
+            cp ~/.local/share/applications/wine/Programs/VARA\ Chat/VARA.desktop ~/Desktop/VARA\ Chat.desktop
     cd ..
         
     mkdir ahk; cd ahk
@@ -392,75 +405,160 @@ function run_installvara()  # Download/extract/install VARA HF/FM, then configur
             sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA\ FM/VARAFM.ini # turn off VARA FM's graphics (change 'View=1' to 'View=3' in VARAFM.ini). INI file shows up after first run of VARA FM.
     cd ..
     
-    ### Fix some VARA graphics glitches caused by Wine's (winecfg) window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
-        ## NOTE: Only run this for non-Pi setups: It's actually better to keep VARA as a black screen for RPi4 and weaker CPU's to prevent freezes.
-        ## Create override-x11.reg
-        #echo 'REGEDIT4'                                      >> override-x11.reg
-        #echo ''                                              >> override-x11.reg
-        #echo '[HKEY_CURRENT_USER\Software\Wine\X11 Driver]'  >> override-x11.reg
-        #echo '"Decorated"="Y"'                               >> override-x11.reg
-        #echo '"Managed"="N"'                                 >> override-x11.reg
-        #wine cmd /c regedit /s override-x11.reg
+    ## Fix some VARA graphics glitches caused by Wine's (winecfg) window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
+        # NOTE: If using dotnet (instead of wine-mono) on Pi, this will slow things down a lot
+        # Create override-x11.reg
+        echo 'REGEDIT4'                                      >> override-x11.reg
+        echo ''                                              >> override-x11.reg
+        echo '[HKEY_CURRENT_USER\Software\Wine\X11 Driver]'  >> override-x11.reg
+        echo '"Decorated"="Y"'                               >> override-x11.reg
+        echo '"Managed"="N"'                                 >> override-x11.reg
+        wine cmd /c regedit /s override-x11.reg
 }
 
-function run_installvaraextras()  # Download and install stand-alone interfaces for VARA
+function run_installvARIM()  # Download, build, and install an open-source stand-alone interface for VARA, called vARIM
 {
-    ## VARA Chat (Text and File transfer P2P app) - CURRENTLY BROKEN IN WINE/BOX86
-    #    # Download / extract / install VARA Chat
-    #    #     files: VARA Chat v1.2.5 Setup.zip > VARA Chat setup (Run as Administrator).exe > /SILENT install is silent
-    #    VARACHATLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA Chat v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-    #    megadl ${VARACHATLINK}
-    #    7z x VARA\ Chat*.zip -o"VARAChatInstaller"
-    #    wine VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT
-    #    cp ~/.local/share/applications/wine/Programs/VARA\ Chat/VARA.desktop ~/Desktop/VARA\ Chat.desktop # Make desktop shortcut.
-    
-    # vARIM
-        ## Download and install vARIM for RPi3B+ or RPi4B
-        #wget -q https://www.whitemesa.net/varim/pkg/varim-1.4-bin-linux-gnueabihf-armv7l.tar.gz || { echo "vARIM Portable download failed!" && run_giveup; }
-        #sudo apt-get install libfltk-images1.3 -y
-        #tar -xzvf varim-1.4-bin-linux-gnueabihf-armv7l.tar.gz
-        #cd varim-1.4
-        #        # Install components (based on how the install script for built versions of vARIM does it)
-        #        ## THIS IS BROKEN - vARIM pre-made packages are 'portable' and thus can't be installed into /usr/local/bin like the compiled version.
-        #        sudo mkdir -p '/usr/local/bin'
-        #        sudo mkdir -p '/usr/local/share/applications'
-        #        sudo mkdir -p '/usr/local/share/doc/varim'
-        #        sudo mkdir -p '/usr/local/share/varim'
-        #        sudo mkdir -p '/usr/local/share/pixmaps'
-        #        sudo install -c varim '/usr/local/bin'
-        #        sudo install -c -m 644 varim.desktop '/usr/local/share/applications'
-        #        sudo install -c -m 644 doc/varim-help-v1.4.pdf doc/varim-help.txt doc/varim\(1\)-v1.4.pdf doc/varim\(5\)-v1.4.pdf doc/NEWS doc/AUTHORS doc/COPYING doc/README '/usr/local/share/doc/varim'
-        #        sudo install -c -m 644 files/test.txt varim.ini in.mbox varim.png varim-64x64.png '/usr/local/share/varim'
-        #        sudo install -c -m 644 out.mbox sent.mbox '/usr/local/share/varim'
-        #        sudo install -c -m 644 varim.xpm '/usr/local/share/pixmaps'
-        #        cp /usr/local/share/applications/varim.desktop ~/Desktop/varim.desktop
-        #cd ..
-        
-        # Build and install vARIM for RPi - Takes longer, but is a cleaner install than the pre-compiled package
-        echo -e "\n${GREENTXT}Downloading and installing vARIM . . .${NORMTXT}\n"
-        sudo apt-get install gcc cmake zlibc libfltk1.3-dev libfltk-images1.3 -y # build dependencies
-        wget -q https://www.whitemesa.net/varim/src/varim-1.4.tar.gz || { echo "vARIM Sourcecode download failed!" && run_giveup; } # "Current vARIM Version 1.4 source code and help file"
-        tar -xzvf varim-1.4.tar.gz
-        cd varim-1.4
-                ./configure
-                make -j$(nproc)
-                sudo make install
-                sudo chmod 644 ~/varim/varim.ini
-        cd ..
-        rm -rf varim-1.4
-        cp /usr/local/share/applications/varim.desktop ~/Desktop/varim.desktop
+    # Build and install vARIM for RPi - Building takes longer than downloading, but building is a cleaner install than the pre-compiled package
+    echo -e "\n${GREENTXT}Downloading and installing vARIM . . .${NORMTXT}\n"
+    sudo apt-get install gcc cmake zlibc libfltk1.3-dev libfltk-images1.3 -y # build dependencies
+    wget -q https://www.whitemesa.net/varim/src/varim-1.4.tar.gz || { echo "vARIM Sourcecode download failed!" && run_giveup; } # "Current vARIM Version 1.4 source code and help file"
+    tar -xzvf varim-1.4.tar.gz
+    cd varim-1.4
+            ./configure
+            make -j$(nproc)
+            sudo make install
+            sudo chmod 644 ~/varim/varim.ini
+    cd ..
+    rm -rf varim-1.4
+    cp /usr/local/share/applications/varim.desktop ~/Desktop/varim.desktop
+
+    ## Download and install vARIM for RPi3B+ or RPi4B
+    # THIS IS BROKEN - vARIM pre-made packages are 'portable' and thus can't be installed into /usr/local/bin like the compiled version.
+    #wget -q https://www.whitemesa.net/varim/pkg/varim-1.4-bin-linux-gnueabihf-armv7l.tar.gz || { echo "vARIM Portable download failed!" && run_giveup; }
+    #sudo apt-get install libfltk-images1.3 -y
+    #tar -xzvf varim-1.4-bin-linux-gnueabihf-armv7l.tar.gz
+    #cd varim-1.4
+    #        # Install components (based on how the install script for built versions of vARIM does it)
+    #        sudo mkdir -p '/usr/local/bin'
+    #        sudo mkdir -p '/usr/local/share/applications'
+    #        sudo mkdir -p '/usr/local/share/doc/varim'
+    #        sudo mkdir -p '/usr/local/share/varim'
+    #        sudo mkdir -p '/usr/local/share/pixmaps'
+    #        sudo install -c varim '/usr/local/bin'
+    #        sudo install -c -m 644 varim.desktop '/usr/local/share/applications'
+    #        sudo install -c -m 644 doc/varim-help-v1.4.pdf doc/varim-help.txt doc/varim\(1\)-v1.4.pdf doc/varim\(5\)-v1.4.pdf doc/NEWS doc/AUTHORS doc/COPYING doc/README '/usr/local/share/doc/varim'
+    #        sudo install -c -m 644 files/test.txt varim.ini in.mbox varim.png varim-64x64.png '/usr/local/share/varim'
+    #        sudo install -c -m 644 out.mbox sent.mbox '/usr/local/share/varim'
+    #        sudo install -c -m 644 varim.xpm '/usr/local/share/pixmaps'
+    #        cp /usr/local/share/applications/varim.desktop ~/Desktop/varim.desktop
+    #cd ..
 }
 
 function run_makewineserverkscript()  # Make a script for the desktop that will rest wine in case it freezes/crashes
 {
     sudo apt-get install zenity -y
-    # RMS Express & VARA crash or freeze often. It would help users to have a 'rest button' on their desktop for these crashes
     # Create 'Reset\ Wine.sh'
         echo '#!/bin/bash'   >> ~/Desktop/Reset\ Wine
         echo ''              >> ~/Desktop/Reset\ Wine
         echo 'wineserver -k' >> ~/Desktop/Reset\ Wine
         echo 'zenity --info --timeout=8 --height 150 --width 500 --text="Wine has been reset so that Winlink Express and VARA will run again.\\n\\nIf you try to run RMS Express again and it crashes or doesn'\''t open, just keep trying to run it.  It should open eventually after enough tries." --title="Wine has been reset"'          >> ~/Desktop/Reset\ Wine
         sudo chmod +x ~/Desktop/Reset\ Wine
+}
+
+function run_makelauncherscripts()  # Kludge for desktop shortcuts being broken as of 10/28/2021 - TODO: Find desktop shortcut problems
+{
+    # Create 'RMS\ Express' script
+        echo '#!/bin/bash'   >> ~/Desktop/RMS\ Express
+        echo ''              >> ~/Desktop/RMS\ Express
+        echo 'wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe' >> ~/Desktop/RMS\ Express
+        sudo chmod +x ~/Desktop/RMS\ Express
+        
+    # Create 'VARA\ HF' script
+        echo '#!/bin/bash'   >> ~/Desktop/VARA\ HF
+        echo ''              >> ~/Desktop/VARA\ HF
+        echo 'wine ~/.wine/drive_c/VARA/VARA.exe' >> ~/Desktop/VARA\ HF
+        sudo chmod +x ~/Desktop/VARA\ HF
+        
+    # Create 'VARA\ FM' script
+        echo '#!/bin/bash'   >> ~/Desktop/VARA\ FM
+        echo ''              >> ~/Desktop/VARA\ FM
+        echo 'wine ~/.wine/drive_c/VARA\ FM/VARAFM.exe' >> ~/Desktop/VARA\ FM
+        sudo chmod +x ~/Desktop/VARA\ FM
+        
+    # Create 'VARA\ Chat' script
+        echo '#!/bin/bash'   >> ~/Desktop/VARA\ Chat
+        echo ''              >> ~/Desktop/VARA\ Chat
+        echo 'wine ~/.wine/drive_c/VARA/VARA\ Chat.exe' >> ~/Desktop/VARA\ Chat
+        sudo chmod +x ~/Desktop/VARA\ Chat
+}
+
+function run_detect_arch()  # Finds what kind of processor we're running (aarch64, armv8l, armv7l, x86_64, x86, etc)
+{
+    KARCH=$(uname -m) # don't use 'arch' since it is not supported by Termux
+    
+    if [ "$KARCH" = "aarch64" ] || [ "$KARCH" = "aarch64-linux-gnu" ] || [ "$KARCH" = "arm64" ] || [ "$KARCH" = "aarch64_be" ]; then
+        ARCH=ARM64
+        #echo -e "\nDetected an ARM processor running in 64-bit mode (detected ARM64)."
+    elif [ "$KARCH" = "armv8r" ] || [  "$KARCH" = "armv8l" ] || [  "$KARCH" = "armv7l" ] || [  "$KARCH" = "armhf" ] || [  "$KARCH" = "armel" ] || [  "$KARCH" = "armv8l-linux-gnu" ] || [  "$KARCH" = "armv7l-linux-gnueabi" ] || [  "$KARCH" = "armv7l-linux-gnueabihf" ] || [  "$KARCH" = "armv7a-linux-gnueabi" ] || [  "$KARCH" = "armv7a-linux-gnueabihf" ] || [  "$KARCH" = "armv7-linux-androideabi" ] || [  "$KARCH" = "arm-linux-gnueabi" ] || [  "$KARCH" = "arm-linux-gnueabihf" ] || [  "$KARCH" = "arm-none-eabi" ] || [  "$KARCH" = "arm-none-eabihf" ]; then
+        ARCH=ARM32
+        #echo -e "\nDetected an ARM processor running in 32-bit mode (detected ARM32)."
+    elif [ "$KARCH" = "x86_64" ]; then
+        ARCH=x64
+        #echo -e "\nDetected an x86_64 processor running in 64-bit mode (detected x64)."
+    elif [ "$KARCH" = "x86" ] || [ "$KARCH" = "i386" ] || [ "$KARCH" = "i686" ]; then
+        ARCH=x86
+        #echo -e "\nDetected an x86 (or x86_64) processor running in 32-bit mode (detected x86)."
+    else
+        echo "Error: Could not identify processor architecture.">&2
+        run_giveup
+    fi
+    
+    # References:
+    #   https://unix.stackexchange.com/questions/136407/is-my-linux-arm-32-or-64-bit
+    #   https://bgamari.github.io/posts/2019-06-12-arm-terminology.html
+    #   https://superuser.com/questions/208301/linux-command-to-return-number-of-bits-32-or-64/208306#208306
+    #   https://stackoverflow.com/questions/45125516/possible-values-for-uname-m
+
+    # Testing:
+    #   RPi4B 64-bit OS: aarch64 (if I remember correctly)
+    #   RPi4B & RPi3B+ 32-bit: armv7l
+    #   Termux 64-bit with 64-bit proot: aarch64 (if I remember correctly)
+    #   Termux 64-bit with 32-bit proot: armv8l
+    #   Exagear RPi3/4 (32bit modified qemu chroot): i686 (if I remember correctly)
+}
+
+function run_gather_os_info()
+{
+    # To my knowledge . . .
+    #    Most post-2012 distros should have a standard '/etc/os-release' file for finding OS
+    #    Pre-2012 distros (& small distros) may not have a canonical way of finding OS.
+    #
+    # Each release file has its own 'standard' vars, but five highly-conserved vars in all(?) os-release files are ...
+    #    NAME="Alpine Linux"
+    #    ID=alpine
+    #    VERSION_ID=3.8.1
+    #    PRETTY_NAME="Alpine Linux v3.8"
+    #    HOME_URL="http://alpinelinux.org"
+    #
+    # Other known os-release file vars are listed here: https://docs.google.com/spreadsheets/d/1ixz0PfeWJ-n8eshMQN0BVoFAFnUmfI5HIMyBA0uK43o/edit#gid=0
+    #
+    # In general, we need to know: $ID (distro) & $VERSION_ID (distro version) into order to add Wine repo's for certain distro's/versions.
+    # If $VERSION_CODENAME is available then we should probably use this for figuring out which repo to use
+    #
+    # We will also have to determine package manager later, which we might try to do multiple ways (whitelist based on distro/version vs runtime detection)
+
+    # Try to find the os-release file on Linux systems
+    if [ -e /etc/os-release ];       then OS_INFOFILE='/etc/os-release'     && echo "Found an OS info file located at ${OS_INFOFILE}"
+    elif [ -e /usr/lib/os-release ]; then OS_INFOFILE='/usr/lib/os-release' && echo "Found an OS info file located at ${OS_INFOFILE}"
+    elif [ -e /etc/*elease ];        then OS_INFOFILE='/etc/*elease'        && echo "Found an OS info file located at ${OS_INFOFILE}"
+    # Add mac OS  https://apple.stackexchange.com/questions/255546/how-to-find-file-release-in-os-x-el-capitan-10-11-6
+    # Add chrome OS
+    # Add chroot Android? (uname -o  can be used to find "Android")
+    else OS_INFOFILE='' && echo "No Linux OS info files could be found!">&2 && run_giveup;
+    fi
+    
+    # Load OS-Release File vars into memory (reads vars like "NAME", "ID", "VERSION_ID", "PRETTY_NAME", and "HOME_URL")
+    source "${OS_INFOFILE}"
 }
 
 function run_giveup()  # If our script failed at any critical stages, notify the user and quit

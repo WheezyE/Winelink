@@ -2,7 +2,8 @@
 # Winelink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
-# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 introduced a requirement for dotnet46 which has broken this project for the moment - messages cannot be created or received.**
+# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 introduced a requirement for dotnet46 which has broken this project for the moment - messages cannot be created or received with RMS Express**
+ - **_VARA HF/FM and ARDOP_Win still run fine at the moment if you want to use a different message-manager (like Pat or PiLinBPQ) to send/receive commands to/from the TNC's_**
  - **_This project is very early in development. It has lots of bugs._**
  - **_I'm currently investigating the problem with creating/receiving messages as my top priority._**
  - **_ARDOP currently does not work (though a fix has been found for ARDOP and will be able to be implemented by the end of November at the latest)._**
@@ -49,14 +50,16 @@ All software used by this script is free and legal to use (with the exception of
 
 ## Future work
  - [ ] Add updated example images
- - [ ] Ask Seb for help getting VARA Chat running in box86
  - [ ] Test port connections to radio CAT / test connection to radio audio. Might need to get my General license first . . .
- - [ ] Work with madewokherd to [see if wine-mono bugs can be fixed](https://github.com/madewokherd/wine-mono/issues/116) (would drastically improve install speed)
- - [ ] Clean up code with Google style guide https://google.github.io/styleguide/shellguide.html
+ - [ ] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed)
+    - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116)
+    - [ ] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122)
+ - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html)
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
     - [ ] Give user the choice to compile or not
     - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency
+ - [x] Ask Seb for help getting VARA Chat running in box86
  - [x] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows) - Fixed with X11 check
  - [x] Add installer for VARA FM.
  - [x] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
@@ -118,5 +121,5 @@ If you use this script in your project (or are inspired by it) just please be su
 ## Donations
 If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb, madewokherd (CodeWeavers/WineHQ), or KM4ACK - without whom, this script would not exist.
  - Sebastien "ptitSeb" Chevalier (author of [Box86](https://github.com/ptitSeb/box86), incredible developer, & really nice guy) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
- - CodeWeavers & madewokherd (authors of [Wine](https://www.winehq.org/) and [wine-mono](https://github.com/madewokherd/wine-mono)) [https://www.winehq.org/donate](https://www.winehq.org/donate)
+ - CodeWeavers & madewokherd (authors of [Wine](https://www.winehq.org/) and [wine-mono](https://github.com/madewokherd/wine-mono) & wonderful people) [https://www.winehq.org/donate](https://www.winehq.org/donate)
  - Jason "KM4ACK" Oleham (author of [Build-a-Pi](https://github.com/km4ack/pi-build), Linux elmer, & ham radio pioneer) [paypal.me/km4ack](paypal.me/km4ack)
