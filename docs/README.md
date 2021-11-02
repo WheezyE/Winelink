@@ -2,7 +2,10 @@
 # Winelink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
-**_This project is very early in development. It has lots of bugs. ARDOP currently does not work._**
+# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 introduced a requirement for dotnet46 which has broken this project for the moment - messages cannot be created or received.**
+ - **_This project is very early in development. It has lots of bugs._**
+ - **_I'm currently investigating the problem with creating/receiving messages as my top priority._**
+ - **_ARDOP currently does not work (though a fix has been found for ARDOP and will be able to be implemented by the end of November at the latest)._**
 
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
