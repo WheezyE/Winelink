@@ -198,8 +198,8 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS
     
     # Kludge until wine-mono 6.5.0 is released
     # Link from https://github.com/madewokherd/wine-mono/actions/runs/1403147396
-    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/108782976.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; } # Nightly build with ARDOP TCP/IP fix
-    7z x ~/.cache/wine/108782976.zip -o"$HOME/.cache/wine/"
+    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/111335721.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; } # Nightly build with ARDOP TCP/IP fix
+    7z x ~/.cache/wine/111335721.zip -o"$HOME/.cache/wine/"
     wine msiexec /i ~/.cache/wine/wine-mono-6.4.99-x86.msi
     
     rm -rf ~/.cache/wine # clean up to save disk space
