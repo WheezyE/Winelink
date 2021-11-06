@@ -63,7 +63,8 @@ function run_main()
         local ARG="$1" # store the first argument passed to the script file as a variable here (i.e. 'bash install_winelink.sh vara_only')
         
         ### Pre-installation
-            rm -rf Winelink-tmp; mkdir Winelink-tmp && cd Winelink-tmp; rm ~/Desktop/Reset\ Wine; rm ../winelink.log # clean up any failed past runs of this script
+            rm -rf Winelink-tmp winelink.log; mkdir Winelink-tmp && cd Winelink-tmp # clean up any failed past runs of this script
+            rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop # clean up any failed past runs of this script
             exec > >(tee "../winelink.log") 2>&1 # start logging
             run_checkpermissions
             run_checkxhost
@@ -86,7 +87,6 @@ function run_main()
         
         ### Post-installation
             run_makewineserverkscript
-            run_makelauncherscripts # TODO: Find actual shortcut errors
             sudo apt-get install zenity -y # TODO: remove redundant apt-get installs - put them at top of script.
             clear
             echo -e "\n${GREENTXT}Setup complete.${NORMTXT}\n"
@@ -215,6 +215,7 @@ function run_installwine()  # Download and install Wine for i386 Debian Buster (
 
     wineserver -k &> /dev/null # stop any old wine installations from running
     rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
+    rm -rf ~/.local/share/applications/wine # remove any old program shortcuts
     mkdir downloads; cd downloads
         # Backup old wine
             rm -rf ~/wine-old; mv ~/wine ~/wine-old
@@ -273,7 +274,17 @@ function run_installrms()  # Download/extract/install RMS Express
         # Extract/install RMS Express
             7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller"
             wine WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
-            cp ~/.local/share/applications/wine/Programs/RMS\ Express/Winlink\ Express.desktop ~/Desktop/ # make a desktop shortcut.
+            
+        # Make a RMS Express desktop shortcut
+            echo '[Desktop Entry]'                                                                                                     >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Name=Winlink Express'                                                                                                >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\RMS\\ Express\\\\Winlink\\ Express.lnk' >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Type=Application'                                                                                                    >> ~/Desktop/Winlink\ Express.desktop
+            echo 'StartupNotify=true'                                                                                                  >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Icon=219D_RMS Express.0'                                                                                             >> ~/Desktop/Winlink\ Express.desktop
+            echo 'StartupWMClass=rms express.exe'                                                                                      >> ~/Desktop/Winlink\ Express.desktop
+            #cp ~/.local/share/applications/wine/Programs/RMS\ Express/Winlink\ Express.desktop ~/Desktop/ # sometimes wine makes broken links
+            sudo chmod +x ~/Desktop/Winlink\ Express.desktop
     cd ..
 }
 
@@ -282,29 +293,42 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
     sudo apt-get install curl megatools p7zip-full -y
     
     mkdir downloads; cd downloads
-        # Download / extract VARA HF (will install/configure via AHK later)
-            echo -e "\n${GREENTXT}Downloading and installing VARA HF . . .${NORMTXT}\n"
+        # Download / extract VARA HF
             # files: VARA HF v4.4.3 Setup > VARA setup (Run as Administrator).exe > /SILENT install has an OK button at end
+            echo -e "\n${GREENTXT}Downloading VARA HF . . .${NORMTXT}\n"
             VARAHFLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
             megadl ${VARAHFLINK}
             7z x VARA\ HF*.zip -o"VARAHFInstaller"
             cp VARAHFInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
+            # VARA HF will be installed and configured with an AHK script later
         
-        # Download / extract VARA FM (will install/configure via AHK later)
-            echo -e "\n${GREENTXT}Downloading and installing VARA FM . . .${NORMTXT}\n"
+        # Download / extract VARA FM
             # files: VARA FM v4.1.3 Setup.zip > VARA FM setup (Run as Administrator).exe > /SILENT install has an OK button at end
+            echo -e "\n${GREENTXT}Downloading VARA FM . . .${NORMTXT}\n"
             VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA FM v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
             megadl ${VARAFMLINK}
             7z x VARA\ FM*.zip -o"VARAFMInstaller"
             cp VARAFMInstaller/VARA\ FM\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
+            # VARA FM will be installed and configured with an AHK script later
             
         # Download / extract / install VARA Chat
             # files: VARA Chat v1.2.5 Setup.zip > VARA Chat setup (Run as Administrator).exe > /SILENT install is silent
+            echo -e "\n${GREENTXT}Downloading and installing VARA Chat . . .${NORMTXT}\n"
             VARACHATLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA Chat v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
             megadl ${VARACHATLINK}
             7z x VARA\ Chat*.zip -o"VARAChatInstaller"
-            wine VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install
-            cp ~/.local/share/applications/wine/Programs/VARA\ Chat/VARA.desktop ~/Desktop/VARA\ Chat.desktop
+            wine VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
+            
+            # Make a VARA Chat desktop shortcut
+            echo '[Desktop Entry]'                                                                                            >> ~/Desktop/VARA\ Chat.desktop
+            echo 'Name=VARA Chat'                                                                                             >> ~/Desktop/VARA\ Chat.desktop
+            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\VARA\\ Chat\\\\VARA.lnk' >> ~/Desktop/VARA\ Chat.desktop
+            echo 'Type=Application'                                                                                           >> ~/Desktop/VARA\ Chat.desktop
+            echo 'StartupNotify=true'                                                                                         >> ~/Desktop/VARA\ Chat.desktop
+            echo 'Icon=DF53_VARA Chat.0'                                                                                      >> ~/Desktop/VARA\ Chat.desktop
+            echo 'StartupWMClass=vara chat.exe'                                                                               >> ~/Desktop/VARA\ Chat.desktop
+            #cp ~/.local/share/applications/wine/Programs/VARA\ Chat/VARA.desktop ~/Desktop/VARA\ Chat.desktop # wine makes broken shortcuts sometimes
+            sudo chmod +x ~/Desktop/VARA\ Chat.desktop
     cd ..
         
     mkdir ahk; cd ahk
@@ -324,8 +348,18 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> varahf_install.ahk
             echo '        WinWaitClose'                                                            >> varahf_install.ahk
             BOX86_NOBANNER=1 wine AutoHotkey.exe varahf_install.ahk # install VARA silently using AHK
-            cp ~/.local/share/applications/wine/Programs/VARA/VARA.desktop ~/Desktop/ # make a desktop shortcut.
             rm ~/.wine/drive_c/VARA\ setup*.exe # clean up
+            
+            # Make a VARA HF desktop shortcut
+            echo '[Desktop Entry]'                                                                                           >> ~/Desktop/VARA.desktop
+            echo 'Name=VARA'                                                                                                 >> ~/Desktop/VARA.desktop
+            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\VARA\\\\VARA.lnk' >> ~/Desktop/VARA.desktop
+            echo 'Type=Application'                                                                                          >> ~/Desktop/VARA.desktop
+            echo 'StartupNotify=true'                                                                                        >> ~/Desktop/VARA.desktop
+            echo 'Icon=F302_VARA.0'                                                                                          >> ~/Desktop/VARA.desktop
+            echo 'StartupWMClass=vara.exe'                                                                                   >> ~/Desktop/VARA.desktop
+            #cp ~/.local/share/applications/wine/Programs/VARA/VARA.desktop ~/Desktop/ # wine makes broken shortcuts sometimes
+            sudo chmod +x ~/Desktop/VARA.desktop
         
         # Install VARA FM silently
             # Create/run varafm_install.ahk
@@ -333,13 +367,23 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             echo '; AHK script to make VARA installer run completely silent'                       >> varafm_install.ahk
             echo 'SetTitleMatchMode, 2'                                                            >> varafm_install.ahk
             echo 'SetTitleMatchMode, slow'                                                         >> varafm_install.ahk
-            echo '        Run, VARA FM setup (Run as Administrator).exe /SILENT, C:\'                 >> varafm_install.ahk
+            echo '        Run, VARA FM setup (Run as Administrator).exe /SILENT, C:\'              >> varafm_install.ahk
             echo '        WinWait, VARA Setup ; Wait for the "VARA installed successfully" window' >> varafm_install.ahk
             echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> varafm_install.ahk
             echo '        WinWaitClose'                                                            >> varafm_install.ahk
             BOX86_NOBANNER=1 wine AutoHotkey.exe varafm_install.ahk # install VARA silently using AHK
-            cp ~/.local/share/applications/wine/Programs/VARA\ FM/VARA\ FM.desktop ~/Desktop/ # make a desktop shortcut.
             rm ~/.wine/drive_c/VARA\ FM\ setup*.exe # clean up
+            
+            # Make a VARA FM desktop shortcut
+            echo '[Desktop Entry]'                                                                                                 >> ~/Desktop/VARA\ FM.desktop
+            echo 'Name=VARA FM'                                                                                                    >> ~/Desktop/VARA\ FM.desktop
+            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\VARA\\ FM\\\\VARA\\ FM.lnk' >> ~/Desktop/VARA\ FM.desktop
+            echo 'Type=Application'                                                                                                >> ~/Desktop/VARA\ FM.desktop
+            echo 'StartupNotify=true'                                                                                              >> ~/Desktop/VARA\ FM.desktop
+            echo 'Icon=C497_VARAFM.0'                                                                                              >> ~/Desktop/VARA\ FM.desktop
+            echo 'StartupWMClass=varafm.exe'                                                                                       >> ~/Desktop/VARA\ FM.desktop
+            #cp ~/.local/share/applications/wine/Programs/VARA\ FM/VARA\ FM.desktop ~/Desktop/ # wine makes broken shortcuts sometimes
+            sudo chmod +x ~/Desktop/VARA\ FM.desktop
         
         # Guide the user to the VARA HF audio setup menu (configure hardware soundcard input/output)
             echo -e "\n${GREENTXT}Configuring VARA HF . . .${NORMTXT}\n"
@@ -431,6 +475,7 @@ function run_installvARIM()  # Download, build, and install an open-source stand
     cd ..
     rm -rf varim-1.4
     cp /usr/local/share/applications/varim.desktop ~/Desktop/varim.desktop
+    sudo chmod +x ~/Desktop/varim.desktop
 
     ## Download and install vARIM for RPi3B+ or RPi4B
     # THIS IS BROKEN - vARIM pre-made packages are 'portable' and thus can't be installed into /usr/local/bin like the compiled version.
@@ -451,6 +496,7 @@ function run_installvARIM()  # Download, build, and install an open-source stand
     #        sudo install -c -m 644 out.mbox sent.mbox '/usr/local/share/varim'
     #        sudo install -c -m 644 varim.xpm '/usr/local/share/pixmaps'
     #        cp /usr/local/share/applications/varim.desktop ~/Desktop/varim.desktop
+    #        sudo chmod +x ~/Desktop/varim.desktop
     #cd ..
 }
 
@@ -463,33 +509,6 @@ function run_makewineserverkscript()  # Make a script for the desktop that will 
         echo 'wineserver -k' >> ~/Desktop/Reset\ Wine
         echo 'zenity --info --timeout=8 --height 150 --width 500 --text="Wine has been reset so that Winlink Express and VARA will run again.\\n\\nIf you try to run RMS Express again and it crashes or doesn'\''t open, just keep trying to run it.  It should open eventually after enough tries." --title="Wine has been reset"'          >> ~/Desktop/Reset\ Wine
         sudo chmod +x ~/Desktop/Reset\ Wine
-}
-
-function run_makelauncherscripts()  # Kludge for desktop shortcuts being broken as of 10/28/2021 - TODO: Find desktop shortcut problems
-{
-    # Create 'RMS\ Express' script
-        echo '#!/bin/bash'   >> ~/Desktop/RMS\ Express
-        echo ''              >> ~/Desktop/RMS\ Express
-        echo 'wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe' >> ~/Desktop/RMS\ Express
-        sudo chmod +x ~/Desktop/RMS\ Express
-        
-    # Create 'VARA\ HF' script
-        echo '#!/bin/bash'   >> ~/Desktop/VARA\ HF
-        echo ''              >> ~/Desktop/VARA\ HF
-        echo 'wine ~/.wine/drive_c/VARA/VARA.exe' >> ~/Desktop/VARA\ HF
-        sudo chmod +x ~/Desktop/VARA\ HF
-        
-    # Create 'VARA\ FM' script
-        echo '#!/bin/bash'   >> ~/Desktop/VARA\ FM
-        echo ''              >> ~/Desktop/VARA\ FM
-        echo 'wine ~/.wine/drive_c/VARA\ FM/VARAFM.exe' >> ~/Desktop/VARA\ FM
-        sudo chmod +x ~/Desktop/VARA\ FM
-        
-    # Create 'VARA\ Chat' script
-        echo '#!/bin/bash'   >> ~/Desktop/VARA\ Chat
-        echo ''              >> ~/Desktop/VARA\ Chat
-        echo 'wine ~/.wine/drive_c/VARA/VARA\ Chat.exe' >> ~/Desktop/VARA\ Chat
-        sudo chmod +x ~/Desktop/VARA\ Chat
 }
 
 function run_detect_arch()  # Finds what kind of processor we're running (aarch64, armv8l, armv7l, x86_64, x86, etc)
