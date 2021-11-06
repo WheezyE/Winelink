@@ -6,7 +6,7 @@ function run_greeting()
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
     echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 30 min  #"
-    echo "# Version: 0.0072a (Work in progress - ARDOP doesn't work, but VARA does)     #"
+    echo "# Version: 0.0073a (Work in progress - problems creating messages)            #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team                                                            #"
     echo "#     (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,        #"
@@ -64,7 +64,6 @@ function run_main()
         
         ### Pre-installation
             rm -rf Winelink-tmp winelink.log; mkdir Winelink-tmp && cd Winelink-tmp # clean up any failed past runs of this script
-            rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop # clean up any failed past runs of this script
             exec > >(tee "../winelink.log") 2>&1 # start logging
             run_checkpermissions
             run_checkxhost
@@ -73,6 +72,7 @@ function run_main()
         ### Install Wine & winetricks
             #run_detect_arch # TODO: Customize this section to install wine for different operating systems.
             #run_gather_os_info
+            rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop # remove old winlink/wine desktop shortcuts (in case we are reinstalling wine)
             run_installwine "pi4" "devel" "6.19~buster-1" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
             run_installwinetricks # software installer script for wine
             run_downloadbox86 1_Nov_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability (this version of box86 can't install dotnet46)
@@ -87,19 +87,9 @@ function run_main()
         
         ### Post-installation
             run_makewineserverkscript
-            sudo apt-get install zenity -y # TODO: remove redundant apt-get installs - put them at top of script.
             clear
             echo -e "\n${GREENTXT}Setup complete.${NORMTXT}\n"
-            echo ""
-            echo -e "\n${GREENTXT}Please enter your callsign and Winlink password, click 'Update', then let${NORMTXT}"
-            echo -e "${GREENTXT}RMS Express run for a few moments before closing the program.${NORMTXT}"
-            echo ""
-            echo -e "${BRIGHT}Please note: ARDOP is not working in this version of Winelink, but VARA works.${NORMAL}"
-            echo -e "${BRIGHT}ARDOP support is planned for the future.${NORMAL}"
-            echo ""
-            echo -e "${GREENTXT}Loading RMS Express now . . .${NORMTXT}"
-            cd .. && rm -rf Winelink-tmp winelink.log
-            wine ~/.wine/drive_c/RMS\ Express/RMS\ Express.exe
+            cd .. && rm -rf Winelink-tmp winelink.log # cleanup
             
         exit
 }
@@ -136,7 +126,7 @@ function run_checkxhost()  # Check to see if an xserver is running (ie are we in
 
 function run_downloadbox86()  # Download & install Box86. (This function needs a date passed to it)
 {
-    sudo apt-get install p7zip-full -y
+    sudo apt-get install p7zip-full -y # TODO: remove redundant apt-get installs - put them at top of script.
     local date="$1"
     
     echo -e "\n${GREENTXT}Downloading and installing Box86 . . .${NORMTXT}\n"
@@ -199,10 +189,19 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
 
 function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS.NET 4.6 takes a very long time to install on RPi4 in Wine
 {
+    sudo apt-get install p7zip-full -y
+    
     mkdir ~/.cache/wine
     echo -e "\n${GREENTXT}Downloading and installing wine-mono . . .${NORMTXT}\n"
-    wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-6.4.1/wine-mono-6.4.1-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
-    wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to the newer wine-mono that fixes ARDOP (as soon as link is available)
+    #wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-6.4.1/wine-mono-6.4.1-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
+    #wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to the newer wine-mono that fixes ARDOP (as soon as link is available)
+    
+    # Kludge until wine-mono 6.5.0 is released
+    # Link from https://github.com/madewokherd/wine-mono/actions/runs/1403147396
+    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/108782976.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; } # Nightly build with ARDOP TCP/IP fix
+    7z x ~/.cache/wine/108782976.zip -o"$HOME/.cache/wine/"
+    wine msiexec /i ~/.cache/wine/wine-mono-6.4.99-x86.msi
+    
     rm -rf ~/.cache/wine # clean up to save disk space
 }
 
@@ -313,10 +312,12 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             
         # Download / extract / install VARA Chat
             # files: VARA Chat v1.2.5 Setup.zip > VARA Chat setup (Run as Administrator).exe > /SILENT install is silent
-            echo -e "\n${GREENTXT}Downloading and installing VARA Chat . . .${NORMTXT}\n"
+            echo -e "\n${GREENTXT}Downloading VARA Chat . . .${NORMTXT}\n"
             VARACHATLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA Chat v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
             megadl ${VARACHATLINK}
             7z x VARA\ Chat*.zip -o"VARAChatInstaller"
+            
+            echo -e "\n${GREENTXT}Installing VARA Chat . . .${NORMTXT}\n"
             wine VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
             
             # Make a VARA Chat desktop shortcut
@@ -338,7 +339,7 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             sudo chmod +x AutoHotkey.exe
         
         # Install VARA HF silently
-            # Create/run varahf_install.ahk
+            # Create varahf_install.ahk
             # The VARA installer prompts the user to hit 'OK' even during silent install (due to a secondary installer).  We will suppress this prompt with AHK.
             echo '; AHK script to make VARA installer run completely silent'                       >> varahf_install.ahk
             echo 'SetTitleMatchMode, 2'                                                            >> varahf_install.ahk
@@ -347,6 +348,9 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             echo '        WinWait, VARA Setup ; Wait for the "VARA installed successfully" window' >> varahf_install.ahk
             echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> varahf_install.ahk
             echo '        WinWaitClose'                                                            >> varahf_install.ahk
+
+            # Run varahf_install.ahk
+            echo -e "\n${GREENTXT}Installing VARA HF . . .${NORMTXT}\n"
             BOX86_NOBANNER=1 wine AutoHotkey.exe varahf_install.ahk # install VARA silently using AHK
             rm ~/.wine/drive_c/VARA\ setup*.exe # clean up
             
@@ -371,6 +375,9 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             echo '        WinWait, VARA Setup ; Wait for the "VARA installed successfully" window' >> varafm_install.ahk
             echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> varafm_install.ahk
             echo '        WinWaitClose'                                                            >> varafm_install.ahk
+            
+            # Run varafm_install.ahk
+            echo -e "\n${GREENTXT}Installing VARA FM . . .${NORMTXT}\n"
             BOX86_NOBANNER=1 wine AutoHotkey.exe varafm_install.ahk # install VARA silently using AHK
             rm ~/.wine/drive_c/VARA\ FM\ setup*.exe # clean up
             
