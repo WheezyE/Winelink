@@ -2,11 +2,13 @@
 # Winelink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
-# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 introduced a requirement for dotnet46 which has broken this project for the moment - messages cannot be created or received with RMS Express**
- - **_VARA HF/FM and ARDOP_Win still run fine at the moment if you want to use a different message-manager (like Pat or PiLinBPQ) to send/receive commands to/from the TNC's_**
+# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 broke Winelink for the moment. Please standby for more updates as bugs are found and fixed.**
  - **_This project is very early in development. It has lots of bugs._**
- - **_I'm currently investigating the problem with creating/receiving messages as my top priority._**
- - **_ARDOP currently does not work (though a fix has been found for ARDOP and will be able to be implemented by the end of November at the latest)._**
+ - **_Creating messages causes a freeze._**
+ - **_Using the Channel Browser causes a crash._**
+ - **_Running ARDOP long enough may cause a crash._**
+ - **_RMS Express sometimes crashes on first load._**
+ - **_VARA HF/FM & ARDOP_Win run fine if you use a message-manager other than RMS Express (like Pat, VARA Chat, or PiLinBPQ)_**
 
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
@@ -27,7 +29,7 @@ This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Ex
 To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  ExaGear is also closed source abandonware and Qemu (qemu-system & qemu-user-static) also has issues running more complex Wine programs on the Pi.  Box86 is much smaller in file size and much easier to install too.
 
 ## Known issues
- - ARDOP doesn't work with wine-mono yet (As of RMS Express v1.5.41.0, RMS Express requires .NET 4.6. Previous versions of RMS Express didn't have this requirement. The updated has forced us to use wine-mono instead of .NET for now.  Wine-mono bugs may be found and fixed in the future.)
+ - RMS Express v1.5.41.0 introduced a requirement for .NET 4.6 (instead of just .NET 3.5sp1). This updated has forced us to use wine-mono instead of .NET.  Wine-mono may have some bugs that we have not encountered yet. Madewokherd, the wine-mono dev, is amazing though and they might be able to fix bugs we encounter.
  - VARA's CPU gauge doesn't display (this is a bug in Wine).
  - I haven't actually tested over-the-air connections yet since I'm still just a tech.  If some generals could test, that would be awesome.
     
@@ -51,6 +53,7 @@ All software used by this script is free and legal to use (with the exception of
 ## Future work
  - [ ] Add updated example images
  - [ ] Test port connections to radio CAT / test connection to radio audio. Might need to get my General license first . . .
+ - [ ] Add an AHK script to help the user with ARDOP first time soundcard setup.
  - [ ] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed)
     - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116)
     - [ ] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122)
