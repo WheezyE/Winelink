@@ -4,7 +4,7 @@ A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the R
 
 # **!UPDATE 11/1/2021: RMS Express v1.5.41.0 broke Winelink for the moment. Please standby for more updates as bugs are found and fixed.**
  - **_This project is very early in development. It has lots of bugs._**
- - **_Creating messages causes a freeze._**
+ - **_RMS Express doesn't show received messages._**
  - **_Using the Channel Browser causes a crash._**
  - **_Running ARDOP long enough may cause a crash._**
  - **_RMS Express sometimes crashes on first load._**
@@ -56,7 +56,8 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Add an AHK script to help the user with ARDOP first time soundcard setup.
  - [ ] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed)
     - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116)
-    - [ ] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122)
+    - [x] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122)
+    - [ ] Message receive issues
  - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html)
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
