@@ -2,13 +2,14 @@
 # Winelink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
-# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 broke Winelink for the moment. Please standby for more updates as bugs are found and fixed.**
- - **_This project is very early in development. It has lots of bugs._**
+_This project is very early in development. It has lots of bugs._
+
+# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 introduced some major bugs into Winelink at the moment. Please standby as bugs are found and fixed.**
  - **_RMS Express doesn't show received messages._**
- - **_Using the Channel Browser causes a crash._**
- - **_Running ARDOP long enough may cause a crash._**
- - **_RMS Express sometimes crashes on first load._**
- - **_VARA HF/FM & ARDOP_Win run fine if you use a message-manager other than RMS Express (like Pat, VARA Chat, or PiLinBPQ)_**
+ - **_Using the Channel Browser crashes RMS Express._**
+ - **_Running ARDOP long enough crashes RMS Express._**
+ - **_Sometimes RMS Express crashes when starting up._**
+ - _VARA HF/FM run fine if you use a message-manager other than RMS Express (like Pat, VARA Chat, or PiLinBPQ)_
 
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
@@ -39,7 +40,7 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 >       monkaBlyat, lowspecman420, epychan, !FlameKat53, #lukefrenner,
 >       icecream95, SpacingBat3, Botspot, Icenowy, Longhorn, et.al.)
 
- - [madewokherd](https://github.com/madewokherd/wine-mono) for implementing more ARDOP-related VB.NET functions into wine-mono
+ - [madewokherd](https://github.com/madewokherd/wine-mono) for debugging RMS Express and ARDOP in wine-mono
  - N7ACW & AD7HE for getting me started in ham radio
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides
@@ -85,38 +86,41 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Simplify installation commands (model after KM4ACK BAP).
  #### Add more platforms (make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build/invoke box86 if needed)
  - [x] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS
-    - [ ] ARM - Raspberry Pi family
-      - [x] RPi 4B
-      - [ ] RPi 3B+
+    - ARM
+      - [x] Raspberry Pi 4B
+      - [ ] Raspberry Pi 3B+
         - [ ] Detect Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi <4 support.
-        - Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
+        - [ ] Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
+      - [ ] RPi Zero 2 W?
       - [ ] RPi Zero W?
-    - [ ] ARM - [Termux](https://github.com/termux/termux-app) (Android without root) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)) - see [AnBox86](https://github.com/lowspecman420/AnBox86) for proof of concept, currently untested with VARA.
-      - [ ] Fix AnBox86
-    - [ ] x86 - Mac.
-    - [ ] x86 - ChromeBook Linux beta.
-      - [ ] Try to detect if processor would be too slow?
-    - [ ] x86 - Linux.
-      - [ ] Debian (Package manager: apt)
-        - [ ] Deepin
-        - [ ] Kali
-      - [ ] Ubuntu (Package manager: apt)
-        - [x] Linux Mint
-        - [ ] Elementary OS
-        - [ ] Zorin OS
-      - [ ] Arch (Package manager: pacman, libalpm)
-        - [ ] Vanilla Arch??
-        - [ ] Manjaro
-        - [ ] XeroLinux
-        - [ ] SteamOS
-      - [ ] Red Hat (Package manager: yum, RPM)
-        - [ ] Fedora (Package manager: RPM/DNF)
-        - [ ] CentOS (Package manager: yum)
-      - [ ] Slackware (Package manager: pkgtool, slackpkg)
-      - [ ] FreeBSD (Package manager: pkg)
-      - [ ] Gentoo (Package manager: Portage)
-      - [ ] Solus (Package manager: eopkg)
-      - [ ] openSUSE (Package manager: ZYpp (standard); YaST (front-end); RPM (low-level))
+      - [ ] [Termux](https://github.com/termux/termux-app) (Android without root) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)) - see [AnBox86](https://github.com/lowspecman420/AnBox86) for proof of concept, currently untested with VARA.
+        - [ ] Fix AnBox86
+    - x86
+      - Mac
+        - [ ] OSX?
+      - Linux
+        - [ ] Debian (Package manager: apt)
+          - [ ] Deepin
+          - [ ] Kali
+        - [ ] Ubuntu (Package manager: apt)
+          - [x] Linux Mint
+          - [ ] Elementary OS
+          - [ ] Zorin OS
+        - [ ] Arch (Package manager: pacman, libalpm)
+          - [ ] Vanilla Arch??
+          - [ ] Manjaro
+          - [ ] XeroLinux
+          - [ ] SteamOS? (Steam Deck)
+        - [ ] Red Hat (Package manager: yum, RPM)
+          - [ ] Fedora (Package manager: RPM/DNF)
+          - [ ] CentOS (Package manager: yum)
+        - [ ] Slackware (Package manager: pkgtool, slackpkg)
+        - [ ] FreeBSD (Package manager: pkg)
+        - [ ] Gentoo (Package manager: Portage)
+        - [ ] Solus (Package manager: eopkg)
+        - [ ] openSUSE (Package manager: ZYpp (standard); YaST (front-end); RPM (low-level))
+      - [ ] ChromeBook Linux beta.
+        - [ ] Try to detect if processor would be too slow?
  - [ ] Make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
 
 ## Distribution
@@ -125,5 +129,5 @@ If you use this script in your project (or are inspired by it) just please be su
 ## Donations
 If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb, madewokherd (CodeWeavers/WineHQ), or KM4ACK - without whom, this script would not exist.
  - Sebastien "ptitSeb" Chevalier (author of [Box86](https://github.com/ptitSeb/box86), incredible developer, & really nice guy) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
- - CodeWeavers & madewokherd (authors of [Wine](https://www.winehq.org/) and [wine-mono](https://github.com/madewokherd/wine-mono) & wonderful people) [https://www.winehq.org/donate](https://www.winehq.org/donate)
+ - Madewokherd (author [wine-mono](https://github.com/madewokherd/wine-mono) & a wonderful person) [https://www.winehq.org/donate](https://www.winehq.org/donate)
  - Jason "KM4ACK" Oleham (author of [Build-a-Pi](https://github.com/km4ack/pi-build), Linux elmer, & ham radio pioneer) [paypal.me/km4ack](paypal.me/km4ack)
