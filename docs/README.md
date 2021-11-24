@@ -4,12 +4,11 @@ A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the R
 
 _This project is very early in development. It has lots of bugs._
 
-# **!UPDATE 11/1/2021: RMS Express v1.5.41.0 introduced some major bugs into Winelink at the moment. Please standby as bugs are found and fixed.**
- - **_RMS Express doesn't show received messages._**
- - **_Using the Channel Browser crashes RMS Express._**
- - **_Running ARDOP long enough crashes RMS Express._**
- - **_Sometimes RMS Express crashes when starting up._**
- - _VARA HF/FM run fine if you use a message-manager other than RMS Express (like Pat, VARA Chat, or PiLinBPQ)_
+## UPDATE 11/1/2021
+RMS Express v1.5.41.0 introduced some major bugs into Winelink at the moment. Please standby as bugs are found and fixed.
+ - _Using the Channel Browser crashes RMS Express._
+ - _Running ARDOP long enough crashes RMS Express._
+ - _Sometimes RMS Express crashes when starting up._
 
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:

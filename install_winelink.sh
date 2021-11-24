@@ -196,11 +196,11 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS
     #wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-6.4.1/wine-mono-6.4.1-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
     #wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to the newer wine-mono that fixes ARDOP (as soon as link is available)
     
-    # Kludge until wine-mono 6.5.0 is released
+    # Kludge until wine-mono 7.1.0 is released
     # Link from https://github.com/madewokherd/wine-mono/actions/runs/1403147396
-    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/111335721.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; } # Nightly build with ARDOP TCP/IP fix
-    7z x ~/.cache/wine/111335721.zip -o"$HOME/.cache/wine/"
-    wine msiexec /i ~/.cache/wine/wine-mono-6.4.99-x86.msi
+    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/118008722.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; } # Nightly build with ARDOP TCP/IP fix
+    7z x ~/.cache/wine/118008722.zip -o"$HOME/.cache/wine/"
+    wine msiexec /i ~/.cache/wine/wine-mono-7.0.99-x86.msi
     
     rm -rf ~/.cache/wine # clean up to save disk space
 }
