@@ -58,7 +58,9 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed)
     - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116)
     - [x] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122)
-    - [ ] Message receive issues
+    - [x] Message receive issues
+    - [ ] [HF Channel Selection Browser crash](https://github.com/WheezyE/Winelink/issues/16) (from small-value input frequencies)
+    - [ ] COM port connection issues to radios/TNC's
  - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html)
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
