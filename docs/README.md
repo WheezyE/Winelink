@@ -7,6 +7,7 @@ _This project is very early in development. It has lots of bugs and should be co
 ## UPDATE 11/1/2021
 RMS Express v1.5.41.0 introduced some major bugs into Winelink at the moment. Please standby as bugs are found and fixed.
  - _ARDOP_Win doesn't run._
+ - _HF Channel Selection Browser might freeze._
 
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
