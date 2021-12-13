@@ -5,8 +5,8 @@ function run_greeting()
     clear
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
-    echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 30 min  #"
-    echo "# Version: 0.0073a (Work in progress - problems creating messages)            #"
+    echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 90 min  #"
+    echo "# Version: 0.0074a (Work in progress - ARDOP does not work)                   #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team                                                            #"
     echo "#     (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,        #"
@@ -73,9 +73,9 @@ function run_main()
             #run_detect_arch # TODO: Customize this section to install wine for different operating systems.
             #run_gather_os_info
             rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop # remove old winlink/wine desktop shortcuts (in case we are reinstalling wine)
-            run_installwine "pi4" "devel" "6.19~buster-1" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
+            run_installwine "pi4" "devel" "5.21~buster" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
             run_installwinetricks # software installer script for wine
-            run_downloadbox86 1_Nov_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability (this version of box86 can't install dotnet46)
+            run_downloadbox86 1_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability (this version of box86 can't install dotnet46)
             
         ### Set up Wine (silently make & configure a new wineprefix)
             run_setupwineprefix
@@ -171,7 +171,9 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
 
     # Install pre-requisite software into the wineprefix for RMS Express and VARA
         echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
-        run_installwinemono # wine-mono replaces dotnet46
+        BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 winetricks -q --force dotnet46 # tested with wine 5.21~buster
+            wineserver -k #stop the looping error messages after dotnet46 install
+        #run_installwinemono # wine-mono replaces dotnet46
         BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed, using wine-mono in place of dotnet46)
         BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
 
@@ -198,7 +200,8 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS
     
     # Kludge until wine-mono 7.1.0 is released
     # Link from https://github.com/madewokherd/wine-mono/actions/runs/1403147396
-    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/118008722.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; } # Nightly build with ARDOP TCP/IP fix
+    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/118008722.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; }
+    # May require wine-devel 6.19
     7z x ~/.cache/wine/118008722.zip -o"$HOME/.cache/wine/"
     wine msiexec /i ~/.cache/wine/wine-mono-7.0.99-x86.msi
     
@@ -275,13 +278,13 @@ function run_installrms()  # Download/extract/install RMS Express
             wine WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
             
         # Make a RMS Express desktop shortcut
-            echo '[Desktop Entry]'                                                                                                     >> ~/Desktop/Winlink\ Express.desktop
-            echo 'Name=Winlink Express'                                                                                                >> ~/Desktop/Winlink\ Express.desktop
-            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\RMS\\ Express\\\\Winlink\\ Express.lnk' >> ~/Desktop/Winlink\ Express.desktop
-            echo 'Type=Application'                                                                                                    >> ~/Desktop/Winlink\ Express.desktop
-            echo 'StartupNotify=true'                                                                                                  >> ~/Desktop/Winlink\ Express.desktop
-            echo 'Icon=219D_RMS Express.0'                                                                                             >> ~/Desktop/Winlink\ Express.desktop
-            echo 'StartupWMClass=rms express.exe'                                                                                      >> ~/Desktop/Winlink\ Express.desktop
+            echo '[Desktop Entry]'                                                                             >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Name=Winlink Express'                                                                        >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Type=Application'                                                                            >> ~/Desktop/Winlink\ Express.desktop
+            echo 'StartupNotify=true'                                                                          >> ~/Desktop/Winlink\ Express.desktop
+            echo 'Icon=219D_RMS Express.0'                                                                     >> ~/Desktop/Winlink\ Express.desktop
+            echo 'StartupWMClass=rms express.exe'                                                              >> ~/Desktop/Winlink\ Express.desktop
             #cp ~/.local/share/applications/wine/Programs/RMS\ Express/Winlink\ Express.desktop ~/Desktop/ # sometimes wine makes broken links
             sudo chmod +x ~/Desktop/Winlink\ Express.desktop
     cd ..
@@ -323,7 +326,7 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             # Make a VARA Chat desktop shortcut
             echo '[Desktop Entry]'                                                                                            >> ~/Desktop/VARA\ Chat.desktop
             echo 'Name=VARA Chat'                                                                                             >> ~/Desktop/VARA\ Chat.desktop
-            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\VARA\\ Chat\\\\VARA.lnk' >> ~/Desktop/VARA\ Chat.desktop
+            echo 'Exec=wine '$HOME'/.wine/drive_c/VARA/VARA\ Chat.exe' >> ~/Desktop/VARA\ Chat.desktop
             echo 'Type=Application'                                                                                           >> ~/Desktop/VARA\ Chat.desktop
             echo 'StartupNotify=true'                                                                                         >> ~/Desktop/VARA\ Chat.desktop
             echo 'Icon=DF53_VARA Chat.0'                                                                                      >> ~/Desktop/VARA\ Chat.desktop
@@ -351,17 +354,17 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
 
             # Run varahf_install.ahk
             echo -e "\n${GREENTXT}Installing VARA HF . . .${NORMTXT}\n"
-            BOX86_NOBANNER=1 wine AutoHotkey.exe varahf_install.ahk # install VARA silently using AHK
+            BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine AutoHotkey.exe varahf_install.ahk # install VARA silently using AHK
             rm ~/.wine/drive_c/VARA\ setup*.exe # clean up
             
             # Make a VARA HF desktop shortcut
-            echo '[Desktop Entry]'                                                                                           >> ~/Desktop/VARA.desktop
-            echo 'Name=VARA'                                                                                                 >> ~/Desktop/VARA.desktop
-            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\VARA\\\\VARA.lnk' >> ~/Desktop/VARA.desktop
-            echo 'Type=Application'                                                                                          >> ~/Desktop/VARA.desktop
-            echo 'StartupNotify=true'                                                                                        >> ~/Desktop/VARA.desktop
-            echo 'Icon=F302_VARA.0'                                                                                          >> ~/Desktop/VARA.desktop
-            echo 'StartupWMClass=vara.exe'                                                                                   >> ~/Desktop/VARA.desktop
+            echo '[Desktop Entry]'                                                                 >> ~/Desktop/VARA.desktop
+            echo 'Name=VARA'                                                                       >> ~/Desktop/VARA.desktop
+            echo 'Exec=wine '$HOME'/.wine/drive_c/VARA/VARA.exe'                                   >> ~/Desktop/VARA.desktop
+            echo 'Type=Application'                                                                >> ~/Desktop/VARA.desktop
+            echo 'StartupNotify=true'                                                              >> ~/Desktop/VARA.desktop
+            echo 'Icon=F302_VARA.0'                                                                >> ~/Desktop/VARA.desktop
+            echo 'StartupWMClass=vara.exe'                                                         >> ~/Desktop/VARA.desktop
             #cp ~/.local/share/applications/wine/Programs/VARA/VARA.desktop ~/Desktop/ # wine makes broken shortcuts sometimes
             sudo chmod +x ~/Desktop/VARA.desktop
         
@@ -378,17 +381,17 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             
             # Run varafm_install.ahk
             echo -e "\n${GREENTXT}Installing VARA FM . . .${NORMTXT}\n"
-            BOX86_NOBANNER=1 wine AutoHotkey.exe varafm_install.ahk # install VARA silently using AHK
+            BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine AutoHotkey.exe varafm_install.ahk # install VARA silently using AHK
             rm ~/.wine/drive_c/VARA\ FM\ setup*.exe # clean up
             
             # Make a VARA FM desktop shortcut
-            echo '[Desktop Entry]'                                                                                                 >> ~/Desktop/VARA\ FM.desktop
-            echo 'Name=VARA FM'                                                                                                    >> ~/Desktop/VARA\ FM.desktop
-            echo 'Exec=env WINEPREFIX='$HOME'/.wine wine C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\VARA\\ FM\\\\VARA\\ FM.lnk' >> ~/Desktop/VARA\ FM.desktop
-            echo 'Type=Application'                                                                                                >> ~/Desktop/VARA\ FM.desktop
-            echo 'StartupNotify=true'                                                                                              >> ~/Desktop/VARA\ FM.desktop
-            echo 'Icon=C497_VARAFM.0'                                                                                              >> ~/Desktop/VARA\ FM.desktop
-            echo 'StartupWMClass=varafm.exe'                                                                                       >> ~/Desktop/VARA\ FM.desktop
+            echo '[Desktop Entry]'                                                                 >> ~/Desktop/VARA\ FM.desktop
+            echo 'Name=VARA FM'                                                                    >> ~/Desktop/VARA\ FM.desktop
+            echo 'Exec=wine '$HOME'/.wine/drive_c/VARA\ FM/VARAFM.exe'                             >> ~/Desktop/VARA\ FM.desktop
+            echo 'Type=Application'                                                                >> ~/Desktop/VARA\ FM.desktop
+            echo 'StartupNotify=true'                                                              >> ~/Desktop/VARA\ FM.desktop
+            echo 'Icon=C497_VARAFM.0'                                                              >> ~/Desktop/VARA\ FM.desktop
+            echo 'StartupWMClass=varafm.exe'                                                       >> ~/Desktop/VARA\ FM.desktop
             #cp ~/.local/share/applications/wine/Programs/VARA\ FM/VARA\ FM.desktop ~/Desktop/ # wine makes broken shortcuts sometimes
             sudo chmod +x ~/Desktop/VARA\ FM.desktop
         
@@ -420,7 +423,7 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> varahf_configure.ahk
             echo '        Sleep 100'                                                               >> varahf_configure.ahk
             echo '        WinClose, VARA HF ; Close VARA'                                          >> varahf_configure.ahk
-            BOX86_NOBANNER=1 wine AutoHotkey.exe varahf_configure.ahk # nobanner option to make console prettier
+            BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine AutoHotkey.exe varahf_configure.ahk # nobanner option to make console prettier
             sleep 5
             sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA/VARA.ini # turn off VARA HF's waterfall (change 'View=1' to 'View=3' in VARA.ini). INI file shows up after first run of VARA HF.
         
@@ -451,7 +454,7 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> varafm_configure.ahk
             echo '        Sleep 100'                                                               >> varafm_configure.ahk
             echo '        WinClose, VARA FM ; Close VARA'                                          >> varafm_configure.ahk
-            BOX86_NOBANNER=1 wine AutoHotkey.exe varafm_configure.ahk # Nobanner option to make console prettier
+            BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine AutoHotkey.exe varafm_configure.ahk # Nobanner option to make console prettier
             sleep 5
             sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA\ FM/VARAFM.ini # turn off VARA FM's graphics (change 'View=1' to 'View=3' in VARAFM.ini). INI file shows up after first run of VARA FM.
     cd ..
