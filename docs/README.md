@@ -14,7 +14,7 @@ Copy/paste these commands into your Raspberry Pi 4's terminal:
 curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
      bash install_winelink.sh
 ```
- - A full installation takes about 30 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
+ - A full installation takes about 90 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
  - You should then be able to run RMS Express and VARA from desktop shortcuts.  They may crash.
 
 ## Examples
