@@ -6,10 +6,7 @@ _This project is very early in development. It has lots of bugs and should be co
 
 ## UPDATE 11/1/2021
 RMS Express v1.5.41.0 introduced some major bugs into Winelink at the moment. Please standby as bugs are found and fixed.
- - _Using the Channel Browser can crash RMS Express. Check [here](https://github.com/WheezyE/Winelink/issues/16#issuecomment-987994118) for a fix if this happens._
- - _COM ports may be inaccessible (for Radio PTT & PACTOR control). Try [this](https://github.com/WheezyE/Winelink/issues/17#issuecomment-990374821) to see if it fixes COM ports._
- - _Running ARDOP long enough crashes RMS Express._
- - _Sometimes RMS Express crashes when starting up._
+ - _ARDOP_Win doesn't run._
 
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
