@@ -5,13 +5,11 @@ function run_greeting()
     clear
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
-    echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 90 min  #"
-    echo "# Version: 0.0074a (Work in progress - ARDOP does not work)                   #"
+    echo "# Author: Eric Wiessner (KI7POL)                   Install time: apx 120 min  #"
+    echo "# Version: 0.0075a (Work in progress - ARDOP does not work)                   #"
     echo "# Credits:                                                                    #"
-    echo "#   The Box86 team                                                            #"
-    echo "#     (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,        #"
-    echo "#      monkaBlyat, lowspecman420, epychan, !FlameKat53, #lukefrenner, et al)  #"
-    echo "#   madewokherd (wine-mono support)                                           #"
+    echo "#   The Box86 team (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, et al) #"
+    echo "#   Esme 'madewokherd' Povirk (CodeWeavers) for wine-mono debugging/support   #"
     echo "#   N7ACW & AD7HE for getting me started in ham radio                         #"
     echo "#   KM4ACK & OH8STN for inspiration                                           #"
     echo "#   K6ETA & DCJ21's Winlink on Linux guides                                   #"
@@ -23,6 +21,7 @@ function run_greeting()
     echo "#   (the creator of box86) or CodeWeavers (wine, wine-mono).                  #"
     echo "#                                                                             #"
     echo "#                  - Donate to Box86:  paypal.me/0ptitSeb -                   #"
+    echo "#    - Support Esme & CodeWeavers: https://www.codeweavers.com/crossover -    #"
     echo "#       - Donate to Wine / wine-mono:  https://www.winehq.org/donate -        #"
     echo "###############################################################################"
     read -n 1 -s -r -p "Press any key to continue . . ."
@@ -78,12 +77,20 @@ function run_main()
             run_downloadbox86 1_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability (this version of box86 can't install dotnet46)
             
         ### Set up Wine (silently make & configure a new wineprefix)
-            run_setupwineprefix
+            if [ "$ARG" = "vara_only" ]; then
+                run_setupwineprefix_varaonly
+            else
+                run_setupwineprefix
+            fi
         
         ### Install Winlink & VARA into our configured wineprefix
-            run_installrms
-            run_installvara
-            #run_installvARIM
+            if [ "$ARG" = "vara_only" ]; then
+                run_installvara
+            else
+                run_installrms
+                run_installvara
+                #run_installvARIM
+            fi
         
         ### Post-installation
             run_makewineserverkscript
@@ -173,6 +180,33 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
         echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
         BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 winetricks -q --force dotnet46 # tested with wine 5.21~buster
             wineserver -k #stop the looping error messages after dotnet46 install
+        #run_installwinemono # wine-mono replaces dotnet46
+        BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed, using wine-mono in place of dotnet46)
+        BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
+
+    # Guide the user to the wineconfig audio menu (configure hardware soundcard input/output)
+        sudo apt-get install zenity -y
+        clear
+        echo ""
+        echo -e "\n${GREENTXT}In winecfg, go to the Audio tab to set up your system's in/out soundcards.\n(please click 'Ok' on the user prompt textbox to continue)${NORMTXT}"
+        zenity --info --height 100 --width 350 --text="We will now setup your soundcards for Wine. \n\nPlease navigate to the Audio tab and choose your systems soundcards \n\nInstall will continue once you have closed the winecfg menu." --title="Wine Soundcard Setup"
+        echo -e "${GREENTXT}Loading winecfg now . . .${NORMTXT}\n"
+        echo ""
+        BOX86_NOBANNER=1 winecfg # nobanner just for prettier terminal
+        clear
+}
+
+function run_setupwineprefix_varaonly()  # Set up a new wineprefix silently.  A wineprefix is kind of like a virtual harddrive for wine
+{
+    # Silently create a new wineprefix
+        echo -e "\n${GREENTXT}Creating a new wineprefix.  This may take a moment . . .${NORMTXT}\n" 
+        rm -rf ~/.cache/wine # make sure no old wine-mono files are in wine's cache, or else they will be auto-installed on first wineboot
+        DISPLAY=0 WINEARCH=win32 wine wineboot # initialize Wine silently (silently makes a fresh wineprefix in `~/.wine`)
+
+    # Install pre-requisite software into the wineprefix for RMS Express and VARA
+        echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
+        #BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 winetricks -q --force dotnet46 # tested with wine 5.21~buster
+        #    wineserver -k #stop the looping error messages after dotnet46 install
         #run_installwinemono # wine-mono replaces dotnet46
         BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed, using wine-mono in place of dotnet46)
         BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
