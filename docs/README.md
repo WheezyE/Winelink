@@ -15,8 +15,9 @@ Copy/paste these commands into your Raspberry Pi 4's terminal:
 curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
      bash install_winelink.sh
 ```
- - A full installation takes about 90 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
+ - A full installation takes about 120 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
  - You should then be able to run RMS Express and VARA from desktop shortcuts.  They may crash.
+ - If needed, you can also tell the script to only install VARA (skipping RMS Express and .NET 4.6, which take a very long time to install).  You can by running `curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && bash install_winelink.sh vara_only`
 
 ## Examples
 ![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
@@ -57,7 +58,7 @@ All software used by this script is free and legal to use (with the exception of
     - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116)
     - [x] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122)
     - [x] [Message receive issues](https://github.com/madewokherd/wine-mono/issues/122#issuecomment-962525136)
-    - [ ] [HF Channel Selection Browser crash](https://github.com/WheezyE/Winelink/issues/16) (from small-value input frequencies)
+    - [x] [HF Channel Selection Browser crash](https://github.com/WheezyE/Winelink/issues/16) (from small-value input frequencies)
     - [ ] [COM port connection issues to radios/TNC's](https://github.com/WheezyE/Winelink/issues/17)
  - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html)
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
