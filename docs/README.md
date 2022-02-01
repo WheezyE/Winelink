@@ -4,20 +4,15 @@ A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the R
 
 _This project is very early in development. It has lots of bugs and should be considered [alpha](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha) software._
 
-## UPDATE 11/1/2021
-RMS Express v1.5.41.0 introduced some major bugs into Winelink at the moment. Please standby as bugs are found and fixed.
- - _ARDOP_Win doesn't run._
- - _HF Channel Selection Browser might freeze._
-
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
 ```bash
 curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
      bash install_winelink.sh
 ```
- - A full installation takes about 120 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
+ - A full installation takes about 30 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
  - You should then be able to run RMS Express and VARA from desktop shortcuts.  They may crash.
- - If needed, you can also tell the script to only install VARA (skipping RMS Express and .NET 4.6, which take a very long time to install).  You can by running `curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && bash install_winelink.sh vara_only`
+ - If desired, you can tell the script to only install VARA by running `curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && bash install_winelink.sh vara_only`
 
 ## Examples
 ![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
@@ -29,20 +24,22 @@ This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Ex
 To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  ExaGear is also closed source abandonware and Qemu (qemu-system & qemu-user-static) also has issues running more complex Wine programs on the Pi.  Box86 is much smaller in file size and much easier to install too.
 
 ## Known issues
- - RMS Express v1.5.41.0 introduced a requirement for .NET 4.6 (instead of just .NET 3.5sp1). This updated has forced us to use wine-mono instead of .NET.  Wine-mono may have some bugs that we have not encountered yet. Madewokherd, the wine-mono dev, is amazing though and they might be able to fix bugs we encounter.
- - VARA's CPU gauge doesn't display (this is a bug in Wine).
- - I haven't actually tested over-the-air connections yet since I'm still just a tech.  If some generals could test, that would be awesome.
+ - ARDOP often has trouble connecting to RMS Express over TCP when if first starts. If ARDOP fails to connect, just restart it until it does connect (this is a bug in wine).
+ - VARA's CPU gauge doesn't display (this is a bug in wine).
+ - Using the map can cause RMS Express to crash.
+ - I haven't tested over-the-air connections since I'm just a tech.  If some generals could test, that would be awesome.
+ - RMS Express v1.5.41.0 introduced a requirement for .NET 4.6 (instead of just .NET 3.5sp1). This updated has forced us to use wine-mono instead of .NET.  Wine-mono may have some bugs. Madewokherd (Esme), the wine-mono dev, is amazing though - they have fixed all of the bugs we've encountered so far.
     
 ## Credits
- - [The Box86 team](https://discord.gg/Fh8sjmu)
+ - [ptitSeb](https://github.com/ptitSeb/box86) for box86 debugging (& everyone on [the TwisterOS discord](https://discord.gg/Fh8sjmu))
 >      (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, phoenixbyrd,
 >       monkaBlyat, lowspecman420, epychan, !FlameKat53, #lukefrenner,
 >       icecream95, SpacingBat3, Botspot, Icenowy, Longhorn, et.al.)
 
- - [madewokherd](https://github.com/madewokherd/wine-mono) for debugging RMS Express and ARDOP in wine-mono
+ - [madewokherd](https://github.com/madewokherd/wine-mono) (Esme) for wine-mono debugging
  - N7ACW & AD7HE for getting me started in ham radio
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
- - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides
+ - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides for early proof-of-concept
 
          "My humanity is bound up in yours, for we can only be human together"
                                                      - Nelson Mandela
@@ -51,22 +48,24 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86, Wine, wine-mono, winetricks, and AutoHotKey, are all open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
 ## Future work
- - [ ] Add updated example images
- - [ ] Test port connections to radio CAT / test connection to radio audio. Might need to get my General license first . . .
+ - [ ] Add updated example images.
  - [ ] Add an AHK script to help the user with ARDOP first time soundcard setup.
- - [ ] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed)
-    - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116)
-    - [x] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122)
-    - [x] [Message receive issues](https://github.com/madewokherd/wine-mono/issues/122#issuecomment-962525136)
-    - [x] [HF Channel Selection Browser crash](https://github.com/WheezyE/Winelink/issues/16) (from small-value input frequencies)
-    - [ ] [COM port connection issues to radios/TNC's](https://github.com/WheezyE/Winelink/issues/17)
- - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html)
+ - [ ] Consider adding a sed script to find/delete any small-value frequencies in `RMS Channels.dat` that would crash the HF Channel Selection Browser
+ - [x] Test COM port connections to radio ("CAT" control, PTT).
+ - [x] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed).
+    - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116).
+    - [x] [Message creation issues](https://github.com/madewokherd/wine-mono/issues/122).
+    - [x] [Message receive issues](https://github.com/madewokherd/wine-mono/issues/122#issuecomment-962525136).
+    - [x] [HF Channel Selection Browser crash](https://github.com/WheezyE/Winelink/issues/16) (from small-value input frequencies).
+    - [x] [COM port connection issues to radios/TNC's](https://github.com/WheezyE/Winelink/issues/17).
+ - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html).
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
- - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling
-    - [ ] Give user the choice to compile or not
-    - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency
- - [x] Ask Seb for help getting VARA Chat running in box86
- - [x] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows) - Fixed with X11 check
+ - [ ] Work with the Wine team to figure out why ARDOP doesn't always connect to RMS Express over TCP when first starting.
+ - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling.
+    - [ ] Give user the choice to compile or not.
+    - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency.
+ - [x] Ask Seb for help getting VARA Chat running in box86.
+ - [x] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows) - Fixed with X11 check.
  - [x] Add installer for VARA FM.
  - [x] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
  - [x] Change VARA Setup/Config terminal text prompts into zenity pop-up boxes.
@@ -78,15 +77,15 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Add an AHK script to help the user with VARA first time soundcard setup.
  - [x] Add more clean-up functions to the script.
  - [x] Have the script download all files into the cloned repository directory (instead of into ~/Downloads)
- - [x] Add shortcuts to the desktop
+ - [x] Add shortcuts to the desktop.
  - [x] Work with the Wine team to find [graphical errors in VARA](https://forum.winehq.org/viewtopic.php?f=8&t=34910).
- - [x] Add the fix for VARA graphical errors to the script
-    - [x] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29))
+ - [x] Add the fix for VARA graphical errors to the script.
+    - [x] Re-fix the VARA graphics errors using a different method ([winecfg reg keys](https://wiki.winehq.org/index.php?title=Useful_Registry_Keys&highlight=%28registry%29)).
   - [x] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
   - [x] Make code modular to help readability.
  - [x] Simplify installation commands (model after KM4ACK BAP).
- #### Add more platforms (make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build/invoke box86 if needed)
- - [x] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS
+ #### Add more platforms (make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build/invoke box86 if needed).
+ - [x] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS.
     - ARM
       - [x] Raspberry Pi 4B
       - [ ] Raspberry Pi 3B+
@@ -95,7 +94,7 @@ All software used by this script is free and legal to use (with the exception of
       - [ ] RPi Zero 2 W?
       - [ ] RPi Zero W?
       - [ ] [Termux](https://github.com/termux/termux-app) (Android without root) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)) - see [AnBox86](https://github.com/lowspecman420/AnBox86) for proof of concept, currently untested with VARA.
-        - [ ] Fix AnBox86
+        - [x] Fix AnBox86
     - x86
       - Mac
         - [ ] OSX?
