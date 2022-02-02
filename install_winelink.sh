@@ -6,7 +6,7 @@ function run_greeting()
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
     echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 30 min  #"
-    echo "# Version: 0.008a (Work in progress)                                          #"
+    echo "# Version: 0.0085a (Work in progress)                                         #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, et al) #"
     echo "#   Esme 'madewokherd' Povirk (CodeWeavers) for wine-mono debugging/support   #"
@@ -66,19 +66,19 @@ function run_main()
         local ARG="$1" # store the first argument passed to the script file as a variable here (i.e. 'bash install_winelink.sh vara_only')
         
         ### Pre-installation
-            rm -rf Winelink-tmp winelink.log; mkdir Winelink-tmp && cd Winelink-tmp # clean up any failed past runs of this script
+            rm -rf Winelink-tmp winelink.log 2>/dev/null; mkdir Winelink-tmp && cd Winelink-tmp # clean up any failed past runs of this script
             exec > >(tee "../winelink.log") 2>&1 # start logging
             run_checkpermissions
             run_checkxhost
+            run_gather_os_info
+            #run_detect_arch # TODO: Customize this section to install wine for different operating systems.
             run_greeting
         
         ### Install Wine & winetricks
-            #run_detect_arch # TODO: Customize this section to install wine for different operating systems.
-            #run_gather_os_info
-            rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop # remove old winlink/wine desktop shortcuts (in case we are reinstalling wine)
-            run_installwine "pi4" "devel" "5.21~buster" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
+            rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop 2>/dev/null # remove old winlink/wine desktop shortcuts (in case we are reinstalling wine)
+            run_installwine "pi4" "devel" "6.19~${VERSION_CODENAME}-1" "${VERSION_CODENAME}" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
             run_installwinetricks # software installer script for wine
-            run_downloadbox86 1_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability
+            run_downloadbox86 31_Jan_22 # emulator to run wine-i386 on ARM - freeze version to ensure compatability
             
         ### Set up Wine (silently make & configure a new wineprefix)
             if [ "$ARG" = "vara_only" ]; then
@@ -252,23 +252,24 @@ function run_installwine()  # Download and install Wine for i386 Debian Buster (
     local system="$1" #example: "pi4" - TODO: implement other systems, like pi3
     local branch="$2" #example: "devel" or "stable" without quotes (staging requires more install steps)  ${version}
     local version="$3" #example: "6.19~buster-1"
+    local dist="$4" #example: buster
 
     wineserver -k &> /dev/null # stop any old wine installations from running - TODO: double-check this command
     rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
     rm -rf ~/.local/share/applications/wine # remove any old program shortcuts
     mkdir downloads 2>/dev/null; cd downloads
         # Backup old wine
-            rm -rf ~/wine-old; mv ~/wine ~/wine-old
-            rm -rf ~/.wine-old; mv ~/.wine ~/.wine-old
-            sudo mv /usr/local/bin/wine /usr/local/bin/wine-old
-            sudo mv /usr/local/bin/wineboot /usr/local/bin/wineboot-old
-            sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old
-            sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old
+            rm -rf ~/wine-old 2>/dev/null; mv ~/wine ~/wine-old 2>/dev/null
+            rm -rf ~/.wine-old 2>/dev/null; mv ~/.wine ~/.wine-old 2>/dev/null
+            sudo mv /usr/local/bin/wine /usr/local/bin/wine-old 2>/dev/null
+            sudo mv /usr/local/bin/wineboot /usr/local/bin/wineboot-old 2>/dev/null
+            sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old 2>/dev/null
+            sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old 2>/dev/null
 
         # Download, extract wine, and install wine
             echo -e "\n${GREENTXT}Downloading wine . . .${NORMTXT}"
-            wget -q https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-${branch}-i386_${version}_i386.deb || { echo "wine-${branch}-i386_${version}_i386.deb download failed!" && run_giveup; }
-            wget -q https://dl.winehq.org/wine-builds/debian/dists/buster/main/binary-i386/wine-${branch}_${version}_i386.deb || { echo "wine-${branch}_${version}_i386.deb download failed!" && run_giveup; }
+            wget -q https://dl.winehq.org/wine-builds/debian/dists/${dist}/main/binary-i386/wine-${branch}-i386_${version}_i386.deb || { echo "wine-${branch}-i386_${version}_i386.deb download failed!" && run_giveup; }
+            wget -q https://dl.winehq.org/wine-builds/debian/dists/${dist}/main/binary-i386/wine-${branch}_${version}_i386.deb || { echo "wine-${branch}_${version}_i386.deb download failed!" && run_giveup; }
             echo -e "${GREENTXT}Extracting wine . . .${NORMTXT}"
             dpkg-deb -x wine-${branch}-i386_${version}_i386.deb wine-installer
             dpkg-deb -x wine-${branch}_${version}_i386.deb wine-installer
@@ -291,7 +292,7 @@ function run_installwinetricks() # Download and install winetricks
     sudo apt-get install cabextract -y # winetricks needs this
     mkdir downloads 2>/dev/null; cd downloads
         echo -e "\n${GREENTXT}Downloading and installing winetricks . . .${NORMTXT}\n"
-        sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old # backup any old winetricks installs
+        sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old 2>/dev/null # backup any old winetricks installs
         wget -q https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks || { echo "winetricks download failed!" && run_giveup; } # download
         sudo chmod +x winetricks
         sudo mv winetricks /usr/local/bin # install
