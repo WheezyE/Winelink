@@ -5,8 +5,8 @@ function run_greeting()
     clear
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
-    echo "# Author: Eric Wiessner (KI7POL)                   Install time: apx 120 min  #"
-    echo "# Version: 0.0075a (Work in progress - ARDOP does not work)                   #"
+    echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 30 min  #"
+    echo "# Version: 0.008a (Work in progress)                                          #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, et al) #"
     echo "#   Esme 'madewokherd' Povirk (CodeWeavers) for wine-mono debugging/support   #"
@@ -46,7 +46,7 @@ function run_greeting()
 #    All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86 and Wine are both open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.
 #
 # Known bugs:
-#    RMS Express and VARA have lots of crashes.  Just ignore any error/crash messages that come up until the program truly crashes. Use 'wineserver -k' to restart everything if you get a freeze.
+#    If programs freeze, use 'wineserver -k' to restart wine.
 #    The Channel Selector is functional, it just takes about 5 minutes to update its propagation indices and sometimes crashes the first time it's loaded.  Just restart it if it crashes.  If you let it run for 5 minutes, then you shouldn't have to do that again - just don't hit the Update Table Via Internet button.  I'm currently experimenting with ITS HF: http://www.greg-hand.com/hfwin32.html
 #    VARA has some graphics issues if we leave window control on in Wine.  Leaving window control on in Wine is a good idea for RPi4 since it reduces CPU overhead.
 #
@@ -54,6 +54,10 @@ function run_greeting()
 #    If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb or KM4ACK - without whom, this script would not exist.
 #        - Sebastien "ptitSeb" Chevalier - author of "Box86": paypal.me/0ptitSeb
 #        - Jason Oleham (KM4ACK) - inspiration & Linux elmer: paypal.me/km4ack
+#
+# Code overview:
+#    This script has a main routine that runs subroutines.  Not all subroutines in this script are used - some are just for testing purposes.
+#    This script just works for Raspberry Pi 4B at the moment, but I hope to one day have it detect CPU, OS, and distro, and install accordingly.
 #
 
 
@@ -74,7 +78,7 @@ function run_main()
             rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop # remove old winlink/wine desktop shortcuts (in case we are reinstalling wine)
             run_installwine "pi4" "devel" "5.21~buster" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
             run_installwinetricks # software installer script for wine
-            run_downloadbox86 1_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability (this version of box86 can't install dotnet46)
+            run_downloadbox86 1_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability
             
         ### Set up Wine (silently make & configure a new wineprefix)
             if [ "$ARG" = "vara_only" ]; then
@@ -178,9 +182,10 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
 
     # Install pre-requisite software into the wineprefix for RMS Express and VARA
         echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
-        BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 winetricks -q --force dotnet46 # tested with wine 5.21~buster
-            wineserver -k #stop the looping error messages after dotnet46 install
-        #run_installwinemono # wine-mono replaces dotnet46
+        run_installwinemono # wine-mono replaces dotnet46
+            # Uncomment these lines to install dotnet46 instead of wine-mono
+            #BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 winetricks -q --force dotnet46 # tested with wine 5.21~buster
+            #    wineserver -k #stop the looping error messages after dotnet46 install
         BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed, using wine-mono in place of dotnet46)
         BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
 
@@ -227,17 +232,16 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS
 {
     sudo apt-get install p7zip-full -y
     
-    mkdir ~/.cache/wine
+    mkdir ~/.cache/wine 2>/dev/null
     echo -e "\n${GREENTXT}Downloading and installing wine-mono . . .${NORMTXT}\n"
     #wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-6.4.1/wine-mono-6.4.1-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
-    #wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to the newer wine-mono that fixes ARDOP (as soon as link is available)
+    #wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to an official release version of wine-mono that includes fixes for COM ports (as soon as link is available)
     
-    # Kludge until wine-mono 7.1.0 is released
-    # Link from https://github.com/madewokherd/wine-mono/actions/runs/1403147396
-    wget -q -P ~/.cache/wine https://nightly.link/madewokherd/wine-mono/actions/artifacts/118008722.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; }
-    # May require wine-devel 6.19
-    7z x ~/.cache/wine/118008722.zip -o"$HOME/.cache/wine/"
-    wine msiexec /i ~/.cache/wine/wine-mono-7.0.99-x86.msi
+        # Kludge: Use a 'nightly build' of wine-mono until official wine-mono 7.1.2 is released
+        # Link from https://github.com/madewokherd/mono/actions/runs/1773995893 (https://github.com/madewokherd/mono/pull/22)
+        wget -q -P ~/.cache/wine https://nightly.link/madewokherd/mono/actions/artifacts/154265073.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; }
+        7z x ~/.cache/wine/154265073.zip -o"$HOME/.cache/wine/"
+        wine msiexec /i ~/.cache/wine/wine-mono-7.1.1-x86.msi # wine-mono-7.1.1 might require wine-devel 6.19 or newer
     
     rm -rf ~/.cache/wine # clean up to save disk space
 }
@@ -249,10 +253,10 @@ function run_installwine()  # Download and install Wine for i386 Debian Buster (
     local branch="$2" #example: "devel" or "stable" without quotes (staging requires more install steps)  ${version}
     local version="$3" #example: "6.19~buster-1"
 
-    wineserver -k &> /dev/null # stop any old wine installations from running
+    wineserver -k &> /dev/null # stop any old wine installations from running - TODO: double-check this command
     rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
     rm -rf ~/.local/share/applications/wine # remove any old program shortcuts
-    mkdir downloads; cd downloads
+    mkdir downloads 2>/dev/null; cd downloads
         # Backup old wine
             rm -rf ~/wine-old; mv ~/wine ~/wine-old
             rm -rf ~/.wine-old; mv ~/.wine ~/.wine-old
@@ -285,7 +289,7 @@ function run_installwinetricks() # Download and install winetricks
 {
     sudo apt-get remove winetricks -y
     sudo apt-get install cabextract -y # winetricks needs this
-    mkdir downloads; cd downloads
+    mkdir downloads 2>/dev/null; cd downloads
         echo -e "\n${GREENTXT}Downloading and installing winetricks . . .${NORMTXT}\n"
         sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old # backup any old winetricks installs
         wget -q https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks || { echo "winetricks download failed!" && run_giveup; } # download
@@ -296,7 +300,7 @@ function run_installwinetricks() # Download and install winetricks
 
 function run_installrms()  # Download/extract/install RMS Express
 {
-    mkdir downloads; cd downloads
+    mkdir downloads 2>/dev/null; cd downloads
         # Download RMS Express (no matter its version number) [https://downloads.winlink.org/User%20Programs/]
             echo -e "\n${GREENTXT}Downloading and installing RMS Express . . .${NORMTXT}\n"
             wget -q -r -l1 -np -nd -A "Winlink_Express_install_*.zip" https://downloads.winlink.org/User%20Programs || { echo "RMS Express download failed!" && run_giveup; }
@@ -328,7 +332,7 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
 {
     sudo apt-get install curl megatools p7zip-full -y
     
-    mkdir downloads; cd downloads
+    mkdir downloads 2>/dev/null; cd downloads
         # Download / extract VARA HF
             # files: VARA HF v4.4.3 Setup > VARA setup (Run as Administrator).exe > /SILENT install has an OK button at end
             echo -e "\n${GREENTXT}Downloading VARA HF . . .${NORMTXT}\n"
