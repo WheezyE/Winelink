@@ -6,7 +6,7 @@ function run_greeting()
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
     echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 30 min  #"
-    echo "# Version: 0.0085a (Work in progress)                                         #"
+    echo "# Version: 0.0086a (Work in progress)                                         #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, et al) #"
     echo "#   Esme 'madewokherd' Povirk (CodeWeavers) for wine-mono debugging/support   #"
@@ -76,9 +76,9 @@ function run_main()
         
         ### Install Wine & winetricks
             rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop 2>/dev/null # remove old winlink/wine desktop shortcuts (in case we are reinstalling wine)
-            run_installwine "pi4" "devel" "6.19~${VERSION_CODENAME}-1" "${VERSION_CODENAME}" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
+            run_installwine "pi4" "devel" "7.1~${VERSION_CODENAME}-1" "${VERSION_CODENAME}" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
             run_installwinetricks # software installer script for wine
-            run_downloadbox86 31_Jan_22 # emulator to run wine-i386 on ARM - freeze version to ensure compatability
+            run_downloadbox86 10_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability
             
         ### Set up Wine (silently make & configure a new wineprefix)
             if [ "$ARG" = "vara_only" ]; then
@@ -253,6 +253,7 @@ function run_installwine()  # Download and install Wine for i386 Debian Buster (
     local branch="$2" #example: "devel" or "stable" without quotes (staging requires more install steps)  ${version}
     local version="$3" #example: "6.19~buster-1"
     local dist="$4" #example: buster
+    local build="$5" #example: debian
 
     wineserver -k &> /dev/null # stop any old wine installations from running - TODO: double-check this command
     rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
@@ -498,15 +499,15 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA\ FM/VARAFM.ini # turn off VARA FM's graphics (change 'View=1' to 'View=3' in VARAFM.ini). INI file shows up after first run of VARA FM.
     cd ..
     
-    ## Fix some VARA graphics glitches caused by Wine's (winecfg) window manager (otherwise VARA appears as a black screen when auto-run by RMS Express)
+    ## In older versions of wine, this fixed graphics glitches caused by Wine's (winecfg) window manager (VARA appeared as a black screen when auto-run by RMS Express)
         # NOTE: If using dotnet (instead of wine-mono) on Pi, this will slow things down a lot
         # Create override-x11.reg
-        echo 'REGEDIT4'                                      >> override-x11.reg
-        echo ''                                              >> override-x11.reg
-        echo '[HKEY_CURRENT_USER\Software\Wine\X11 Driver]'  >> override-x11.reg
-        echo '"Decorated"="Y"'                               >> override-x11.reg
-        echo '"Managed"="N"'                                 >> override-x11.reg
-        wine cmd /c regedit /s override-x11.reg
+        #echo 'REGEDIT4'                                      >> override-x11.reg
+        #echo ''                                              >> override-x11.reg
+        #echo '[HKEY_CURRENT_USER\Software\Wine\X11 Driver]'  >> override-x11.reg
+        #echo '"Decorated"="Y"'                               >> override-x11.reg
+        #echo '"Managed"="N"'                                 >> override-x11.reg
+        #wine cmd /c regedit /s override-x11.reg
 }
 
 function run_installvARIM()  # Download, build, and install an open-source stand-alone interface for VARA, called vARIM

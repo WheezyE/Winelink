@@ -11,7 +11,6 @@ curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink
      bash install_winelink.sh
 ```
  - A full installation takes about 30 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
- - You should then be able to run RMS Express and VARA from desktop shortcuts.  They may crash.
  - If desired, you can tell the script to only install VARA by running `curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && bash install_winelink.sh vara_only`
 
 ## Examples
@@ -24,9 +23,8 @@ This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Ex
 To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  ExaGear is also closed source abandonware and Qemu (qemu-system & qemu-user-static) also has issues running more complex Wine programs on the Pi.  Box86 is much smaller in file size and much easier to install too.
 
 ## Known issues
- - ARDOP often has trouble connecting to RMS Express over TCP when if first starts. If ARDOP fails to connect, just restart it until it does connect (this is a bug in wine).
+ - ARDOP & VARA often have trouble connecting to RMS Express over TCP when they first start. If ARDOP fails to connect, just restart RMS Express it until it does connect (this is a bug in wine).
  - VARA's CPU gauge doesn't display (this is a bug in wine).
- - Using the map can cause RMS Express to crash.
  - I haven't tested over-the-air connections since I'm just a tech.  If some generals could test, that would be awesome.
  - RMS Express v1.5.41.0 introduced a requirement for .NET 4.6 (instead of just .NET 3.5sp1). This updated has forced us to use wine-mono instead of .NET.  Wine-mono may have some bugs. Madewokherd (Esme), the wine-mono dev, is amazing though - they have fixed all of the bugs we've encountered so far.
     
