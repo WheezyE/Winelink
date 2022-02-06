@@ -76,7 +76,7 @@ function run_main()
         
         ### Install Wine & winetricks
             rm ~/Desktop/Reset\ Wine ~/Desktop/VARA.desktop ~/Desktop/VARA\ Chat.desktop ~/Desktop/VARA\ FM.desktop ~/Desktop/Winlink\ Express.desktop 2>/dev/null # remove old winlink/wine desktop shortcuts (in case we are reinstalling wine)
-            run_installwine "pi4" "devel" "7.1~${VERSION_CODENAME}-1" "${VERSION_CODENAME}" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
+            run_installwine "pi4" "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1" # windows API-call interperter for non-windows OS's - freeze version to ensure compatability
             run_installwinetricks # software installer script for wine
             run_downloadbox86 10_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability
             
@@ -183,10 +183,8 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
     # Install pre-requisite software into the wineprefix for RMS Express and VARA
         echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
         run_installwinemono # wine-mono replaces dotnet46
-            # Uncomment these lines to install dotnet46 instead of wine-mono
-            #BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 winetricks -q --force dotnet46 # tested with wine 5.21~buster
-            #    wineserver -k #stop the looping error messages after dotnet46 install
-        BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed, using wine-mono in place of dotnet46)
+        #BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express # - TODO: This line may be redundant
+        # - TODO: Check to see if 'winetricks -q corefonts riched20' would make text look nicer
         BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
 
     # Guide the user to the wineconfig audio menu (configure hardware soundcard input/output)
@@ -201,7 +199,7 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
         clear
 }
 
-function run_setupwineprefix_varaonly()  # Set up a new wineprefix silently.  A wineprefix is kind of like a virtual harddrive for wine
+function run_setupwineprefix_varaonly()  # TODO: This function is probably redundant now that we're using wine-mono
 {
     # Silently create a new wineprefix
         echo -e "\n${GREENTXT}Creating a new wineprefix.  This may take a moment . . .${NORMTXT}\n" 
@@ -210,10 +208,6 @@ function run_setupwineprefix_varaonly()  # Set up a new wineprefix silently.  A 
 
     # Install pre-requisite software into the wineprefix for RMS Express and VARA
         echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
-        #BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 winetricks -q --force dotnet46 # tested with wine 5.21~buster
-        #    wineserver -k #stop the looping error messages after dotnet46 install
-        #run_installwinemono # wine-mono replaces dotnet46
-        BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express (corefonts & vcrun2015 do not appear to be needed, using wine-mono in place of dotnet46)
         BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
 
     # Guide the user to the wineconfig audio menu (configure hardware soundcard input/output)
@@ -237,7 +231,7 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS
     #wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-6.4.1/wine-mono-6.4.1-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
     #wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to an official release version of wine-mono that includes fixes for COM ports (as soon as link is available)
     
-        # Kludge: Use a 'nightly build' of wine-mono until official wine-mono 7.1.2 is released
+        # Kludge: Use a 'nightly build' of wine-mono until official wine-mono 7.1.3 is released
         # Link from https://github.com/madewokherd/mono/actions/runs/1773995893 (https://github.com/madewokherd/mono/pull/22)
         wget -q -P ~/.cache/wine https://nightly.link/madewokherd/mono/actions/artifacts/154265073.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; }
         7z x ~/.cache/wine/154265073.zip -o"$HOME/.cache/wine/"
@@ -246,20 +240,22 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS
     rm -rf ~/.cache/wine # clean up to save disk space
 }
 
-function run_installwine()  # Download and install Wine for i386 Debian Buster (This function needs a winebranch & version passed to it)
+function run_installwine()  # Download and install Wine for i386 Debian Buster (This function needs variables passed to it)
+                            #   (Example function variables: run_installwine "pi4" "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1")
 {
     # These variables are here in the hopes that more systems might be implemented in the future. For now, they just help change wine version more easily.
     local system="$1" #example: "pi4" - TODO: implement other systems, like pi3
-    local branch="$2" #example: "devel" or "stable" without quotes (staging requires more install steps)  ${version}
-    local version="$3" #example: "6.19~buster-1"
-    local dist="$4" #example: buster
-    local build="$5" #example: debian
+    local branch="$2" #example: "devel" or "stable" without quotes (staging requires more install steps)
+    local version="$3" #example: "7.1"
+    local build="$4" #example: debian - TODO: implement other distros, like Ubuntu
+    local dist="$5" #example: bullseye
+    local tag="$6" #example: -1
 
     wineserver -k &> /dev/null # stop any old wine installations from running - TODO: double-check this command
     rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
     rm -rf ~/.local/share/applications/wine # remove any old program shortcuts
     mkdir downloads 2>/dev/null; cd downloads
-        # Backup old wine
+        # Backup any old wine installs
             rm -rf ~/wine-old 2>/dev/null; mv ~/wine ~/wine-old 2>/dev/null
             rm -rf ~/.wine-old 2>/dev/null; mv ~/.wine ~/.wine-old 2>/dev/null
             sudo mv /usr/local/bin/wine /usr/local/bin/wine-old 2>/dev/null
@@ -267,13 +263,13 @@ function run_installwine()  # Download and install Wine for i386 Debian Buster (
             sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old 2>/dev/null
             sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old 2>/dev/null
 
-        # Download, extract wine, and install wine
+        # Download, extract, and install wine-i386 onto our armhf device
             echo -e "\n${GREENTXT}Downloading wine . . .${NORMTXT}"
-            wget -q https://dl.winehq.org/wine-builds/debian/dists/${dist}/main/binary-i386/wine-${branch}-i386_${version}_i386.deb || { echo "wine-${branch}-i386_${version}_i386.deb download failed!" && run_giveup; }
-            wget -q https://dl.winehq.org/wine-builds/debian/dists/${dist}/main/binary-i386/wine-${branch}_${version}_i386.deb || { echo "wine-${branch}_${version}_i386.deb download failed!" && run_giveup; }
+            wget -q https://dl.winehq.org/wine-builds/debian/dists/${dist}/main/binary-i386/wine-${branch}-i386_${version}~${dist}${tag}_i386.deb || { echo "wine-${branch}-i386_${version}_i386.deb download failed!" && run_giveup; }
+            wget -q https://dl.winehq.org/wine-builds/debian/dists/${dist}/main/binary-i386/wine-${branch}_${version}~${dist}${tag}_i386.deb || { echo "wine-${branch}_${version}_i386.deb download failed!" && run_giveup; }
             echo -e "${GREENTXT}Extracting wine . . .${NORMTXT}"
-            dpkg-deb -x wine-${branch}-i386_${version}_i386.deb wine-installer
-            dpkg-deb -x wine-${branch}_${version}_i386.deb wine-installer
+            dpkg-deb -x wine-${branch}-i386_${version}~${dist}${tag}_i386.deb wine-installer
+            dpkg-deb -x wine-${branch}_${version}~${dist}${tag}_i386.deb wine-installer
             echo -e "${GREENTXT}Installing wine . . .${NORMTXT}\n"
             mv wine-installer/opt/wine* ~/wine
 
@@ -363,10 +359,12 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             echo -e "\n${GREENTXT}Installing VARA Chat . . .${NORMTXT}\n"
             wine VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
             
+        # TODO: Add VARA Sat
+            
             # Make a VARA Chat desktop shortcut
             echo '[Desktop Entry]'                                                                                            >> ~/Desktop/VARA\ Chat.desktop
             echo 'Name=VARA Chat'                                                                                             >> ~/Desktop/VARA\ Chat.desktop
-            echo 'Exec=wine '$HOME'/.wine/drive_c/VARA/VARA\ Chat.exe' >> ~/Desktop/VARA\ Chat.desktop
+            echo 'Exec=wine '$HOME'/.wine/drive_c/VARA/VARA\ Chat.exe'                                                        >> ~/Desktop/VARA\ Chat.desktop
             echo 'Type=Application'                                                                                           >> ~/Desktop/VARA\ Chat.desktop
             echo 'StartupNotify=true'                                                                                         >> ~/Desktop/VARA\ Chat.desktop
             echo 'Icon=DF53_VARA Chat.0'                                                                                      >> ~/Desktop/VARA\ Chat.desktop
@@ -499,15 +497,24 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
             sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA\ FM/VARAFM.ini # turn off VARA FM's graphics (change 'View=1' to 'View=3' in VARAFM.ini). INI file shows up after first run of VARA FM.
     cd ..
     
-    ## In older versions of wine, this fixed graphics glitches caused by Wine's (winecfg) window manager (VARA appeared as a black screen when auto-run by RMS Express)
+    # In older versions of wine, this fixed graphics glitches caused by Wine's (winecfg) window manager (VARA appeared as a black screen when auto-run by RMS Express)
         # NOTE: If using dotnet (instead of wine-mono) on Pi, this will slow things down a lot
         # Create override-x11.reg
-        #echo 'REGEDIT4'                                      >> override-x11.reg
-        #echo ''                                              >> override-x11.reg
-        #echo '[HKEY_CURRENT_USER\Software\Wine\X11 Driver]'  >> override-x11.reg
-        #echo '"Decorated"="Y"'                               >> override-x11.reg
-        #echo '"Managed"="N"'                                 >> override-x11.reg
-        #wine cmd /c regedit /s override-x11.reg
+        echo 'REGEDIT4'                                      >> override-x11.reg
+        echo ''                                              >> override-x11.reg
+        echo '[HKEY_CURRENT_USER\Software\Wine\X11 Driver]'  >> override-x11.reg
+        echo '"Decorated"="Y"'                               >> override-x11.reg
+        echo '"Managed"="N"'                                 >> override-x11.reg
+        wine cmd /c regedit /s override-x11.reg
+    
+    # Install dll's needed by users of "RA-boards," like the DRA-50
+    #  https://masterscommunications.com/products/radio-adapter/dra/dra-index.html
+        sudo apt install p7zip-full -y
+        BOX86_NOBANNER=1 winetricks -q hid
+        wget http://uz7.ho.ua/modem_beta/ptt-dll.zip
+        7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA/" # For VARA HF & VARAChat
+        7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA FM/" # For VARA FM
+        
 }
 
 function run_installvARIM()  # Download, build, and install an open-source stand-alone interface for VARA, called vARIM

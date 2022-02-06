@@ -59,6 +59,7 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html).
  - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [ ] Work with the Wine team to figure out why ARDOP doesn't always connect to RMS Express over TCP when first starting.
+ - [ ] Add 'splash screen' to RMS Express desktop shortcut (since launching takes a while)
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling.
     - [ ] Give user the choice to compile or not.
     - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency.
@@ -119,7 +120,14 @@ All software used by this script is free and legal to use (with the exception of
         - [ ] openSUSE (Package manager: ZYpp (standard); YaST (front-end); RPM (low-level))
       - [ ] ChromeBook Linux beta.
         - [ ] Try to detect if processor would be too slow?
- - [ ] Make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Andronix, Mac, Linux, ChromeOS)
+ - [ ] Make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Termux, Mac, Linux, ChromeOS)
+ 
+ - Android testing notes (Termux/PRoot/AnBox86_64)
+     - [x] Proof of concept https://youtu.be/FkeP_IW3GGQ?t=23
+     - [x] Audio in/out (ARDOP works with alsa / hiccups with pulseaudio)
+     - [ ] Speed benchmarks with different devices (Fire HD10 Tablet is a bit slow, Retroid Pocket 2 TBD)
+     - [ ] OTG-USB-CAT (order OTG_USB_C-USB)
+     - [ ] Create alpha version of Winelink for AnBox86_64
 
 ## Distribution
 If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).  This script is free to use, open-source, and should not be monetized (for further information see the [license file](LICENSE)).
