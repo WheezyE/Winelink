@@ -35,7 +35,7 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 >       icecream95, SpacingBat3, Botspot, Icenowy, Longhorn, et.al.)
 
  - [madewokherd](https://github.com/madewokherd/wine-mono) (Esme) for wine-mono debugging
- - N7ACW & AD7HE for getting me started in ham radio
+ - N7ACW, AD7HE, & KK6FVG for getting me started in ham radio
  - [KM4ACK](https://github.com/km4ack/pi-build) & OH8STN for inspiration
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides for early proof-of-concept
 
@@ -49,6 +49,13 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Add updated example images.
  - [ ] Add an AHK script to help the user with ARDOP first time soundcard setup.
  - [ ] Consider adding a sed script to find/delete any small-value frequencies in `RMS Channels.dat` that would crash the HF Channel Selection Browser
+ - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html).
+ - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
+ - [ ] Work with the Wine team to [figure out why ARDOP & VARA don't always connect to RMS Express over TCP when first starting](https://bugs.winehq.org/show_bug.cgi?id=52521).
+ - [ ] Add 'splash screen' to RMS Express desktop shortcut (since launching takes a while)
+ - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling.
+    - [ ] Give user the choice to compile or not.
+    - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency.
  - [x] Test COM port connections to radio ("CAT" control, PTT).
  - [x] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed).
     - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116).
@@ -56,13 +63,6 @@ All software used by this script is free and legal to use (with the exception of
     - [x] [Message receive issues](https://github.com/madewokherd/wine-mono/issues/122#issuecomment-962525136).
     - [x] [HF Channel Selection Browser crash](https://github.com/WheezyE/Winelink/issues/16) (from small-value input frequencies).
     - [x] [COM port connection issues to radios/TNC's](https://github.com/WheezyE/Winelink/issues/17).
- - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html).
- - [ ] Work with the Wine team to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
- - [ ] Work with the Wine team to figure out why ARDOP doesn't always connect to RMS Express over TCP when first starting.
- - [ ] Add 'splash screen' to RMS Express desktop shortcut (since launching takes a while)
- - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling.
-    - [ ] Give user the choice to compile or not.
-    - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency.
  - [x] Ask Seb for help getting VARA Chat running in box86.
  - [x] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows) - Fixed with X11 check.
  - [x] Add installer for VARA FM.
