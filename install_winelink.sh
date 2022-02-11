@@ -6,7 +6,7 @@ function run_greeting()
     echo ""
     echo "########### Winlink & VARA Installer Script for the Raspberry Pi 4B ###########"
     echo "# Author: Eric Wiessner (KI7POL)                    Install time: apx 30 min  #"
-    echo "# Version: 0.0087a (Work in progress)                                         #"
+    echo "# Version: 0.0089a (Work in progress)                                         #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, et al) #"
     echo "#   Esme 'madewokherd' Povirk (CodeWeavers) for wine-mono debugging/support   #"
@@ -81,19 +81,14 @@ function run_main()
             run_downloadbox86 10_Dec_21 # emulator to run wine-i386 on ARM - freeze version to ensure compatability
             
         ### Set up Wine (silently make & configure a new wineprefix)
-            if [ "$ARG" = "vara_only" ]; then
-                run_setupwineprefix_varaonly
-            else
-                run_setupwineprefix
-            fi
-        
+            run_setupwineprefix $ARG # if 'vara_only' was passed to the winelink script, then pass 'vara_only' to this subroutine function too
+	    
         ### Install Winlink & VARA into our configured wineprefix
             if [ "$ARG" = "vara_only" ]; then
                 run_installvara
             else
                 run_installrms
                 run_installvara
-                #run_installvARIM
             fi
         
         ### Post-installation
@@ -176,74 +171,53 @@ function run_buildbox86()  # Build & install Box86. (This function needs a commi
 
 function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefix is kind of like a virtual harddrive for wine
 {
-    # Silently create a new wineprefix
-        echo -e "\n${GREENTXT}Creating a new wineprefix.  This may take a moment . . .${NORMTXT}\n" 
-        rm -rf ~/.cache/wine # make sure no old wine-mono files are in wine's cache, or else they will be auto-installed on first wineboot
-        DISPLAY=0 WINEARCH=win32 wine wineboot # initialize Wine silently (silently makes a fresh wineprefix in `~/.wine`)
-
-    # Install pre-requisite software into the wineprefix for RMS Express and VARA
-        echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
-        run_installwinemono # wine-mono replaces dotnet46
-        #BOX86_NOBANNER=1 winetricks -q win7 sound=alsa # for RMS Express # - TODO: This line may be redundant
-        # - TODO: Check to see if 'winetricks -q corefonts riched20' would make text look nicer
-        BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
-
-    # Guide the user to the wineconfig audio menu (configure hardware soundcard input/output)
-        sudo apt-get install zenity -y
-        clear
-        echo ""
-        echo -e "\n${GREENTXT}In winecfg, go to the Audio tab to set up your system's in/out soundcards.\n(please click 'Ok' on the user prompt textbox to continue)${NORMTXT}"
-        zenity --info --height 100 --width 350 --text="We will now setup your soundcards for Wine. \n\nPlease navigate to the Audio tab and choose your systems soundcards \n\nInstall will continue once you have closed the winecfg menu." --title="Wine Soundcard Setup"
-        echo -e "${GREENTXT}Loading winecfg now . . .${NORMTXT}\n"
-        echo ""
-        BOX86_NOBANNER=1 winecfg # nobanner just for prettier terminal
-        clear
-}
-
-function run_setupwineprefix_varaonly()  # TODO: This function is probably redundant now that we're using wine-mono
-{
-    # Silently create a new wineprefix
-        echo -e "\n${GREENTXT}Creating a new wineprefix.  This may take a moment . . .${NORMTXT}\n" 
-        rm -rf ~/.cache/wine # make sure no old wine-mono files are in wine's cache, or else they will be auto-installed on first wineboot
-        DISPLAY=0 WINEARCH=win32 wine wineboot # initialize Wine silently (silently makes a fresh wineprefix in `~/.wine`)
-
-    # Install pre-requisite software into the wineprefix for RMS Express and VARA
-        echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
-        BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
-
-    # Guide the user to the wineconfig audio menu (configure hardware soundcard input/output)
-        sudo apt-get install zenity -y
-        clear
-        echo ""
-        echo -e "\n${GREENTXT}In winecfg, go to the Audio tab to set up your system's in/out soundcards.\n(please click 'Ok' on the user prompt textbox to continue)${NORMTXT}"
-        zenity --info --height 100 --width 350 --text="We will now setup your soundcards for Wine. \n\nPlease navigate to the Audio tab and choose your systems soundcards \n\nInstall will continue once you have closed the winecfg menu." --title="Wine Soundcard Setup"
-        echo -e "${GREENTXT}Loading winecfg now . . .${NORMTXT}\n"
-        echo ""
-        BOX86_NOBANNER=1 winecfg # nobanner just for prettier terminal
-        clear
-}
-
-function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.  MS.NET 4.6 takes a very long time to install on RPi4 in Wine
-{
-    sudo apt-get install p7zip-full -y
+    # Store first string passed to this function as a variable
+    local varaonly="$1"
     
+    # Silently create a new wineprefix
+        echo -e "\n${GREENTXT}Creating a new wineprefix.  This may take a moment . . .${NORMTXT}\n" 
+        rm -rf ~/.cache/wine # make sure no old wine-mono files are in wine's cache, or else they will be auto-installed on first wineboot
+        DISPLAY=0 WINEARCH=win32 wine wineboot # initialize Wine silently (silently makes a fresh wineprefix in `~/.wine`)
+
+    # Install pre-requisite software into the wineprefix for RMS Express and VARA
+        if [ "$varaonly" = "vara_only" ]; then
+	    echo -e "\n${GREENTXT}Setting up your wineprefix for VARA . . .${NORMTXT}\n"
+	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
+	else
+	    echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
+	    run_installwinemono # for RMS Express - wine-mono replaces dotnet46
+	    #BOX86_NOBANNER=1 winetricks -q dotnet46 win7 sound=alsa # for RMS Express
+	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
+	fi
+	# TODO: Check to see if 'winetricks -q corefonts riched20' would make text look nicer
+
+    # Guide the user to the wineconfig audio menu (configure hardware soundcard input/output)
+        sudo apt-get install zenity -y
+        clear
+        echo ""
+        echo -e "\n${GREENTXT}In winecfg, go to the Audio tab to set up your system's in/out soundcards.\n(please click 'Ok' on the user prompt textbox to continue)${NORMTXT}"
+        zenity --info --height 100 --width 350 --text="We will now setup your soundcards for Wine. \n\nPlease navigate to the Audio tab and choose your systems soundcards \n\nInstall will continue once you have closed the winecfg menu." --title="Wine Soundcard Setup"
+        echo -e "${GREENTXT}Loading winecfg now . . .${NORMTXT}\n"
+        echo ""
+        BOX86_NOBANNER=1 winecfg # nobanner just for prettier terminal
+        clear
+}
+
+function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.
+{
+    # MS.NET 4.6 takes a very long time to install on RPi4 in Wine and runs slower than wine-mono
+    sudo apt-get install p7zip-full -y
     mkdir ~/.cache/wine 2>/dev/null
     echo -e "\n${GREENTXT}Downloading and installing wine-mono . . .${NORMTXT}\n"
-    #wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-6.4.1/wine-mono-6.4.1-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
-    #wine msiexec /i ~/.cache/wine/wine-mono-6.4.1-x86.msi # TODO: Updated this to an official release version of wine-mono that includes fixes for COM ports (as soon as link is available)
-    
-        # Kludge: Use a 'nightly build' of wine-mono until official wine-mono 7.1.3 is released
-        # Link from https://github.com/madewokherd/mono/actions/runs/1773995893 (https://github.com/madewokherd/mono/pull/22)
-        wget -q -P ~/.cache/wine https://nightly.link/madewokherd/mono/actions/artifacts/154265073.zip || { echo "wine-mono .msi install file download failed!" && run_giveup; }
-        7z x ~/.cache/wine/154265073.zip -o"$HOME/.cache/wine/"
-        wine msiexec /i ~/.cache/wine/wine-mono-7.1.1-x86.msi # wine-mono-7.1.1 might require wine-devel 6.19 or newer
-    
+    wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-7.1.3/wine-mono-7.1.3-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
+    wine msiexec /i ~/.cache/wine/wine-mono-7.1.3-x86.msi
     rm -rf ~/.cache/wine # clean up to save disk space
 }
 
 function run_installwine()  # Download and install Wine for i386 Debian Buster (This function needs variables passed to it)
                             #   (Example function variables: run_installwine "pi4" "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1")
 {
+    # Store first six strings passed to this function as variables
     # These variables are here in the hopes that more systems might be implemented in the future. For now, they just help change wine version more easily.
     local system="$1" #example: "pi4" - TODO: implement other systems, like pi3
     local branch="$2" #example: "devel" or "stable" without quotes (staging requires more install steps)
@@ -318,6 +292,7 @@ function run_installrms()  # Download/extract/install RMS Express
             echo '[Desktop Entry]'                                                                             >> ~/Desktop/Winlink\ Express.desktop
             echo 'Name=Winlink Express'                                                                        >> ~/Desktop/Winlink\ Express.desktop
             echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  >> ~/Desktop/Winlink\ Express.desktop
+            #echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_STRONGMEM=1 wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  >> ~/Desktop/Winlink\ Express.desktop # TODO: Does this improve stability or cost speed?
             echo 'Type=Application'                                                                            >> ~/Desktop/Winlink\ Express.desktop
             echo 'StartupNotify=true'                                                                          >> ~/Desktop/Winlink\ Express.desktop
             echo 'Icon=219D_RMS Express.0'                                                                     >> ~/Desktop/Winlink\ Express.desktop
@@ -510,7 +485,7 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
     
     # Install dll's needed by users of "RA-boards," like the DRA-50
     #  https://masterscommunications.com/products/radio-adapter/dra/dra-index.html
-        sudo apt install p7zip-full -y
+        sudo apt-get install p7zip-full -y
         BOX86_NOBANNER=1 winetricks -q hid
         wget http://uz7.ho.ua/modem_beta/ptt-dll.zip
         7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA/" # For VARA HF & VARAChat
