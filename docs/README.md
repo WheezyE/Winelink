@@ -10,7 +10,7 @@ Copy/paste these commands into your Raspberry Pi 4's terminal:
 curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && \
      bash install_winelink.sh
 ```
- - A full installation takes about 30 minutes (with user prompts) and lots of errors will appear in the terminal (just ignore those).
+ - A full installation takes about 10 minutes (with user prompts)
  - If desired, you can tell the script to only install VARA by running `curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && bash install_winelink.sh vara_only`
 
 ## Examples
@@ -25,8 +25,8 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 ## Known issues
  - ARDOP & VARA often have trouble connecting to RMS Express (over local TCP) when they first start up. Just restart RMS Express until they do connect (this is a bug in wine).
  - VARA's CPU gauge doesn't display (this is a bug in wine).
- - VARA doesn't connect to DRA boards at this time. This might be a bug in box86 or wine.
- - Enabling VARA HF's waterfally display can sometimes crash VARA & RMS Express.
+ - VARA doesn't connect to DRA boards at this time (this might be a bug in wine or box86).
+ - Enabling VARA HF's waterfall display can sometimes crash VARA & RMS Express.
     
 ## Credits
  - [ptitSeb](https://github.com/ptitSeb/box86) for box86 debugging (& everyone on [the TwisterOS discord](https://discord.gg/Fh8sjmu))
@@ -46,8 +46,6 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86, Wine, wine-mono, winetricks, and AutoHotKey, are all open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
 ## Future work
- - [ ] Separate soundcard setups from program installations. Make a script for that.
- - [ ] Put program scripts and icons into start menu instead of on desktop.
  - [ ] Add an AHK script to help the user with ARDOP first time soundcard setup.
  - [ ] Switch to using Seb's GitHub box86 binaries instead of Pale's internet archive binaries.
  - [ ] Help DRA-board compatability with VARA ([might be a box86 issue?](https://github.com/ptitSeb/box86/issues/567))
@@ -57,11 +55,13 @@ All software used by this script is free and legal to use (with the exception of
  - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html).
  - [ ] Work with WineHQ to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [ ] Work with WineHQ to [figure out why ARDOP & VARA don't always connect to RMS Express over TCP when first starting](https://bugs.winehq.org/show_bug.cgi?id=52521).
- - [ ] Add 'splash screen' to RMS Express desktop shortcut (since launching takes a while)
  - [ ] Add progress bar (GUI?) for installation.
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling.
     - [ ] Give user the choice to compile or not.
     - [ ] Add auto-detection of failed downloads, then switch to compiling as contingency.
+ - [x] Separate soundcard setups from program installations. Make a script for that.
+ - [x] Make an uninstaller script
+ - [x] Put program scripts and icons into start menu instead of on desktop.
  - [x] Test COM port connections to radio ("CAT" control, PTT).
  - [x] Work with madewokherd to see if wine-mono bugs can be fixed (would drastically improve install speed).
     - [x] [ARDOP TCP/IP Connection issues](https://github.com/madewokherd/wine-mono/issues/116).
