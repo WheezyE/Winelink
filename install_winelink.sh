@@ -94,6 +94,8 @@ function run_main()
         ### Post-installation
             run_makewineserverkscript
             run_makevaraupdatescript
+	    run_soundcardsetup
+	    #run_makesoundcardsetupscript
             clear
             echo -e "\n${GREENTXT}Setup complete.${NORMTXT}\n"
             cd .. && rm -rf Winelink-tmp winelink.log # cleanup
@@ -209,7 +211,7 @@ function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.
     sudo apt-get install p7zip-full -y
     mkdir ~/.cache/wine 2>/dev/null
     echo -e "\n${GREENTXT}Downloading and installing wine-mono . . .${NORMTXT}\n"
-    wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-7.1.3/wine-mono-7.1.3-x86.msi || { echo "wine-mono .msi install file download failed!" && run_giveup; }
+    wget -q -P ~/.cache/wine https://github.com/madewokherd/wine-mono/releases/download/wine-mono-7.1.3/wine-mono-7.1.3-x86.msi || { echo "wine-mono .msi install file download failed! Please check your internet connection and try again." && run_giveup; }
     wine msiexec /i ~/.cache/wine/wine-mono-7.1.3-x86.msi
     rm -rf ~/.cache/wine # clean up to save disk space
 }
@@ -485,12 +487,17 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat, then
     
     # Install dll's needed by users of "RA-boards," like the DRA-50
     #  https://masterscommunications.com/products/radio-adapter/dra/dra-index.html
-        sudo apt-get install p7zip-full -y
-        BOX86_NOBANNER=1 winetricks -q hid
-        wget http://uz7.ho.ua/modem_beta/ptt-dll.zip
-        7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA/" # For VARA HF & VARAChat
-        7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA FM/" # For VARA FM
+        BOX86_NOBANNER=1 winetricks -q hid # unsure if this is needed...
+        #sudo apt-get install p7zip-full -y
+        #wget http://uz7.ho.ua/modem_beta/ptt-dll.zip
+        #7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA/" # For VARA HF & VARAChat
+        #7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA FM/" # For VARA FM
         
+}
+
+function run_soundcardsetup()
+{
+    : #placeholder
 }
 
 function run_installvARIM()  # Download, build, and install an open-source stand-alone interface for VARA, called vARIM
