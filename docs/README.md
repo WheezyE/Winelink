@@ -72,6 +72,7 @@ All software used by this script is free and legal to use (with the exception of
  - [x] Ask Seb for help getting VARA Chat running in box86.
  - [x] Add option (or check) for running the script via SSH (currently ssh causes wine to not display Windows) - Fixed with X11 check.
  - [x] Add installer for VARA FM.
+ - [x] Add installer for VARA SAT.
  - [x] Add a check for sudo priviledges? Add a check to make sure script is not run as sudo?
  - [x] Change VARA Setup/Config terminal text prompts into zenity pop-up boxes.
     - [x] Change all terminal text prompts into text boxes?
