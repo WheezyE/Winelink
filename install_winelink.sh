@@ -67,8 +67,10 @@ function run_main()
     ### Clean up previous runs (or failed runs) of this script
         sudo rm install_winelink.sh 2>/dev/null # silently remove this script so it cannot be re-run by accident
         sudo rm -rf ${HOME}/winelink 2>/dev/null # silently clean up any failed past runs of this script
-        sudo rm ${STARTMENU}/resetwine.desktop ${STARTMENU}/vara-update.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-chat.desktop \
-                ${STARTMENU}/vara-fm.desktop ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara-soundcardsetup.desktop 2>/dev/null # remove old shortcuts
+        sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop \
+                ${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop ${STARTMENU}/vara-soundcardsetup.desktop \
+                ${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop 2>/dev/null # remove old shortcuts
+		 
         
     ### Create winelink directory
         mkdir ${HOME}/winelink && cd ${HOME}/winelink # store all downloaded/installed files in their own directory
@@ -488,7 +490,44 @@ function run_makevaraupdatescript()
 					echo 'StartupWMClass=varafm.exe'                                                       | sudo tee -a ${STARTMENU}/vara-fm.desktop > /dev/null
 					echo 'Categories=HamRadio'                                                             | sudo tee -a ${STARTMENU}/vara-fm.desktop > /dev/null
 
-			# TODO: Add VARA SAT
+			# Download / extract / silently install VARA SAT
+				# Search the rosmodem website for a VARA SAT mega.nz link of any version, then download it
+					echo -e "\n${GREENTXT}Downloading VARA SAT . . .${NORMTXT}\n"
+					VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA SAT v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
+					megadl ${VARAFMLINK} --path=${VARAUPDATE} || { echo "VARA SAT download failed! Please check your internet connection and re-run the script." && run_giveup; }
+					7z x ${VARAUPDATE}/VARA\ SAT*.zip -o"${VARAUPDATE}/VARASATInstaller" -y -bsp0 -bso0
+					mv ${VARAUPDATE}/VARASATInstaller/VARA\ SAT\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
+
+				# Create varafm_install.ahk autohotkey script
+					# The VARA installer prompts the user to hit 'OK' even during silent install (due to a secondary installer).  We will suppress this prompt with AHK.
+					echo '; AHK script to make VARA installer run completely silent'                       > ${AHK}/varasat_install.ahk
+					echo 'SetTitleMatchMode, 2'                                                            >> ${AHK}/varasat_install.ahk
+					echo 'SetTitleMatchMode, slow'                                                         >> ${AHK}/varasat_install.ahk
+					echo '        Run, VARA SAT setup (Run as Administrator).exe /SILENT, C:\'             >> ${AHK}/varasat_install.ahk
+					echo '        WinWait, VARA Setup ; Wait for the "VARA installed successfully" window' >> ${AHK}/varasat_install.ahk
+					echo '        ControlClick, Button1, VARA Setup ; Click the OK button'                 >> ${AHK}/varasat_install.ahk
+					echo '        WinWaitClose'                                                            >> ${AHK}/varasat_install.ahk
+
+				# Run varafm_install.ahk
+					echo -e "\n${GREENTXT}Installing VARA SAT . . .${NORMTXT}\n"
+					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
+
+				# Clean up the installation
+					rm ~/.wine/drive_c/VARA\ SAT\ setup*.exe
+					rm ${AHK}/varasat_install.ahk
+					sleep 3; sudo rm -rf ${HOME}/.local/share/applications/wine/Programs/VARA # Remove wine's auto-generated VARA SAT program icon from the start menu
+
+				# Make a VARA SAT desktop shortcut
+					echo '[Desktop Entry]'                                                                 | sudo tee ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'Name=VARA SAT'                                                                   | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'GenericName=VARA SAT'                                                            | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'Comment=VARA SAT TNC emulated with Box86/Wine'                                   | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'Exec=env WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VARA/VARASAT.exe'             | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'Type=Application'                                                                | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'StartupNotify=true'                                                              | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'Icon=29B6_VARASAT.0'                                                             | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'StartupWMClass=varasat.exe'                                                      | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
+					echo 'Categories=HamRadio'                                                             | sudo tee -a ${STARTMENU}/vara-sat.desktop > /dev/null
 
 			# Download / extract / silently install VARA Chat
 				# Search the rosmodem website for a VARA Chat mega.nz link of any version, then download it
@@ -635,11 +674,45 @@ function run_makevarasoundcardsetupscript()
 			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varafm_configure.ahk # Nobanner option to make console prettier
 			rm ${AHK}/varafm_configure.ahk
 			sleep 5
-			
-		clear
 		
 		# Turn off VARA FM's graphics (change 'View=1' to 'View=3' in VARAFM.ini). INI file shows up after first run of VARA FM
 			sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA\ FM/VARAFM.ini
+			
+		# Guide the user to the VARA SAT audio setup menu (configure hardware soundcard input/output)
+			clear
+			echo -e "\n${GREENTXT}Configuring VARA SAT . . .${NORMTXT}\n"
+			echo -e "\n${GREENTXT}Please set up your soundcard input/output for VARA SAT\n(please click 'Ok' on the user prompt textbox to continue)${NORMTXT}\n"
+			zenity --info --height 100 --width 350 --text="We will now setup your soundcards for VARA SAT. \n\nInstall will continue once you have closed the VARA Settings menu." --title="VARA SAT Soundcard Setup"
+			echo -e "\n${GREENTXT}Loading VARA SAT now . . .${NORMTXT}\n"
+
+		# Create/run varasat_configure.ahk
+			# We will disable all graphics except gauges to help RPi4 CPU. Users can enable these if they have better CPU
+			# We will then open the soundcard menu for users so that they can set up their sound cards
+			# After the settings menu is closed, we will close VARA SAT
+			echo '; AHK script to assist users in setting up VARA on its first run'                > ${AHK}/varasat_configure.ahk
+			echo 'SetTitleMatchMode, 2'                                                            >> ${AHK}/varasat_configure.ahk
+			echo 'SetTitleMatchMode, slow'                                                         >> ${AHK}/varasat_configure.ahk
+			echo '        Run, VARASAT.exe, C:\VARA'                                               >> ${AHK}/varasat_configure.ahk
+			echo '        WinActivate, VARA SAT'                                                   >> ${AHK}/varasat_configure.ahk
+			echo '        WinWait, VARA SAT ; Wait for VARA HF to open'                            >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep 2500 ; If we dont wait at least 2000 for VARA then AHK wont work'  >> ${AHK}/varasat_configure.ahk
+			echo '        Send, !{s} ; Open SoundCard menu for user to set up sound cards'         >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep 500'                                                               >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Down}'                                                            >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep, 100'                                                              >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Enter}'                                                           >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep 5000'                                                              >> ${AHK}/varasat_configure.ahk
+			echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep 100'                                                               >> ${AHK}/varasat_configure.ahk
+			echo '        WinClose, VARA SAT ; Close VARA'                                         >> ${AHK}/varasat_configure.ahk
+			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varasat_configure.ahk # nobanner option to make console prettier
+			rm ${AHK}/varasat_configure.ahk
+			sleep 5
+			
+		# Turn off VARA SAT's waterfall (change 'View=1' to 'View=3' in VARA.ini). INI file shows up after first run of VARA HF.
+			sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA/VARASAT.ini
+			
+		clear
 	EOM
 	sudo chmod +x ${HOME}/winelink/VARA\ Soundcard\ Setup
         
@@ -687,8 +760,9 @@ function run_makeuninstallscript()
 		UNWL=$? # the answer of the yes/no questions is stored in the $? variable ( 0 = yes, 1 = no ).
 		if	[ "$UNWL" = 0 ]; # If user answered 'yes', then ...
 		then
-			sudo rm ${STARTMENU}/resetwine.desktop ${STARTMENU}/vara-update.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-chat.desktop \
-				${STARTMENU}/vara-fm.desktop ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara-soundcardsetup.desktop 2>/dev/null # remove old shortcuts
+			sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop \
+				${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop ${STARTMENU}/vara-soundcardsetup.desktop \
+				${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop 2>/dev/null # remove old shortcuts
 			sudo rm -rf ${HOME}/winelink 2>/dev/null
 
 			# Ask user if they would like to remove wine & box86
