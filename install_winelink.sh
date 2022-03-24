@@ -696,6 +696,19 @@ function run_makevarasoundcardsetupscript()
 			echo '        WinActivate, VARA SAT'                                                   >> ${AHK}/varasat_configure.ahk
 			echo '        WinWait, VARA SAT ; Wait for VARA HF to open'                            >> ${AHK}/varasat_configure.ahk
 			echo '        Sleep 2500 ; If we dont wait at least 2000 for VARA then AHK wont work'  >> ${AHK}/varasat_configure.ahk
+			echo '        Send, !{s} ; Open view menu for user to turn off waterfall'              >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep 100'                                                               >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Right}'                                                           >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep, 100'                                                              >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Right}'                                                           >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep, 100'                                                              >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Down}'                                                            >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep, 100'                                                              >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Down}'                                                            >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep, 100'                                                              >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Down}'                                                            >> ${AHK}/varasat_configure.ahk
+			echo '        Sleep, 100'                                                              >> ${AHK}/varasat_configure.ahk
+			echo '        Send, {Enter}'                                                           >> ${AHK}/varasat_configure.ahk
 			echo '        Send, !{s} ; Open SoundCard menu for user to set up sound cards'         >> ${AHK}/varasat_configure.ahk
 			echo '        Sleep 500'                                                               >> ${AHK}/varasat_configure.ahk
 			echo '        Send, {Down}'                                                            >> ${AHK}/varasat_configure.ahk
@@ -708,15 +721,12 @@ function run_makevarasoundcardsetupscript()
 			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varasat_configure.ahk # nobanner option to make console prettier
 			rm ${AHK}/varasat_configure.ahk
 			sleep 5
-			
-		# Turn off VARA SAT's waterfall (change 'View=1' to 'View=3' in VARA.ini). INI file shows up after first run of VARA HF.
-			sed -i 's+View\=1+View\=3+g' ~/.wine/drive_c/VARA/VARASAT.ini
-			
+		
 		clear
 	EOM
 	sudo chmod +x ${HOME}/winelink/VARA\ Soundcard\ Setup
         
-        # Make a start menu shortcut for the Reset Wine script
+        # Make a start menu shortcut for the Soundcard Setup script
             echo '[Desktop Entry]'                                            | sudo tee ${STARTMENU}/vara-soundcardsetup.desktop > /dev/null
             echo 'Name=VARA Soundcard Setup'                                  | sudo tee -a ${STARTMENU}/vara-soundcardsetup.desktop > /dev/null
             echo 'GenericName=VARA Soundcard Setup'                           | sudo tee -a ${STARTMENU}/vara-soundcardsetup.desktop > /dev/null
