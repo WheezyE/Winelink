@@ -27,6 +27,7 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
  - VARA's CPU gauge doesn't display (this is a bug in wine).
  - VARA doesn't connect to DRA boards at this time (this might be a bug in wine or box86).
  - Enabling VARA HF's waterfall display can sometimes crash VARA & RMS Express.
+ - Using Monitor Mode in VARA can freeze VARA. (Users might have to delete their VARA config file to recover: `rm ~/.wine/drive_c/VARA/VARA.ini`)
     
 ## Credits
  - [ptitSeb](https://github.com/ptitSeb/box86) for box86 debugging (& everyone on [the TwisterOS discord](https://discord.gg/Fh8sjmu))
