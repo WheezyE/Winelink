@@ -26,3 +26,6 @@ user@localhost:~/.wine/drive_c/RMS Express/Logs$ more ARDOP_WinTNC_Exceptions_20
   
 Not sure if this method is not implemented in wine-mono yet (I think it is though), if I not uninstalling old wine-mono before installing new wine-mono matters? (version number is correct)
 Not sure if FT-891 USB -> Android OTG -> Android TCP -> Termux TCP is a viable com1 connection.
+VARA cannot install since winetricks is not working in AnBox yet.
+
+Try setting up PAT next to try PTT there (figure out if it's a wine-mono issue)
