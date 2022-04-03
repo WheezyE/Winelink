@@ -1,0 +1,28 @@
+Installed AnBox86_64
+Updated wine-mono to 7.1.3 (from winelink)
+Installed RMS Express
+Plugged in FT-891 to OTG-USB-Android
+Started bridge app and followed PACTOR guide.
+Added /data/data/com.termux/files/home/ttyBT to --bind in AnBox86_64 launcher.
+Added COM1 as /data/data/com.termux/files/home/ttyBT in `wine regedit` HKEY_LOCAL_MACHINE\Software\Wine\Ports
+rm ~/.wine/dosdevices/com*
+wine winecfg (then close)
+confirmed that com1 was now pointing to "ttyBT" USB device
+Launched RMS Express and pointed ARDOP to COM1
+
+COM1 cannot be accessed
+
+user@localhost:~/.wine/drive_c/RMS Express/Logs$ more ARDOP_WinTNC_Exceptions_20220403.log
+﻿2022/04/03 00:31:29 [1.0.2.5] [Radio.InitRadioPorts] Control port COM1 Failed to open!  Err: System.NotImplementedException: The method or operation is not implemented.
+  at System.IO.Ports.SerialPort.set_ReceivedBytesThreshold (System.Int32 value) [0x0000f] in <df9bd3dce2b44025bc3e82ab0b5f0714>:0
+  at (wrapper remoting-invoke-with-check) System.IO.Ports.SerialPort.set_ReceivedBytesThreshold(int)
+  at ARDOP_Win1.Radio.InitRadioPorts () [0x000bc] in <3a9f668defbb44cca36e388899b9cc5a>:0
+2022/04/03 00:31:41 [1.0.2.5] [Radio.PTTCAT] ControlPort COM1 not open
+2022/04/03 00:33:29 [1.0.2.5] [Radio.InitRadioPorts] Control port COM1 Failed to open!  Err: System.NotImplementedException: The method or operation is not implemented.
+  at System.IO.Ports.SerialPort.set_ReceivedBytesThreshold (System.Int32 value) [0x0000f] in <df9bd3dce2b44025bc3e82ab0b5f0714>:0
+  at (wrapper remoting-invoke-with-check) System.IO.Ports.SerialPort.set_ReceivedBytesThreshold(int)
+  at ARDOP_Win1.Radio.InitRadioPorts () [0x000bc] in <3a9f668defbb44cca36e388899b9cc5a>:0
+  
+  
+Not sure if this method is not implemented in wine-mono yet (I think it is though), if I not uninstalling old wine-mono before installing new wine-mono matters? (version number is correct)
+Not sure if FT-891 USB -> Android OTG -> Android TCP -> Termux TCP is a viable com1 connection.
