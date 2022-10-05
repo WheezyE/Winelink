@@ -415,8 +415,8 @@ function run_downloadbox86()  # Download & install Box86. (This function needs a
     mkdir downloads 2>/dev/null; cd downloads
         mkdir box86; cd box86
             sudo rm /usr/local/bin/box86 2>/dev/null # in case box86 is already installed and running
-            wget -q https://github.com/WheezyE/Winelink/raw/WheezyE-patch-5/binaries/box86_"$version".7z # || { echo "box86_$version download failed!" && run_giveup; }
-            wget -q https://github.com/WheezyE/Winelink/raw/main/binaries/box86_"$version".7z # || { echo "box86_$version download failed!" && run_giveup; }
+            #wget -q https://github.com/WheezyE/Winelink/raw/WheezyE-patch-5/binaries/box86_"$version".7z # || { echo "box86_$version download failed!" && run_giveup; }
+            wget -q https://github.com/WheezyE/Winelink/raw/main/binaries/box86_"$version".7z || { echo "box86_$version download failed!" && run_giveup; }
 	    7z x box86_"$version".7z -y -bsp0 -bso0
             sudo cp box86_"$version"/build/system/box86.conf /etc/binfmt.d/
             sudo cp box86_"$version"/build/box86 /usr/local/bin/box86

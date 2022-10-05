@@ -115,7 +115,7 @@ Make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build
  - [x] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS.
     - ARM
       - [x] Raspberry Pi 4B (32-bit OS)
-      - [ ] Raspberry Pi 4B (64-bit OS)
+      - [x] Raspberry Pi 4B (64-bit OS)
       - [x] Raspberry Pi 3B+
         - [x] Detect Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi <4 support.
         - [x] Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
@@ -152,7 +152,7 @@ Make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build
         - [ ] Try to detect if processor would be too slow?
     - x64
       - Linux (top priorities are distros that WineHQ hosts binaries for: Ubuntu, Debian, Fedora, macOS, SUSE, Slackware, and FreeBSD)
-        - [x] Linux Mint
+        - [x] Linux Mint (Ubuntu)
         - [x] Debian 11
  - [ ] Make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Termux, Mac, Linux, ChromeOS)
 </details>
