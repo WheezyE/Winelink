@@ -1,8 +1,11 @@
 ![logo](WinelinkLogo.png "Project logo")
-# Winelink
+# Winɘlink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
 
-_This project is very early in development. It has lots of bugs and should be considered [alpha](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha) software._
+_This project has lots of bugs and should be considered [alpha](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha) software._
+
+![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
+_VARA running on a Raspberry Pi 4B (Twister OS)_
 
 ## Installation
 Copy/paste these commands into your Raspberry Pi 4's terminal:
@@ -13,17 +16,8 @@ curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink
  - A full installation takes about 10 minutes (with user prompts)
  - If desired, you can tell the script to only install VARA by running `curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && bash install_winelink.sh vara_only`
 
-## Examples
-![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
-VARA running on a Raspberry Pi 4B (Twister OS)
-
-## How it works
-This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Express, & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now (support for earlier Raspberry Pi models is planned for later).
-
-To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 10x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html) or [Qemu](https://github.com/qemu/qemu).  ExaGear is also closed source abandonware and Qemu (qemu-system & qemu-user-static) also has issues running more complex Wine programs on the Pi.  Box86 is much smaller in file size and much easier to install too.
-
 ## Known issues
- - ARDOP & VARA often have trouble connecting to RMS Express (over local TCP) when they first start up. Just restart RMS Express until they do connect (this is a bug in wine).
+ - ARDOP & VARA often have trouble connecting to RMS Express (over local TCP) when they first start up. Just restart them through RMS Express until they do connect (this is a bug in wine).
  - VARA's CPU gauge doesn't display (this is a bug in wine).
  - VARA doesn't connect to DRA boards at this time (this might be a bug in wine or box86).
  - Enabling VARA HF's waterfall display can sometimes crash VARA & RMS Express.
@@ -36,6 +30,7 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
 >       icecream95, SpacingBat3, Botspot, Icenowy, Longhorn, et.al.)
 
  - [madewokherd](https://github.com/madewokherd/wine-mono) (Esme) for wine-mono debugging
+ - [Botspot](https://github.com/Botspot/) for their RPi3 kernel switching code
  - N7ACW, AD7HE, & KK6FVG for getting me started in ham radio
  - [KM4ACK](https://github.com/km4ack/pi-build) & [OH8STN](https://oh8stn.org/) for inspiration
  - [K6ETA](http://k6eta.com/linux/installing-rms-express-on-linux-with-wine) & [DCJ21](https://dcj21net.wordpress.com/2016/06/17/install-rms-express-linux/)'s 'Winlink on Linux' guides for early proof-of-concept
@@ -43,12 +38,32 @@ To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](
          "My humanity is bound up in yours, for we can only be human together"
                                                      - Nelson Mandela
 
-## Legal
-All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86, Wine, wine-mono, winetricks, and AutoHotKey, are all open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
 
-## Future work
+## Donations
+If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb, madewokherd (CodeWeavers/WineHQ), or KM4ACK - without whom, this script would not exist.
+ - Sebastien "ptitSeb" Chevalier (author of [Box86](https://github.com/ptitSeb/box86), incredible developer, & really nice guy) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
+ - Madewokherd (author of [wine-mono](https://github.com/madewokherd/wine-mono) & wonderful person) [https://www.winehq.org/donate](https://www.winehq.org/donate)
+ - Jason "KM4ACK" Oleham (author of [Build-a-Pi](https://github.com/km4ack/pi-build), Linux elmer, & ham radio pioneer) [paypal.me/km4ack](paypal.me/km4ack)
+
+## Stuff for nerds
+<details><summary>How it works</summary>
+
+This script will help you install Box86, Wine, winetricks, Windows DLL's, RMS Express, & VARA.  You will then be prompted to configure RMS Express & VARA to send/receive audio from a USB sound card plugged into your Pi.  This installer will only work on the Raspberry Pi 4B for now (support for earlier Raspberry Pi models is planned for later).
+
+To run Windows .exe files on RPi4 (ARM/Linux), we need an x86 emulator ([Box86](https://github.com/ptitSeb/box86)) and a Windows API Call interpreter ([Wine](https://github.com/wine-mirror/wine)).  Box86 is open-source and runs about 5x faster than [ExaGear](https://www.huaweicloud.com/kunpeng/software/exagear.html)/[Qemu](https://github.com/qemu/qemu) (see [these benchmarks](https://box86.org/2022/03/box86-box64-vs-qemu-vs-fex-vs-rosetta2/)).  ExaGear is also closed source abandonware and Qemu (qemu-system & qemu-user-static) also has issues running more complex Wine programs on the Pi.  Box86 is much smaller in file size and much easier to install too.
+</details>
+
+<details><summary>Distribution</summary>
+
+If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).  This script is free to use, open-source, and should not be monetized (for further information see the [license file](LICENSE)).
+</details>
+
+<details><summary>Future Work: Roadmap</summary>
+
  - [ ] Add an AHK script to help the user with ARDOP first time soundcard setup.
- - [ ] Switch to using Seb's GitHub box86 binaries instead of Pale's internet archive binaries.
+ - [ ] Add HDD-space check to make sure user has enough space to install everything
+ - [ ] Time all individual components and embed comments in functions for Pi models. Add variable timer to welcome screen.
+ - [ ] Switch to using Seb's GitHub box86 binaries (or hosted box86 bins) instead of Pale's internet archive binaries.
  - [ ] Help DRA-board compatability with VARA ([might be a box86 issue?](https://github.com/ptitSeb/box86/issues/567))
  - [ ] Bisect box86 commits that crash VARA's local TCP to RMS connection (bug in newer box86's)
  - [ ] Add updated example images.
@@ -91,33 +106,35 @@ All software used by this script is free and legal to use (with the exception of
   - [x] Add pdhNT4 to [winetricks](https://github.com/Winetricks/winetricks) to streamline this installer.
   - [x] Make code modular to help readability.
  - [x] Simplify installation commands (model after KM4ACK BAP).
- #### Add more platforms (make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build/invoke box86 if needed).
+</details>
+
+<details><summary>Future work: More platforms</summary>
+     
+Make a multi-platform [Wine](https://wiki.winehq.org/Download) installer & build/invoke box86 if needed. ([Linode](https://www.linode.com/company/about/#row--about) may be helpful here)
+     
  - [x] Auto-detection of system arch (x86 vs armhf vs aarch64) & OS.
     - ARM
       - [x] Raspberry Pi 4B (32-bit OS)
       - [ ] Raspberry Pi 4B (64-bit OS)
-      - [ ] Raspberry Pi 3B+
-        - [ ] Detect Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi <4 support.
-        - [ ] Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
+      - [x] Raspberry Pi 3B+
+        - [x] Detect Raspberry Pi kernel memory split (and install the correct kernel if needed) for RPi <4 support.
+        - [x] Ask Botspot if I can borrow some of his [pi-apps code](https://github.com/Botspot/pi-apps/blob/4a48ba62b157420c6e33666e7d050ee3ce21ab0b/apps/Wine%20(x86)/install-32#L165).
       - [ ] RPi Zero 2 W?
       - [ ] RPi Zero W?
       - [ ] [Termux](https://github.com/termux/termux-app) (Android without root) ([proot-distro](https://github.com/termux/proot-distro) + Ubuntu ARM + [termux-usb](https://wiki.termux.com/wiki/Termux-usb)) - see [AnBox86](https://github.com/lowspecman420/AnBox86) for proof of concept, currently untested with VARA.
-        - [x] Fix AnBox86
-        - [x] [Proof-of-concept](https://www.youtube.com/watch?v=FkeP_IW3GGQ&t=29s)
-        - [ ] ~See if termux-usb can be adapted somehow to allow connections without root?~
-      - [ ] [Box86Launcher](https://github.com/AllPlatform/Box86Launcher) (Android -- root?)
       - [ ] Mac M1 processors
     - x86
       - Mac
         - [ ] OSX?
       - Linux (top priorities are distros that WineHQ hosts binaries for: Ubuntu, Debian, Fedora, macOS, SUSE, Slackware, and FreeBSD)
         - [ ] Ubuntu (Package manager: apt)
-          - [x] Linux Mint
+          - [ ] Linux Mint
           - [ ] Elementary OS
           - [ ] Zorin OS
         - [ ] Debian (Package manager: apt)
           - [ ] Deepin
           - [ ] Kali
+          - [ ] MX-Linux
         - [ ] Red Hat (Package manager: yum, RPM)
           - [ ] Fedora (Package manager: RPM/DNF)
           - [ ] CentOS (Package manager: yum)
@@ -133,21 +150,30 @@ All software used by this script is free and legal to use (with the exception of
         - [ ] Solus (Package manager: eopkg)
       - [ ] ChromeBook Linux beta.
         - [ ] Try to detect if processor would be too slow?
+    - x64
+      - Linux (top priorities are distros that WineHQ hosts binaries for: Ubuntu, Debian, Fedora, macOS, SUSE, Slackware, and FreeBSD)
+        - [x] Linux Mint
+        - [x] Debian 11
  - [ ] Make a youtube video showcasing current methods (box86, Exagear issues, qemu-user-static errors, Pi4B, Pi3B+, Termux, Mac, Linux, ChromeOS)
- 
- - Android testing notes (Termux/PRoot/AnBox86_64)
-     - [ ] Termux-usb seems to need root to really work. See if there is a work-around for no root?
-     - [ ] Create alpha version of Winelink for AnBox86_64
-     - [ ] Speed benchmarks with different devices (Fire HD10 Tablet is a bit slow, Retroid Pocket 2 TBD)
-     - [x] OTG-USB-CAT (order OTG_USB_C-USB)
-     - [x] Audio in/out (ARDOP works with alsa / hiccups with pulseaudio)
-     - [x] Proof of concept https://youtu.be/FkeP_IW3GGQ?t=23
+</details>
+     
+<details><summary>Android testing notes</summary>
 
-## Distribution
-If you use this script in your project (or are inspired by it) just please be sure to mention ptitSeb, Box86, and myself (KI7POL).  This script is free to use, open-source, and should not be monetized (for further information see the [license file](LICENSE)).
+Termux/PRoot/AnBox86_64
 
-## Donations
-If you feel that you are able and would like to support this project, please consider sending donations to ptitSeb, madewokherd (CodeWeavers/WineHQ), or KM4ACK - without whom, this script would not exist.
- - Sebastien "ptitSeb" Chevalier (author of [Box86](https://github.com/ptitSeb/box86), incredible developer, & really nice guy) [paypal.me/0ptitSeb](paypal.me/0ptitSeb)
- - Madewokherd (author of [wine-mono](https://github.com/madewokherd/wine-mono) & wonderful person) [https://www.winehq.org/donate](https://www.winehq.org/donate)
- - Jason "KM4ACK" Oleham (author of [Build-a-Pi](https://github.com/km4ack/pi-build), Linux elmer, & ham radio pioneer) [paypal.me/km4ack](paypal.me/km4ack)
+ - [ ] Try using [BT/USB/TCP Bridge Pro](https://play.google.com/store/apps/details?id=masar.bluetoothbridge.pro) to connect USB devices to RMS Express (credits: Torsten, DL1THM / [harenber](https://github.com/harenber/ptc-go/wiki/Android))
+ - [ ] Create alpha version of Winelink for AnBox86_64
+ - [ ] Speed benchmarks with different devices (Fire HD10 Tablet is a bit slow, Retroid Pocket 2 TBD)
+ - [ ] ~See if termux-usb can be adapted somehow to allow connections without root?~
+ - [ ] See if [a python wrapper](https://github.com/Querela/termux-usb-python/issues/4) could be written for TermuxUSB-OTG-USB connections between RMS Express & FT-891.
+ - [x] OTG-USB-CAT (order OTG_USB_C-USB)
+ - [x] Audio in/out (ARDOP works with alsa / hiccups with pulseaudio)
+ - [x] [Proof-of-concept](https://www.youtube.com/watch?v=FkeP_IW3GGQ&t=29s)
+ - [x] Fix AnBox86
+     
+</details>
+     
+<details><summary>Legal</summary>
+
+All software used by this script is free and legal to use (with the exception of VARA, of course, which is shareware).  Box86, Wine, wine-mono, winetricks, and AutoHotKey, are all open-source (which avoids the legal problems of use & distribution that ExaGear had - ExaGear also ran much slower than Box86 and is no-longer maintained, despite what Huawei says these days).  All proprietary Windows DLL files required by Wine are downloaded directly from Microsoft and installed according to their redistribution guidelines.  Raspberry Pi is a trademark of the Raspberry Pi Foundation
+</details>

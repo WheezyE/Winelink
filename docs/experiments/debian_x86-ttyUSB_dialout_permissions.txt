@@ -1,0 +1,83 @@
+PTT from Windows laptop works on Windows w/ ARDOP.
+PTT from Linux+wine x86 VM (running within laptop) doesn't work w/ ARDOP.
+ - Same behavior with mono or dotnet46.
+ - Wine does detect the FT-891's COM ports (USB ports) but can't access them.
+ - Debian needed user permissions to be added to the USB dialout group (this is not a problem on RaspberryPi OS though on Pi4)
+
+---- 
+
+sudo apt install setserial
+		FT-891 serial connection is named: "silicon cp2105 dual usb to uart bridge controller"
+
+ttyUSB0 & ttyUSB1 are not listed before connecting the FT-891 to the laptop running the VM. They are listed after connecting.
+		pi@debian:/dev$ sudo dmesg | grep tty
+		[    0.093140] console [tty0] enabled
+		[    1.438158] 00:05: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+		[    2.796210] systemd[1]: Created slice system-getty.slice.
+		[ 3808.551827] usb 1-2.2: cp210x converter now attached to ttyUSB0
+		[ 3808.563798] usb 1-2.2: cp210x converter now attached to ttyUSB1
+		
+		pi@debian:/dev$ ls tty*
+		tty    tty14  tty20  tty27  tty33  tty4   tty46  tty52  tty59  tty8     ttyUSB1
+		tty0   tty15  tty21  tty28  tty34  tty40  tty47  tty53  tty6   tty9
+		tty1   tty16  tty22  tty29  tty35  tty41  tty48  tty54  tty60  ttyS0
+		tty10  tty17  tty23  tty3   tty36  tty42  tty49  tty55  tty61  ttyS1
+		tty11  tty18  tty24  tty30  tty37  tty43  tty5   tty56  tty62  ttyS2
+		tty12  tty19  tty25  tty31  tty38  tty44  tty50  tty57  tty63  ttyS3
+		tty13  tty2   tty26  tty32  tty39  tty45  tty51  tty58  tty7   ttyUSB0
+
+`wine regedit` registry key "HKEY_LOCAL_MACHINE\Software\Wine\Ports" is empty.
+
+Checking wine's com port symlinks (wine already linked its com5 & com6 to the FT-891's ttyUSB0 & ttyUSB1):
+		pi@debian:~/.wine/dosdevices$ ls
+		c:  com1  com2  com3  com4  com5  com6  d:  d::  z:
+		pi@debian:~/.wine/dosdevices$ ls -l com1
+		lrwxrwxrwx 1 pi pi 10 Jan  3 19:03 com1 -> /dev/ttyS0
+		pi@debian:~/.wine/dosdevices$ ls -l com2
+		lrwxrwxrwx 1 pi pi 10 Jan  3 19:03 com2 -> /dev/ttyS1
+		pi@debian:~/.wine/dosdevices$ ls -l com3
+		lrwxrwxrwx 1 pi pi 10 Jan  3 19:03 com3 -> /dev/ttyS2
+		pi@debian:~/.wine/dosdevices$ ls -l com4
+		lrwxrwxrwx 1 pi pi 10 Jan  3 19:03 com4 -> /dev/ttyS3
+		pi@debian:~/.wine/dosdevices$ ls -l com5
+		lrwxrwxrwx 1 pi pi 12 Jan  3 19:03 com5 -> /dev/ttyUSB0
+		pi@debian:~/.wine/dosdevices$ ls -l com6
+		lrwxrwxrwx 1 pi pi 12 Jan  3 19:03 com6 -> /dev/ttyUSB1
+	
+When setting ARDOP to use COM6 (wine's com6 symlink) to try to talk to the FT-891's USB port, ARDOP says no connection could be made and to check the exceptions log.
+
+The ARDOP exceptions log says:
+		pi@debian:~/.wine/drive_c/RMS Express/KI7POL/Logs$ more RMS\ Express\ Exceptions\ 20220104.log 
+		2022/01/04 02:17:56 [1.5.44.0] [Radio.SendASCIICommand] Err:
+		2022/01/04 02:18:05 [1.5.44.0] [Radio.OpenControlPort]
+
+Trying to start a winlink connection with ARDOP plays tones, but doesn't trigger radio's "push-to-talk" (PTT) since the radio's USB isn't accssible.
+
+-------------------------------------------------------------------
+Check permissions on the FT-891's serial port to see if non-root users can access it:
+		pi@debian:~/.wine/drive_c/RMS Express/KI7POL/Logs$ ls -l /dev/ttyUSB1
+		crw-rw---- 1 root dialout 188, 1 Jan  3 19:50 /dev/ttyUSB1
+Guess not (only 'root' and 'dialout' have access?)
+
+	sudo adduser <the user you want to add> dialout
+Try opening ARDOP again - COM6 access still denied.
+	sudo reboot
+Try opening ARDOP again - COM6 access still denied, but no more permission errors pop up with winlink.
+	sudo usermod -a -G dialout $USER
+Try opening ARDOP again - COM6 access still denied, but no more permission errors pop up with winlink.
+	sudo reboot
+Try opening ARDOP again - COM6 access still denied, but no more permission errors pop up with winlink.
+Set COM5, same.
+
+Play with ARDOP settings some more: Setting COM5 and PTT "FT-891" works!
+ - PTT on transmit works.
+ - Channel selection browser: When selecting a channel, the radio changes to that channel! :)
+ - Setting to COM6 and PTT "FT-891" doesn't work
+
+TODO: Test this with mono. Mono used to have USB errors but I think this was fixed after Feb 1, 2022.
+
+
+K6ETAadd for permissions (suggested by Jouko/OH5RM):
+sudo usermod -a -G dialout $USERNAME
+sudo usermod -a -G tty $USERNAME
+sudo usermod -a -G audio $USERNAME
