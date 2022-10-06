@@ -188,7 +188,7 @@ function run_main()
 				#Note: Old method for installing key and repo
 				#wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
 				#sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/debian/ ${VERSION_CODENAME} main"
-			sudo apt-get update -y
+			sudo apt-get update
 			sudo apt-get install --install-recommends wine-stable winehq-stable -y || { echo "wine instllation failed!" && run_giveup; } #note: winehq-stable is required for debian or else no symlinks will be made in /usr/local/bin/
 				#Note: Method for installing old versions of wine
 				#sudo apt-get install --install-recommends wine-${branch}-amd64=${version}~${dist} --allow-downgrades -y # Allow downgrades so that we can install old versions of wine if desired
@@ -408,8 +408,18 @@ function run_checkdiskspace()
 
 function run_downloadbox86()  # Download & install Box86. (This function needs a date passed to it) - TODO: Replace with self-hosted github binaries
 {
-    sudo apt-get install p7zip-full -y # TODO: remove redundant apt-get installs - put them at top of script.
     local version="$1"
+    
+    if [ "$arch" == "ARM64" ]; then
+	sudo dpkg --add-architecture armhf && sudo apt-get update
+	sudo apt-get install libc6:armhf -y # needed to run box86:armhf on aarch64
+	#sudo apt-get install libgtk2.0-0:armhf libsdl2-image-2.0-0:armhf libsdl1.2debian:armhf \
+	#	libopenal1:armhf libvorbisfile3:armhf libgl1:armhf libjpeg62:armhf libcurl4:armhf \
+	#	libasound2-plugins:armhf -y # not sure if needed. from: https://box86.org/2022/03/box86-box64-vs-qemu-vs-fex-vs-rosetta2/
+    elif [ "$arch" == "ARM32" ]; then
+    	:
+    fi
+    sudo apt-get install p7zip-full -y # TODO: remove redundant apt-get installs - put them at top of script.
     
     echo -e "${GREENTXT}Downloading and installing Box86 . . .${NORMTXT}"
     mkdir downloads 2>/dev/null; cd downloads
@@ -435,7 +445,7 @@ function run_buildbox64() # This method is not currently used
     local series="$2" # "RPI4"
     
     # Build and install box64
-    sudo apt install git cmake python3 build-essential gcc -y # box64 dependencies
+    sudo apt-get install git cmake python3 build-essential gcc -y # box64 dependencies
     echo -e "${GREENTXT}Building and installing Box64 . . .${NORMTXT}"
     mkdir downloads 2>/dev/null; cd downloads
         mkdir box64; cd box64
@@ -444,7 +454,7 @@ function run_buildbox64() # This method is not currently used
                     git checkout "$commit64"
                     mkdir build; cd build
                         cmake .. -DARM_DYNAREC=ON -D${series}ARM64=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo
-			make -j$(($(nproc)-2)) # compile using all processors minus one (to prevent OS freezes)
+			make -j$(($(nproc)-2)) # compile using all processors minus two (to prevent OS freezes)
                         sudo make install
                         sudo systemctl restart systemd-binfmt
                     cd ..
@@ -460,15 +470,18 @@ function run_buildbox86() # Compile box64 & box86 on-device (takes a long time, 
     local commit86="$1" # "ed8e01ea0c69739ced597fecb5c3d61b96c5c761"
     local series="$2" # "RPI4"
     local arch="$3" # "ARM64" (ARM32 is not needed since it's default)
-	
-    # Build and install box86
-    sudo apt-get install cmake git -y # box86 dependencies
 
     if [ "$arch" == "ARM64" ]; then
-        sudo apt-get install gcc-arm-linux-gnueabihf python3 build-essential gcc -y # extra box86 dependencies for aarch64
+	sudo dpkg --add-architecture armhf && sudo apt-get update
+	sudo apt-get install libc6:armhf # needed to run box86:armhf on aarch64
+	#sudo apt-get install libgtk2.0-0:armhf libsdl2-image-2.0-0:armhf libsdl1.2debian:armhf \
+	#	libopenal1:armhf libvorbisfile3:armhf libgl1:armhf libjpeg62:armhf libcurl4:armhf \
+	#	libasound2-plugins:armhf -y # not sure if needed. from: https://box86.org/2022/03/box86-box64-vs-qemu-vs-fex-vs-rosetta2/
+        sudo apt-get install gcc-arm-linux-gnueabihf python3 build-essential gcc -y # extra libraries for building ARM32 on aarch64
     elif [ "$arch" == "ARM32" ]; then
         local arch="" # box86 builds ARM32 by default
     fi
+    sudo apt-get install cmake git -y # box86 dependencies
 
     echo -e "${GREENTXT}Building and installing Box86 . . .${NORMTXT}"
     mkdir downloads 2>/dev/null; cd downloads
@@ -479,7 +492,7 @@ function run_buildbox86() # Compile box64 & box86 on-device (takes a long time, 
                     mkdir build; cd build
                         cmake .. -DARM_DYNAREC=ON -D${series}${arch}=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo
 			if [ "$(nproc)" > 1 ]; then
-                        	make -j$(($(nproc)-1)) # compile using all processors minus one (to prevent OS freezes)
+                        	make -j$(($(nproc)-2)) # compile using all processors minus two (to prevent OS freezes)
 			else
 				make
 			fi
@@ -561,25 +574,39 @@ function run_sideloadi386wine() {
 
 function run_install64bitRpiOSi386WineDependencies()
 {
-	# Install 64-bit RPiOS i386-Wine dependencies for (also for Ubuntu 64-bit)
-	#    libc6:armhf is needed for box86 to be detected by aarch64 https://github.com/ptitSeb/box86/issues/465
-	#    Unsure about the rest but wine-amd64 & wine-i386 on aarch64 need some libs too.
-	#    Credits: monkaBlyat (Dr. van RockPi), Itai-Nelken, & WheezyE
-	#    TODO: Go through this dependencies list and weed out un-needed libraries.
+	# Install :armhf libraries to run i386-Wine on RPiOS 64-bit
 	echo -e "${GREENTXT}Installing armhf dependencies for i386-Wine on aarch64 . . .${NORMTXT}"
-	sudo dpkg --add-architecture armhf && sudo apt update #enable multi-arch on aarch64 (so we can install armhf libraries for box86/winei386)
-	sudo apt-get install apt-utils libcups2 libfontconfig1 libncurses6 libxcomposite-dev libxcursor-dev libxi6 libxinerama1 libxrandr2 libxrender1 -y # for wine64
-	sudo apt-get install libavcodec58:armhf libavformat58:armhf libboost-filesystem1.74.0:armhf libboost-iostreams1.74.0:armhf \
-		libboost-program-options1.74.0:armhf libc6:armhf libcal3d12v5:armhf libcups2:armhf libcurl4:armhf libfontconfig1:armhf \
-		libfreetype6:armhf libgdk-pixbuf2.0-0:armhf libgl1-mesa-dev:armhf libgtk2.0-0:armhf libjpeg62:armhf libmpg123-0:armhf \
-		libmyguiengine3debian1v5:armhf libncurses5:armhf libncurses6:armhf libopenal1:armhf libpng16-16:armhf \
-		libsdl1.2-dev:armhf libsdl2-2.0-0:armhf libsdl2-image-2.0-0:armhf libsdl2-mixer-2.0-0:armhf libsdl2-net-2.0-0:armhf \
-		libsdl-mixer1.2:armhf libsmpeg0:armhf libsnappy1v5:armhf libstdc++6:armhf libswscale5:armhf libudev1:armhf \
-		libvorbis-dev:armhf libx11-6:armhf libx11-dev:armhf libxcb1:armhf libxcomposite1:armhf libxcursor1:armhf libxext6:armhf \
-		libxi6:armhf libxinerama1:armhf libxrandr2:armhf libxrender1:armhf libxxf86vm1:armhf mesa-va-drivers:armhf osspd:armhf \
-		pulseaudio:armhf -y # for wine on aarch64 (multiarch)
-	sudo apt-get install libasound2:armhf libpulse0:armhf libxml2:armhf libxslt1.1:armhf libxslt1-dev:armhf -y # fixes wine sound
-	sudo apt-get install libpulse0 -y # not sure if needed, but can't hurt anything
+	sudo dpkg --add-architecture armhf && sudo apt-get update #enable multi-arch
+	sudo apt-get install -y libasound2:armhf libc6:armhf libglib2.0-0:armhf libgphoto2-6:armhf libgphoto2-port12:armhf \
+		libgstreamer-plugins-base1.0-0:armhf libgstreamer1.0-0:armhf libldap-2.4-2:armhf libopenal1:armhf libpcap0.8:armhf \
+		libpulse0:armhf libsane1:armhf libudev1:armhf libusb-1.0-0:armhf libvkd3d1:armhf libx11-6:armhf libxext6:armhf \
+		libasound2-plugins:armhf ocl-icd-libopencl1:armhf libncurses6:armhf libncurses5:armhf libcap2-bin:armhf libcups2:armhf \
+		libdbus-1-3:armhf libfontconfig1:armhf libfreetype6:armhf libglu1-mesa:armhf libglu1:armhf libgnutls30:armhf \
+		libgssapi-krb5-2:armhf libkrb5-3:armhf libodbc1:armhf libosmesa6:armhf libsdl2-2.0-0:armhf libv4l-0:armhf \
+		libxcomposite1:armhf libxcursor1:armhf libxfixes3:armhf libxi6:armhf libxinerama1:armhf libxrandr2:armhf \
+		libxrender1:armhf libxxf86vm1 libc6:armhf libcap2-bin:armhf
+		# This list found by downloading...
+		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel-i386_7.1~bullseye-1_i386.deb
+		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/winehq-devel_7.1~bullseye-1_i386.deb
+		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel_7.1~bullseye-1_i386.deb
+		# then `dpkg-deb -I package.deb`. Read output, add `:armhf` to packages in dep list, then try installing them on Pi aarch64.
+	
+	# Old i386-wine dependency list for box86/wine on aarch64 (worked for buster, but causes taskbar to disappear in bullseye) from Discord
+	# Credits: monkaBlyat (Dr. van RockPi), Itai-Nelken, & WheezyE
+	#sudo apt-get install libavcodec58:armhf libavformat58:armhf libboost-filesystem1.74.0:armhf libboost-iostreams1.74.0:armhf \
+	#	libboost-program-options1.74.0:armhf libcal3d12v5:armhf libcups2:armhf libcurl4:armhf libfontconfig1:armhf \
+	#	libfreetype6:armhf libgdk-pixbuf2.0-0:armhf libgl1-mesa-dev:armhf libgtk2.0-0:armhf libjpeg62:armhf libmpg123-0:armhf \
+	#	libmyguiengine3debian1v5:armhf libncurses5:armhf libncurses6:armhf libopenal1:armhf libpng16-16:armhf \
+	#	libsdl1.2-dev:armhf libsdl2-2.0-0:armhf libsdl2-image-2.0-0:armhf libsdl2-mixer-2.0-0:armhf libsdl2-net-2.0-0:armhf \
+	#	libsdl-mixer1.2:armhf libsmpeg0:armhf libsnappy1v5:armhf libstdc++6:armhf libswscale5:armhf libudev1:armhf \
+	#	libvorbis-dev:armhf libx11-6:armhf libx11-dev:armhf libxcb1:armhf libxcomposite1:armhf libxcursor1:armhf libxext6:armhf \
+	#	libxi6:armhf libxinerama1:armhf libxrandr2:armhf libxrender1:armhf libxxf86vm1:armhf mesa-va-drivers:armhf osspd:armhf \
+	#	pulseaudio:armhf -y # for i386-wine on aarch64 - TODO: Something in this list makes taskbar disappear (after reboot) in bullseye
+	#	sudo apt-get install libasound2:armhf libpulse0:armhf libxml2:armhf libxslt1.1:armhf libxslt1-dev:armhf -y # fixes i386-wine sound? from Discord
+	
+	# Wine-amd64 on aarch64 needs some 64-bit libs
+	#sudo apt-get install apt-utils libcups2 libfontconfig1 libncurses6 libxcomposite-dev libxcursor-dev libxi6 libxinerama1 libxrandr2 libxrender1 -y
+	#sudo apt-get install libpulse0 -y # not sure if needed, but probably can't hurt
 }
 
 function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.
