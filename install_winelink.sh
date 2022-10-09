@@ -76,17 +76,17 @@ function run_main()
 				"ARM32")
 					run_greeting "${PI_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
 					run_checkdiskspace "2100" #min space required in MB
-					run_downloadbox86 "ed8e01ea_RPI4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
+					run_downloadbox86 "14113faa_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
 					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_sideloadi386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${PI_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
-					run_downloadbox86 "ed8e01ea_RPI4"
+					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64"
-					run_sideloadi386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
-					run_install64bitRpiOSi386WineDependencies
+					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -106,19 +106,19 @@ function run_main()
 					run_checkdiskspace "4100" #min space required in MB
 					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
 					run_custompi3kernel "1" # This kernel installer will ignore 64bit Pi3's since they already have 3G/1G VMem Swap (not needed for 64-bit RPiOS)
-					run_downloadbox86 "ed8e01ea_RPI4"
+					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_sideloadi386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					;; #"ARM32")
 				"ARM64")
 					run_greeting "${PI_SERIES} ${ARCH}" "28" "3.5" "${ARG}"
 					#ARG="bap" # Force-skip RMS Express installation (since it doesn't run great on RPi3B+)
 					run_checkdiskspace "3500" #min space required in MB
 					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
-					run_downloadbox86 "ed8e01ea_RPI4"
+					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64"
-					run_sideloadi386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
-					run_install64bitRpiOSi386WineDependencies
+					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Install_i386wineDependencies_RpiOS64bit
 					;; #"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -505,9 +505,9 @@ function run_buildbox86() # Compile box64 & box86 on-device (takes a long time, 
     cd ..
 }
 
-function run_sideloadi386wine() {
-	# NOTE: We only need i386-wine/box86 on RPi (regardless of 64-bit or 32-bit RPiOS)
-	# We don't need amd64-wine64/box64 for our purposes of running RMS Express and VARA.
+function run_Sideload_i386wine() {
+	# NOTE: We only really need i386-wine/box86 on RPiOS 64/32-bit for RMS Express and VARA since they are 32-bit.
+	# We don't need really amd64-wine64/box64 for our purposes of running RMS Express and VARA.
 
 	# Wine version variables
 	local branch="$1" #example: "devel" or "stable" without quotes (wine-staging 4.5+ depends on libfaudio0 and requires more install steps)
@@ -550,7 +550,7 @@ function run_sideloadi386wine() {
 		echo -e "${GREENTXT}Installing wine . . .${NORMTXT}\n"
 		mv wine-installer/opt/wine* ~/wine
 		
-		## Old codescrap: Install amd64-wine (64-bit) and i386-wine (32-bit)
+		## Install amd64-wine (64-bit) and i386-wine (32-bit)
 		#echo -e "\n${GREENTXT}Downloading wine . . .${NORMTXT}"
 		#wget -q ${LNKA}${DEB_A1} || { echo "${DEB_A1} download failed!" && run_giveup; }
 		#wget -q ${LNKA}${DEB_A2} || { echo "${DEB_A2} download failed!" && run_giveup; }
@@ -572,9 +572,10 @@ function run_sideloadi386wine() {
 	sudo chmod +x /usr/local/bin/wine /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver
 }
 
-function run_install64bitRpiOSi386WineDependencies()
+function run_Install_i386wineDependencies_RpiOS64bit()
 {
 	# Install :armhf libraries to run i386-Wine on RPiOS 64-bit
+	# - these packages are needed for running box86/wine-i386 on a 64-bit RPiOS via multiarch
 	echo -e "${GREENTXT}Installing armhf dependencies for i386-Wine on aarch64 . . .${NORMTXT}"
 	sudo dpkg --add-architecture armhf && sudo apt-get update #enable multi-arch
 	sudo apt-get install -y libasound2:armhf libc6:armhf libglib2.0-0:armhf libgphoto2-6:armhf libgphoto2-port12:armhf \
@@ -603,10 +604,96 @@ function run_install64bitRpiOSi386WineDependencies()
 	#	libxi6:armhf libxinerama1:armhf libxrandr2:armhf libxrender1:armhf libxxf86vm1:armhf mesa-va-drivers:armhf osspd:armhf \
 	#	pulseaudio:armhf -y # for i386-wine on aarch64 - TODO: Something in this list makes taskbar disappear (after reboot) in bullseye
 	#	sudo apt-get install libasound2:armhf libpulse0:armhf libxml2:armhf libxslt1.1:armhf libxslt1-dev:armhf -y # fixes i386-wine sound? from Discord
-	
-	# Wine-amd64 on aarch64 needs some 64-bit libs
-	#sudo apt-get install apt-utils libcups2 libfontconfig1 libncurses6 libxcomposite-dev libxcursor-dev libxi6 libxinerama1 libxrandr2 libxrender1 -y
-	#sudo apt-get install libpulse0 -y # not sure if needed, but probably can't hurt
+}
+
+function run_Sideload_amd64wineWithi386wine()
+{
+	# NOTE: Can only run on aarch64 (since box64 can only run on aarch64)
+	# box64 runs wine-amd64, box86 runs wine-i386.
+	# NOTE: We only really need i386-wine/box86 on RPiOS 64/32-bit for RMS Express and VARA since they are 32-bit.
+	# We don't need really amd64-wine64/box64 for our purposes of running RMS Express and VARA.
+  	
+  	# Wine version variables
+	local branch="$1" #example: devel, staging, or stable (wine-staging 4.5+ requires libfaudio0:i386)
+	local version="$2" #example: "7.1"
+	local id="$3" #example: debian, ubuntu
+	local dist="$4" #example (for debian): bullseye, buster, jessie, wheezy, ${VERSION_CODENAME}, etc 
+	local tag="$5" #example: -1 (some wine .deb files have -1 tag on the end and some don't)
+
+	# Clean up any old wine instances
+	wineserver -k &> /dev/null # stop any old wine installations from running
+	rm -rf ~/.cache/wine # remove any old wine-mono/wine-gecko install files
+	rm -rf ~/.local/share/applications/wine # remove any old program shortcuts
+
+	# Backup any old wine installs
+	rm -rf ~/wine-old 2>/dev/null; mv ~/wine ~/wine-old 2>/dev/null
+	rm -rf ~/.wine-old 2>/dev/null; mv ~/.wine ~/.wine-old 2>/dev/null
+	sudo mv /usr/local/bin/wine /usr/local/bin/wine-old 2>/dev/null
+	sudo mv /usr/local/bin/wine64 /usr/local/bin/wine-old 2>/dev/null
+	sudo mv /usr/local/bin/wineboot /usr/local/bin/wineboot-old 2>/dev/null
+	sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old 2>/dev/null
+	sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old 2>/dev/null
+
+	# Wine download links from WineHQ: https://dl.winehq.org/wine-builds/
+	LNKA="https://dl.winehq.org/wine-builds/${id}/dists/${dist}/main/binary-amd64/" #amd64-wine links
+	DEB_A1="wine-${branch}-amd64_${version}~${dist}${tag}_amd64.deb" #wine64 main bin
+	DEB_A2="wine-${branch}_${version}~${dist}${tag}_amd64.deb" #wine64 support files (required for wine64 / can work alongside wine_i386 main bin)
+		#DEB_A3="winehq-${branch}_${version}~${dist}${tag}_amd64.deb" #shortcuts & docs
+	LNKB="https://dl.winehq.org/wine-builds/${id}/dists/${dist}/main/binary-i386/" #i386-wine links
+	DEB_B1="wine-${branch}-i386_${version}~${dist}${tag}_i386.deb" #wine_i386 main bin
+	DEB_B2="wine-${branch}_${version}~${dist}${tag}_i386.deb" #wine_i386 support files (required for wine_i386 if no wine64 / CONFLICTS WITH wine64 support files)
+		#DEB_B3="winehq-${branch}_${version}~${dist}${tag}_i386.deb" #shortcuts & docs
+
+	# Install amd64-wine (64-bit) alongside i386-wine (32-bit)
+	echo -e "Downloading wine . . ."
+	wget -q ${LNKA}${DEB_A1} 
+	wget -q ${LNKA}${DEB_A2} 
+	wget -q ${LNKB}${DEB_B1} 
+	echo -e "Extracting wine . . ."
+	dpkg-deb -x ${DEB_A1} wine-installer
+	dpkg-deb -x ${DEB_A2} wine-installer
+	dpkg-deb -x ${DEB_B1} wine-installer
+	echo -e "Installing wine . . ."
+	mv wine-installer/opt/wine* ~/wine
+
+	# These packages are needed for running wine-staging on RPiOS (Credits: chills340)
+	sudo apt install libstb0 -y
+	cd ~/Downloads
+	wget -r -l1 -np -nd -A "libfaudio0_*~bpo10+1_i386.deb" http://ftp.us.debian.org/debian/pool/main/f/faudio/ # Download libfaudio i386 no matter its version number
+	dpkg-deb -xv libfaudio0_*~bpo10+1_i386.deb libfaudio
+	sudo cp -TRv libfaudio/usr/ /usr/
+	rm libfaudio0_*~bpo10+1_i386.deb # clean up
+	rm -rf libfaudio # clean up
+
+	# Install symlinks
+	sudo ln -s ~/wine/bin/wine /usr/local/bin/wine
+	sudo ln -s ~/wine/bin/wine64 /usr/local/bin/wine64
+	sudo ln -s ~/wine/bin/wineboot /usr/local/bin/wineboot
+	sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
+	sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
+	sudo chmod +x /usr/local/bin/wine /usr/local/bin/wine64 /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver
+}
+
+function run_Install_amd64wineDependencies_RpiOS64bit()
+{
+	# Download wine64 dependencies
+	# - these packages are needed for running box64/wine-amd64 on RPiOS (box64 only runs on 64-bit OS's)
+	sudo apt-get install -y libasound2:arm64 libc6:arm64 libglib2.0-0:arm64 libgphoto2-6:arm64 libgphoto2-port12:arm64 \
+		libgstreamer-plugins-base1.0-0:arm64 libgstreamer1.0-0:arm64 libldap-2.4-2:arm64 libopenal1:arm64 libpcap0.8:arm64 \
+		libpulse0:arm64 libsane1:arm64 libudev1:arm64 libunwind8:arm64 libusb-1.0-0:arm64 libvkd3d1:arm64 libx11-6:arm64 libxext6:arm64 \
+		ocl-icd-libopencl1:arm64 libasound2-plugins:arm64 libncurses6:arm64 libncurses5:arm64 libcups2:arm64 \
+		libdbus-1-3:arm64 libfontconfig1:arm64 libfreetype6:arm64 libglu1-mesa:arm64 libgnutls30:arm64 \
+		libgssapi-krb5-2:arm64 libjpeg62-turbo:arm64 libkrb5-3:arm64 libodbc1:arm64 libosmesa6:arm64 libsdl2-2.0-0:arm64 libv4l-0:arm64 \
+		libxcomposite1:arm64 libxcursor1:arm64 libxfixes3:arm64 libxi6:arm64 libxinerama1:arm64 libxrandr2:arm64 \
+		libxrender1:arm64 libxxf86vm1:arm64 libc6:arm64 libcap2-bin:arm64
+		# This list found by downloading...
+		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-amd64/wine-devel_7.1~bullseye-1_amd64.deb
+		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-amd64/wine-devel-amd64_7.1~bullseye-1_amd64.deb
+		# then `dpkg-deb -I package.deb`. Read output, add `:arm64` to packages in dep list, then try installing them on Pi aarch64.	
+		
+	# Old: Wine-amd64 on aarch64 needs some 64-bit libs
+	#	sudo apt-get install apt-utils libcups2 libfontconfig1 libncurses6 libxcomposite-dev libxcursor-dev libxi6 libxinerama1 libxrandr2 libxrender1 -y
+	#	sudo apt-get install libpulse0 -y # not sure if needed, but probably can't hurt
 }
 
 function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.
@@ -721,11 +808,12 @@ function run_custompi3kernel() # Needed to run wine on Pi3's running RPiOS (32-b
 			#backup ~/linux if it exists
 			rm -rf ~/linux.bak
 			[ -e ~/linux ] && (echo "$HOME/linux already exists, moving it to $HOME/linux.bak" ; mv -f ~/linux ~/linux.bak)
-
+			
 			echo "Installing necessary build packages..."
 			sudo apt-get install raspberrypi-kernel-headers build-essential bc git wget bison flex libssl-dev make libncurses-dev -y
 
 			#download kernel source code
+			cd $HOME
 			git clone --depth=1 https://github.com/raspberrypi/linux || { echo "Failed to clone the raspberry pi kernel repo!" && run_giveup; }
 
 			#build for pi3
