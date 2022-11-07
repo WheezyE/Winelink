@@ -231,11 +231,23 @@ function run_main()
 
 				#Install wine (note: In Ubuntu, packages are called "wine-stable", not "winehq-stable" like in the Wine wiki).
 				sudo dpkg --add-architecture i386 #Install procedure last reviewed 09/07/2022 - ejw
-				sudo wget -O /usr/share/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
-				sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources || { echo "unable to download winehq sources file!" && run_giveup; }
+				
+				# 7-11-2022 updated to install doc https://wiki.winehq.org/Ubuntu
+				sudo mkdir -pm755 /etc/apt/keyrings
+				sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
+				if [ $ID == "ubuntu" ];then
+					sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources || { echo "unable to download ubuntu winehq sources file!" && run_giveup; }
+				fi
 				sudo apt-get update
-				#sudo apt-get install --install-recommends wine-stable -y  || { echo "wine instllation failed!" && run_giveup; } #note: no winehq-stable package for ubuntu. Symlinks are still created though#sudo apt-get install --install-recommends wine-stable -y  || { echo "wine instllation failed!" && run_giveup; } #note: no winehq-stable package for ubuntu. Symlinks are still created though
-				sudo apt-get install --install-recommends winehq-devel -y  || { echo "wine instllation failed!" && run_giveup; } #note: for some reason wine-stable lags far behind on ubuntu
+
+				if [ $ID == "linuxmint" ];then
+					#mint package
+					sudo apt-get install --install-recommends wine-installer -y || { echo "wine installation on mint failed!" && run_giveup; }
+				else
+					#ubuntu
+					sudo apt-get install --install-recommends winehq-devel -y  || { echo "wine insallation on ubuntu failed!" && run_giveup; } #note: for some reason wine-stable lags far behind on ubuntu
+					#sudo apt-get install --install-recommends wine-stable -y  || { echo "wine instllation failed!" && run_giveup; } #note: no winehq-stable package for ubuntu. Symlinks are still created though#sudo apt-get install --install-recommends wine-stable -y  || { echo "wine instllation failed!" && run_giveup; } #note: no winehq-stable package for ubuntu. Symlinks are still created though
+				fi
 
 				#Add the user to the USB dialout group so that they can access radio USB CAT control later.
 				sudo usermod -a -G dialout $USER
