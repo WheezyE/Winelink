@@ -955,23 +955,20 @@ function run_installvarAC()  # Download/extract/install varAC chat app
         # Extract/install varAC
 			mkdir -p $HOME/.wine/drive_c/VarAC
             7z e -oD:"$HOME/.wine/drive_c/VarAC" VarAC_V6_0_8.zip
-			
-	    	mv VarAC 
 		# Clean up
             rm -rf VarAC_V6_0_8.zip
-
         # Make a 
-            echo '[Desktop Entry]'                                                                             | sudo tee ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'Name=VarAC HF Chat'                                                                        | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'GenericName=VarAC HF Chat'                                                                 | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'Comment=VarAC emulated with Box86/Wine'                                                | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            #echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null # TODO: Does this improve stability or cost speed?
-            echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'Icon=219D_RMS Express.0'                                                                     | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'StartupWMClass=rms express.exe'                                                              | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'Categories=HamRadio;'                                                                        | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
+            echo '[Desktop Entry]'                                                                             | sudo tee ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Name=VarAC HF Chat'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'GenericName=VarAC HF Chat'                                                                   | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Comment=VarAC emulated with Box86/Wine'                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe' | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            #echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe'  | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null # TODO: Does this improve stability or cost speed?
+            echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Icon=findone.0'                                                         		               | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'StartupWMClass=VarAC.exe'                                                                    | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                        | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
     cd ..
 }
 
