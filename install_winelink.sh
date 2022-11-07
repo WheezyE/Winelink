@@ -281,7 +281,7 @@ function run_main()
         ### Set up Wine (silently make & configure a new wineprefix)
             run_setupwineprefix $ARG # if 'vara_only' was passed to the winelink script, then pass 'vara_only' to this subroutine function too
 	
-        ### Install Winlink & VARA into our configured wineprefix
+        ### Install Winlink, VARA, & VarAC into our configured wineprefix
             if [ "$ARG" = "vara_only" ] || [ "$ARG" = "bap" ]; then #TODO: Am I using brackets and ='s correctly?
                 run_installvara
             else
