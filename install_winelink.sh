@@ -950,13 +950,12 @@ function run_installvarAC()  # Download/extract/install varAC chat app
     mkdir downloads 2>/dev/null; cd downloads
         # Download varAC linux working version 6.1 (static Link as no dynamic link known at the moment)
             echo -e "\n${GREENTXT}Downloading and installing VarAC . . .${NORMTXT}\n"
-            wget -q https://288b5dcd-0898-4460-b829-4a40f1724acf.usrfiles.com/archives/288b5d_c885af0fc9e841efbe5d419a849ca7d3.zip?dn=VarAC_V6_0_8.zip || { echo "varAC download failed!" && run_giveup; }
-
+            wget https://288b5dcd-0898-4460-b829-4a40f1724acf.usrfiles.com/archives/288b5d_c885af0fc9e841efbe5d419a849ca7d3.zip?dn=VarAC_V6_0_8.zip || { echo "RMS Express download failed!" && run_giveup; }
         # Extract/install varAC
 			mkdir -p $HOME/.wine/drive_c/VarAC
-            7z e -oD:"$HOME/.wine/drive_c/VarAC" VarAC_V6_0_8.zip
+			7z x 28*.zip -oc:${HOME}/.wine/drive_c/VarAC
 		# Clean up
-            rm -rf VarAC_V6_0_8.zip
+            rm -rf 28*.zip
         # Make a 
             echo '[Desktop Entry]'                                                                             | sudo tee ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Name=VarAC HF Chat'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
