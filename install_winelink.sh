@@ -899,11 +899,11 @@ function run_installahk()
     mkdir downloads 2>/dev/null; cd downloads
         # Download AutoHotKey
 	echo -e "\n${GREENTXT}Downloading AutoHotkey . . .${NORMTXT}\n"
-        wget -q https://github.com/AutoHotkey/AutoHotkey/releases/download/v1.0.48.05/AutoHotkey104805_Install.exe || { echo "AutoHotkey download failed!" && run_giveup; }
-        7z x AutoHotkey104805_Install.exe AutoHotkey.exe -y -bsp0 -bso0
+        wget -q https://github.com/AutoHotkey/AutoHotkey/releases/download/v1.1.36.02/AutoHotkey_1.1.36.02_setup.exe || { echo "AutoHotkey download failed!" && run_giveup; }
+		7z e AutoHotkey_1.1.36.02_setup.exe AutoHotkeyU32.exe -y -bsp0 -bso0
 	mkdir ${HOME}/winelink 2>/dev/null
 	mkdir ${AHK}
-	sudo mv AutoHotkey.exe ${AHK}/AutoHotkey.exe
+	sudo mv AutoHotkeyU32.exe ${AHK}/AutoHotkey.exe
 	sudo chmod +x ${AHK}/AutoHotkey.exe
     cd ..
 }
