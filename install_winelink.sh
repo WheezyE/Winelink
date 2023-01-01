@@ -182,6 +182,9 @@ function run_main()
 			#Install wine (note: packages are called "wine-stable", not "winehq-stable" like in the Wine wiki).
 			sudo dpkg --add-architecture i386 # also install wine32 using multi-arch
 			sudo apt-key del "D43F 6401 4536 9C51 D786 DDEA 76F1 A20F F987 672F" #apt-key is deprecated, but this step is here as a hotfix in case distro has an old winehq gpg key installed
+			sudo mkdir -pm755 /etc/apt/keyrings
+			sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
+			
 			sudo wget -O /usr/share/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
 			sudo wget -P /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/${VERSION_CODENAME}/winehq-${VERSION_CODENAME}.sources || { echo "unable to download winehq sources file!" && run_giveup; }
 			sudo sed -i 's&/etc/apt/keyrings/winehq-archive.key&/usr/share/keyrings/winehq-archive.key&g' /etc/apt/sources.list.d/winehq-${VERSION_CODENAME}.sources #fix bug found in the winehq-bullseye.sources file present 09/11/2022
