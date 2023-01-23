@@ -182,9 +182,9 @@ function run_main()
 			#Install wine (note: packages are called "wine-stable", not "winehq-stable" like in the Wine wiki).
 			sudo dpkg --add-architecture i386 # also install wine32 using multi-arch
 			sudo apt-key del "D43F 6401 4536 9C51 D786 DDEA 76F1 A20F F987 672F" #apt-key is deprecated, but this step is here as a hotfix in case distro has an old winehq gpg key installed
-			sudo wget -O /usr/share/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
+			sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
 			sudo wget -P /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/${VERSION_CODENAME}/winehq-${VERSION_CODENAME}.sources || { echo "unable to download winehq sources file!" && run_giveup; }
-			sudo sed -i 's&/etc/apt/keyrings/winehq-archive.key&/usr/share/keyrings/winehq-archive.key&g' /etc/apt/sources.list.d/winehq-${VERSION_CODENAME}.sources #fix bug found in the winehq-bullseye.sources file present 09/11/2022
+			sudo sed -i 's&/usr/share/keyrings/winehq-archive.key&/etc/apt/keyrings/winehq-archive.key&g' /etc/apt/sources.list.d/winehq-${VERSION_CODENAME}.sources #fix bug found in the winehq-bullseye.sources file https://bugs.winehq.org/show_bug.cgi?id=53662
 				#Note: Old method for installing key and repo
 				#wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
 				#sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/debian/ ${VERSION_CODENAME} main"
@@ -231,8 +231,9 @@ function run_main()
 
 				#Install wine (note: In Ubuntu, packages are called "wine-stable", not "winehq-stable" like in the Wine wiki).
 				sudo dpkg --add-architecture i386 #Install procedure last reviewed 09/07/2022 - ejw
-				sudo wget -O /usr/share/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
+				sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key || { echo "unable to download winehq gpg key!" && run_giveup; }
 				sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/${UBUNTU_CODENAME}/winehq-${UBUNTU_CODENAME}.sources || { echo "unable to download winehq sources file!" && run_giveup; }
+				sudo sed -i 's&/usr/share/keyrings/winehq-archive.key&/etc/apt/keyrings/winehq-archive.key&g' /etc/apt/sources.list.d/winehq-${UBUNTU_CODENAME}.sources #fix bug found in the winehq-bullseye.sources file https://bugs.winehq.org/show_bug.cgi?id=53662
 				sudo apt-get update
 				#sudo apt-get install --install-recommends wine-stable -y  || { echo "wine instllation failed!" && run_giveup; } #note: no winehq-stable package for ubuntu. Symlinks are still created though#sudo apt-get install --install-recommends wine-stable -y  || { echo "wine instllation failed!" && run_giveup; } #note: no winehq-stable package for ubuntu. Symlinks are still created though
 				sudo apt-get install --install-recommends winehq-devel -y  || { echo "wine instllation failed!" && run_giveup; } #note: for some reason wine-stable lags far behind on ubuntu
@@ -900,11 +901,11 @@ function run_installahk()
     mkdir downloads 2>/dev/null; cd downloads
         # Download AutoHotKey
 	echo -e "\n${GREENTXT}Downloading AutoHotkey . . .${NORMTXT}\n"
-        wget -q https://github.com/AutoHotkey/AutoHotkey/releases/download/v1.0.48.05/AutoHotkey104805_Install.exe || { echo "AutoHotkey download failed!" && run_giveup; }
-        7z x AutoHotkey104805_Install.exe AutoHotkey.exe -y -bsp0 -bso0
+        wget -q https://github.com/AutoHotkey/AutoHotkey/releases/download/v1.1.36.02/AutoHotkey_1.1.36.02_setup.exe || { echo "AutoHotkey download failed!" && run_giveup; }
+		7z e AutoHotkey_1.1.36.02_setup.exe AutoHotkeyU32.exe -y -bsp0 -bso0
 	mkdir ${HOME}/winelink 2>/dev/null
 	mkdir ${AHK}
-	sudo mv AutoHotkey.exe ${AHK}/AutoHotkey.exe
+	sudo mv AutoHotkeyU32.exe ${AHK}/AutoHotkey.exe
 	sudo chmod +x ${AHK}/AutoHotkey.exe
     cd ..
 }
