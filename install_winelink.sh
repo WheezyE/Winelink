@@ -282,12 +282,13 @@ function run_main()
         ### Set up Wine (silently make & configure a new wineprefix)
             run_setupwineprefix $ARG # if 'vara_only' was passed to the winelink script, then pass 'vara_only' to this subroutine function too
 	
-        ### Install Winlink & VARA into our configured wineprefix
+        ### Install Winlink, VARA, & VarAC into our configured wineprefix
             if [ "$ARG" = "vara_only" ] || [ "$ARG" = "bap" ]; then #TODO: Am I using brackets and ='s correctly?
                 run_installvara
             else
                 run_installrms
                 run_installvara
+				run_installvarAC
             fi
         
         ### Post-installation
@@ -942,6 +943,33 @@ function run_installrms()  # Download/extract/install RMS Express
             echo 'Icon=219D_RMS Express.0'                                                                     | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'StartupWMClass=rms express.exe'                                                              | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Categories=HamRadio;'                                                                        | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
+    cd ..
+}
+
+function run_installvarAC()  # Download/extract/install varAC chat app
+{
+    mkdir downloads 2>/dev/null; cd downloads
+        # Download varAC linux working version 6.1 (static Link as no dynamic link known at the moment)
+            echo -e "\n${GREENTXT}Downloading and installing VarAC . . .${NORMTXT}\n"
+            wget https://varac.hopp.to/varac_latest || { echo "VarAC download failed!" && run_giveup; }
+        # Extract/install varAC
+			mkdir -p ${HOME}/.wine/drive_c/VarAC
+			7z x varac_latest -oc:${HOME}/.wine/drive_c/VarAC
+			sed -i 's/LinuxCompatibleMode=OFF/LinuxCompatibleMode=ON/' ${HOME}/.wine/drive_c/VarAC/VarAC.ini
+		# Clean up
+            rm -rf varac_latest
+        # Make a 
+            echo '[Desktop Entry]'                                                                             | sudo tee ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Name=VarAC HF Chat'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'GenericName=VarAC HF Chat'                                                                   | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Comment=VarAC emulated with Box86/Wine'                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe' | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            #echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe'  | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null # TODO: Does this improve stability or cost speed?
+            echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Icon=findone.0'                                                         		               | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'StartupWMClass=VarAC.exe'                                                                    | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                        | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
     cd ..
 }
 
