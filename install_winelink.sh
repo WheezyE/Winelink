@@ -46,9 +46,9 @@ function run_main()
         sudo rm -rf ${HOME}/winelink 2>/dev/null # silently clean up any failed past runs of this script
         sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop \
                 ${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop ${STARTMENU}/vara-soundcardsetup.desktop \
-                ${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop 2>/dev/null # remove old shortcuts
-	rm ${HOME}/RMS\ Express\ *.log 2>/dev/null # silently remove old RMS Express logs
-		 
+                ${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop ${STARTMENU}/VarAC.desktop 2>/dev/null # remove old shortcuts
+        rm ${HOME}/RMS\ Express\ *.log 2>/dev/null # silently remove old RMS Express logs
+        rm ${HOME}/VarAC.ini ${HOME}/VarAC_cat_commands.ini ${HOME}/VarAC_frequencies.conf ${HOME}/VarAC_frequency_schedule.conf ${HOME}/VarAC_alert_tags.conf
         
     ### Create winelink directory
         mkdir ${HOME}/winelink && cd ${HOME}/winelink # store all downloaded/installed files in their own directory
@@ -160,7 +160,7 @@ function run_main()
 	"x86"|"x64") ############### i386 & i686 OS Section ###############
 		case $ID in
 		"debian"|"raspbian")
-			run_greeting "${ARCH}" "30" "1.5" "${ARG}"
+			run_greeting "${ARCH} ${ID}" "30" "1.5" "${ARG}"
 			run_checkdiskspace "1500" #min space required in MB
 			
 			# TODO: Use the OS-specific package manager to install needed packages? Or do a 'try' in-situ?
@@ -220,7 +220,7 @@ function run_main()
 				run_giveup
 				;; #/x86)
 			"x64")
-				run_greeting "${ARCH}" "30" "1.5" "${ARG}"
+				run_greeting "${ARCH}${ID}" "30" "1.5" "${ARG}"
 				run_checkdiskspace "1500" #min space required in MB
 
 				#Make sure system time and certs are up to date (in case system is old or a virtual machine)
@@ -288,7 +288,7 @@ function run_main()
             else
                 run_installrms
                 run_installvara
-				run_installvarAC
+                run_installvarAC
             fi
         
         ### Post-installation
@@ -298,6 +298,7 @@ function run_main()
                 : # If 'bap' is passed to this script, then don't run run_varasoundcardsetup
             else
                 run_varasoundcardsetup
+                run_varACsetup
             fi
 	    run_makeuninstallscript
 	    
@@ -334,9 +335,9 @@ function run_greeting()
     clear
     echo ""
     echo "####################### Winlink & VARA Installer Script #######################"
-    echo "# Author: Eric Wiessner (KI7POL)                          System: ${hardware}  #"
-    echo "# Version: 0.0097a                                  Install time: apx ${tinst} min  #"
-    echo "#                                                 Space required: apx ${space} GB  #"
+    echo "# Author: Eric Wiessner (KI7POL)                         System: ${hardware}  #"
+    echo "# Version: 0.0097a                                 Install time: apx ${tinst} min   #"
+    echo "#                                                Space required: apx ${space} GB   #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, et al) #"
     echo "#   Esme 'madewokherd' Povirk (CodeWeavers) for adding functions to wine-mono #"
@@ -902,7 +903,7 @@ function run_installahk()
         # Download AutoHotKey
 	echo -e "\n${GREENTXT}Downloading AutoHotkey . . .${NORMTXT}\n"
         wget -q https://github.com/AutoHotkey/AutoHotkey/releases/download/v1.1.36.02/AutoHotkey_1.1.36.02_setup.exe || { echo "AutoHotkey download failed!" && run_giveup; }
-		7z e AutoHotkey_1.1.36.02_setup.exe AutoHotkeyU32.exe -y -bsp0 -bso0
+        7z e AutoHotkey_1.1.36.02_setup.exe AutoHotkeyU32.exe -y -bsp0 -bso0
 	mkdir ${HOME}/winelink 2>/dev/null
 	mkdir ${AHK}
 	sudo mv AutoHotkeyU32.exe ${AHK}/AutoHotkey.exe
@@ -951,26 +952,74 @@ function run_installvarAC()  # Download/extract/install varAC chat app
     mkdir downloads 2>/dev/null; cd downloads
         # Download varAC linux working version 6.1 (static Link as no dynamic link known at the moment)
             echo -e "\n${GREENTXT}Downloading and installing VarAC . . .${NORMTXT}\n"
-            wget https://varac.hopp.to/varac_latest || { echo "VarAC download failed!" && run_giveup; }
-        # Extract/install varAC
-			mkdir -p ${HOME}/.wine/drive_c/VarAC
-			7z x varac_latest -oc:${HOME}/.wine/drive_c/VarAC
-			sed -i 's/LinuxCompatibleMode=OFF/LinuxCompatibleMode=ON/' ${HOME}/.wine/drive_c/VarAC/VarAC.ini
-		# Clean up
+            wget -q https://varac.hopp.to/varac_latest || { echo "VarAC download failed!" && run_giveup; }
+            
+        # Extract/install VarAC
+            mkdir -p ${HOME}/.wine/drive_c/VarAC
+            7z x varac_latest -aoa -y -o"${HOME}/.wine/drive_c/VarAC" -bsp0 -bso0
+            
+	# Extract VarAC Windows icon then convert it to png for Linux
+	    sudo apt-get install icoutils -y # installs wrestool & icotool
+            wrestool -x --output=${HOME}'/.wine/drive_c/VarAC/varac.ico' -t14 ${HOME}'/.wine/drive_c/VarAC/VarAC.exe' 2>/dev/null; # extract ico from exe
+            mkdir ${HOME}'/.wine/drive_c/VarAC/img/' 2>/dev/null;
+            icotool -x -o ${HOME}'/.wine/drive_c/VarAC/img/' ${HOME}'/.wine/drive_c/VarAC/varac.ico' 2>/dev/null; # extract png from ico
+	    VARACICON="$(basename $(find ${HOME}'/.wine/drive_c/VarAC/img/' -maxdepth 1 -type f  -printf "%s\t%p\n" | sort -n | tail -1 | awk '{print $NF}'))" 2>/dev/null; # store name of largest png - https://unix.stackexchange.com/a/565995
+            
+        # Clean up
             rm -rf varac_latest
-        # Make a 
+            
+        # Make a VarAC Chat desktop shortcut
             echo '[Desktop Entry]'                                                                             | sudo tee ${STARTMENU}/VarAC.desktop > /dev/null
-            echo 'Name=VarAC HF Chat'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
-            echo 'GenericName=VarAC HF Chat'                                                                   | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Name=VarAC Chat'                                                                             | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'GenericName=VarAC Chat'                                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Comment=VarAC emulated with Box86/Wine'                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe' | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             #echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe'  | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null # TODO: Does this improve stability or cost speed?
             echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
-            echo 'Icon=findone.0'                                                         		               | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Icon='$HOME'/.wine/drive_c/VarAC/img/'${VARACICON}                                           | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'StartupWMClass=VarAC.exe'                                                                    | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Categories=HamRadio;'                                                                        | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
     cd ..
+}
+
+function run_varACsetup() # TODO: This is a kludge until VarAC can be patched to find its own config files / not put them into the user home directory!!!
+{
+        # Set up VarAC for the user
+            #cp ${HOME}'/.wine/drive_c/VarAC/VarAC.ini' ${HOME}'/VarAC.ini' # This will be created when we run VarAC (copying before running VarAC is unstable for some reason).
+            cp ${HOME}'/.wine/drive_c/VarAC/VarAC_alert_tags.conf' ${HOME}'/VarAC_alert_tags.conf' 2>/dev/null; # Kludge: VarAC can't find its files on Wine
+            cp ${HOME}'/.wine/drive_c/VarAC/VarAC_frequencies.conf' ${HOME}'/VarAC_frequencies.conf' 2>/dev/null; # Kludge: VarAC can't find its files on Wine
+            cp ${HOME}'/.wine/drive_c/VarAC/VarAC_cat_commands.ini' ${HOME}'/VarAC_cat_commands.ini' 2>/dev/null; # Kludge: VarAC can't find its files on Wine
+	    
+	    clear
+	    echo -e "\n${GREENTXT}Now starting VarAC ...\n\n  Please enter your Callsign & Gridsquare into the VarAC settings box\n  when it appears in a moment.\n\n  NOTE: VARA will restart a few times as VarAC tries to handshake with VARA.\n  VarAC will then start after a short time.${NORMTXT}"
+            env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}'/.wine/drive_c/VarAC/VarAC.exe' # Run VarAC: Asks user for callsign & gridsquare, then copies VarAC.ini to user's home directory.
+	    
+	# Create/run varaac_configure.ahk
+		# VarAC must be run once an then closed so that it makes a 'VarAC.ini' file in the user home directory. Then we can modify that file.
+		# First run of VarAC will also prompt the user for CallSn & Grid.
+		echo '; AHK script to assist users in setting up VARA on its first run'                > ${AHK}/varac_configure.ahk
+		echo 'SetTitleMatchMode, 2'                                                            >> ${AHK}/varac_configure.ahk
+		echo 'SetTitleMatchMode, slow'                                                         >> ${AHK}/varac_configure.ahk
+		echo '        Run, C:\VarAC\VarAC.exe'                                                 >> ${AHK}/varac_configure.ahk
+		echo '        WinActivate, Change frequency Manually'                                  >> ${AHK}/varac_configure.ahk
+		echo '        WinWait, Change frequency Manually ; Wait for VarAC to open'              >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Enter}'                                                           >> ${AHK}/varac_configure.ahk
+		echo '        WinActivate, VarAC'                                                      >> ${AHK}/varac_configure.ahk
+		echo '        WinWait, VarAC ; Wait for VarAC to open'                                 >> ${AHK}/varac_configure.ahk
+		echo '        WinClose, VarAC ; Close VarAC'                                           >> ${AHK}/varac_configure.ahk
+		BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varac_configure.ahk # nobanner option to make console prettier
+		rm ${AHK}/varac_configure.ahk
+		sleep 5
+	            
+            sed -i 's&LinuxCompatibleMode=OFF&LinuxCompatibleMode=ON&' ${HOME}'/VarAC.ini' 2>/dev/null;
+            sed -i 's&VaraModemType=&VaraModemType=VaraHF&' ${HOME}'/VarAC.ini' 2>/dev/null;
+            sed -i 's&VarahfMainKissPort=8100&VarahfMainKissPort=8100\nVarahfMainPath=C:\\VARA\\VARA.exe\nVarahfMainPort=8300\nVarahfMonitorPort=8350&' ${HOME}'/VarAC.ini' 2>/dev/null;
+            mkdir ${HOME}'/.wine/drive_c/VarAC/incoming' 2>/dev/null;
+            mkdir ${HOME}'/.wine/drive_c/VarAC/outgoing' 2>/dev/null;
+            sed -i 's&IncomingFilesDir=&IncomingFilesDir=C:\\VarAC\\incoming\\&' ${HOME}'/VarAC.ini' 2>/dev/null;
+            sed -i 's&OutgoingFilesDir=&OutgoingFilesDir=C:\\VarAC\\outgoing\\&' ${HOME}'/VarAC.ini' 2>/dev/null;
+            sed -i 's&IncomingFilesSizeLimit=1000&IncomingFilesSizeLimit=1000000&' ${HOME}'/VarAC.ini' 2>/dev/null;
 }
 
 function run_installvara()  # Download / extract / install VARA HF/FM/Chat
@@ -1065,7 +1114,7 @@ function run_makevaraupdatescript()
 					
 				# Run varahf_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA HF . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
+					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
 				
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ setup*.exe
@@ -1104,7 +1153,7 @@ function run_makevaraupdatescript()
 
 				# Run varafm_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA FM . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
+					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
 
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ FM\ setup*.exe
@@ -1143,7 +1192,7 @@ function run_makevaraupdatescript()
 		#
 		#		# Run varasat_install.ahk
 		#			echo -e "\n${GREENTXT}Installing VARA SAT . . .${NORMTXT}\n"
-		#			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
+		#			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
 		#
 		#		# Clean up the installation
 		#			rm ~/.wine/drive_c/VARA\ SAT\ setup*.exe
@@ -1280,7 +1329,7 @@ function run_makevarasoundcardsetupscript()
 			echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> ${AHK}/varahf_configure.ahk
 			echo '        Sleep 100'                                                               >> ${AHK}/varahf_configure.ahk
 			echo '        WinClose, VARA HF ; Close VARA'                                          >> ${AHK}/varahf_configure.ahk
-			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varahf_configure.ahk # nobanner option to make console prettier
+			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varahf_configure.ahk # nobanner option to make console prettier
 			rm ${AHK}/varahf_configure.ahk
 			sleep 5
 		
@@ -1317,7 +1366,7 @@ function run_makevarasoundcardsetupscript()
 			echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> ${AHK}/varafm_configure.ahk
 			echo '        Sleep 100'                                                               >> ${AHK}/varafm_configure.ahk
 			echo '        WinClose, VARA FM ; Close VARA'                                          >> ${AHK}/varafm_configure.ahk
-			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varafm_configure.ahk # Nobanner option to make console prettier
+			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varafm_configure.ahk # Nobanner option to make console prettier
 			rm ${AHK}/varafm_configure.ahk
 			sleep 5
 			
@@ -1361,7 +1410,7 @@ function run_makevarasoundcardsetupscript()
 	#		echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> ${AHK}/varasat_configure.ahk
 	#		echo '        Sleep 100'                                                               >> ${AHK}/varasat_configure.ahk
 	#		echo '        WinClose, VARA SAT ; Close VARA'                                         >> ${AHK}/varasat_configure.ahk
-	#		BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varasat_configure.ahk # nobanner option to make console prettier
+	#		BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varasat_configure.ahk # nobanner option to make console prettier
 	#		rm ${AHK}/varasat_configure.ahk
 	#		sleep 5
 		
@@ -1423,9 +1472,10 @@ function run_makeuninstallscript()
 		then
 			sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop \
 				${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop ${STARTMENU}/vara-soundcardsetup.desktop \
-				${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop 2>/dev/null # remove old shortcuts
+				${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop ${STARTMENU}/VarAC.desktop 2>/dev/null # remove old shortcuts
 			sudo rm -rf ${HOME}/winelink 2>/dev/null
 			rm ${HOME}/RMS\ Express\ *.log 2>/dev/null # silently remove old RMS Express logs
+			rm ${HOME}/VarAC.ini ${HOME}/VarAC_cat_commands.ini ${HOME}/VarAC_frequencies.conf ${HOME}/VarAC_frequency_schedule.conf ${HOME}/VarAC_alert_tags.conf
 
 			# Ask user if they would like to remove wine & box86
 				zenity --question --height 150 --width 500 --text="Winelink uninstalled\\n\\nWould you also like to remove Wine and Box86?" --title="Remove Wine & Box86?"
