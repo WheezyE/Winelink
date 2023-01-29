@@ -881,7 +881,7 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
     # Silently create a new wineprefix
         echo -e "\n${GREENTXT}Creating a new wineprefix.  This may take a moment . . .${NORMTXT}\n" 
         rm -rf ~/.cache/wine # make sure no old wine-mono files are in wine's cache, or else they will be auto-installed on first wineboot
-        DISPLAY=0 WINEARCH=win32 wine wineboot # initialize Wine silently (silently makes a fresh wineprefix in `~/.wine`)
+        DISPLAY=0 WINEARCH=win32 WINEDEBUG=-all wine wineboot # initialize Wine silently (silently makes a fresh wineprefix in `~/.wine`)
 
     # Install pre-requisite software into the wineprefix for RMS Express and VARA
         if [ "$varaonly" = "vara_only" ]; then
