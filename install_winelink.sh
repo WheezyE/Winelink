@@ -867,7 +867,7 @@ function run_installwinetricks() # Download and install winetricks
     mkdir downloads 2>/dev/null; cd downloads
         echo -e "\n${GREENTXT}Downloading and installing winetricks . . .${NORMTXT}\n"
         sudo mv /usr/local/bin/winetricks /usr/local/bin/winetricks-old 2>/dev/null # backup any old winetricks installs
-        wget -q https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks || { echo "winetricks download failed!" && run_giveup; } # download
+        wget -q https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks || { echo "Winetricks download failed!" && run_giveup; } # download
         sudo chmod +x winetricks
         sudo mv winetricks /usr/local/bin # install
     cd ..
@@ -886,12 +886,13 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
     # Install pre-requisite software into the wineprefix for RMS Express and VARA
         if [ "$varaonly" = "vara_only" ]; then
 	    echo -e "\n${GREENTXT}Setting up your wineprefix for VARA . . .${NORMTXT}\n"
-	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
+	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
+	    #WTERR_VB6RUN=$( winetricks -q vb6run | tee /dev/stderr | grep -o -P '(warning: Downloading )(.*?)(VB6.0-KB290887-X86.exe failed)' ) # more precise error reporting
 	else
 	    echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
 	    run_installwinemono # for RMS Express - wine-mono replaces dotnet46
 	    #BOX86_NOBANNER=1 winetricks -q dotnet46 win7 sound=alsa # for RMS Express
-	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa # for VARA
+	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
 	fi
 	# TODO: Check to see if 'winetricks -q corefonts riched20' would make text look nicer
 }
