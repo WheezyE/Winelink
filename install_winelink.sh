@@ -975,7 +975,6 @@ function run_installvarAC()  # Download/extract/install varAC chat app
             echo 'GenericName=VarAC Chat'                                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Comment=VarAC emulated with Box86/Wine'                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe' | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
-            #echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe'  | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null # TODO: Does this improve stability or cost speed?
             echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Icon='$HOME'/.wine/drive_c/VarAC/img/'${VARACICON}                                           | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
@@ -992,10 +991,14 @@ function run_varACsetup() # TODO: This is a kludge until VarAC can be patched to
             cp ${HOME}'/.wine/drive_c/VarAC/VarAC_frequencies.conf' ${HOME}'/VarAC_frequencies.conf' 2>/dev/null; # Kludge: VarAC can't find its files on Wine
             cp ${HOME}'/.wine/drive_c/VarAC/VarAC_cat_commands.ini' ${HOME}'/VarAC_cat_commands.ini' 2>/dev/null; # Kludge: VarAC can't find its files on Wine
 	    
-	    clear
-	    echo -e "\n${GREENTXT}Now starting VarAC ...\n\n  Please enter your Callsign & Gridsquare into the VarAC settings box\n  when it appears in a moment.\n\n  NOTE: VARA will restart a few times as VarAC tries to handshake with VARA.\n  VarAC will then start after a short time.${NORMTXT}"
-            env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}'/.wine/drive_c/VarAC/VarAC.exe' # Run VarAC: Asks user for callsign & gridsquare, then copies VarAC.ini to user's home directory.
-	    
+	# Guide the user to enter Callsign/Grid into VarAC's menu (configure hardware soundcard input/output)
+            clear
+            #echo -e "\n${GREENTXT}Loading VarAC . . .${NORMTXT}\n"
+            #echo -e "\n${GREENTXT}Please enter your Callsign & Gridsquare into the VarAC settings box\n(click 'Ok' on the user prompt textbox to continue)\n\nThis might take a moment.${NORMTXT}\n"
+            #zenity --info --height 100 --width 350 --text="We will now setup your Callsign &amp; Gridsquare for VarAC. \n\nInstall will continue once you have closed the VarAC Settings menu." --title="VarAC User Info Setup"
+            echo -e "\n${GREENTXT}Configuring VarAC now . . .${NORMTXT}\n"
+	    echo -e "\n${GREENTXT}Note: This might take a moment${NORMTXT}\n"
+            
 	# Create/run varaac_configure.ahk
 		# VarAC must be run once an then closed so that it makes a 'VarAC.ini' file in the user home directory. Then we can modify that file.
 		# First run of VarAC will also prompt the user for CallSn & Grid.
@@ -1003,16 +1006,47 @@ function run_varACsetup() # TODO: This is a kludge until VarAC can be patched to
 		echo 'SetTitleMatchMode, 2'                                                            >> ${AHK}/varac_configure.ahk
 		echo 'SetTitleMatchMode, slow'                                                         >> ${AHK}/varac_configure.ahk
 		echo '        Run, C:\VarAC\VarAC.exe'                                                 >> ${AHK}/varac_configure.ahk
-		echo '        WinActivate, Change frequency Manually'                                  >> ${AHK}/varac_configure.ahk
-		echo '        WinWait, Change frequency Manually ; Wait for VarAC to open'              >> ${AHK}/varac_configure.ahk
+		echo '        WinWait, Callsign missing ; Wait for VarAC to open'                      >> ${AHK}/varac_configure.ahk
+		echo '        WinActivate, Callsign missing'                                           >> ${AHK}/varac_configure.ahk
 		echo '        Send, {Enter}'                                                           >> ${AHK}/varac_configure.ahk
-		echo '        WinActivate, VarAC'                                                      >> ${AHK}/varac_configure.ahk
+		echo '        WinWait, My Information ; Wait for VarAC to open'                        >> ${AHK}/varac_configure.ahk
+		echo '        WinActivate, My Information'                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Tab}'                                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Tab}'                                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Tab}'                                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {A}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {A}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {0}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {0}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {X}'                                                               >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Tab}'                                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Tab}'                                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Tab}'                                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Tab}'                                                             >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Enter}'                                                           >> ${AHK}/varac_configure.ahk
+		echo '        WinWait, Restart required ; Wait for VarAC to open'                      >> ${AHK}/varac_configure.ahk
+		echo '        WinActivate, Restart required'                                           >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Enter}'                                                           >> ${AHK}/varac_configure.ahk
+		echo '        WinWait, VARA HF ; Wait for VARA to open'                                >> ${AHK}/varac_configure.ahk
+		echo '        WinMinimize, VARA HF ; Minimize VARA'                                    >> ${AHK}/varac_configure.ahk
+		echo '        WinWait, Change frequency Manually ; Wait for VarAC to open'             >> ${AHK}/varac_configure.ahk
+		echo '        WinActivate, Change frequency Manually'                                  >> ${AHK}/varac_configure.ahk
+		echo '        Send, {Enter}'                                                           >> ${AHK}/varac_configure.ahk
 		echo '        WinWait, VarAC ; Wait for VarAC to open'                                 >> ${AHK}/varac_configure.ahk
 		echo '        WinClose, VarAC ; Close VarAC'                                           >> ${AHK}/varac_configure.ahk
 		BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varac_configure.ahk # nobanner option to make console prettier
 		rm ${AHK}/varac_configure.ahk
 		sleep 5
-	            
+	    
+            sed -i 's&Mycall=XXXXXX&Mycall=&' ${HOME}'/VarAC.ini' 2>/dev/null;
+            sed -i 's&MyLocator=AA00XX&MyLocator=&' ${HOME}'/VarAC.ini' 2>/dev/null;
             sed -i 's&LinuxCompatibleMode=OFF&LinuxCompatibleMode=ON&' ${HOME}'/VarAC.ini' 2>/dev/null;
             sed -i 's&VaraModemType=&VaraModemType=VaraHF&' ${HOME}'/VarAC.ini' 2>/dev/null;
             sed -i 's&VarahfMainKissPort=8100&VarahfMainKissPort=8100\nVarahfMainPath=C:\\VARA\\VARA.exe\nVarahfMainPort=8300\nVarahfMonitorPort=8350&' ${HOME}'/VarAC.ini' 2>/dev/null;
