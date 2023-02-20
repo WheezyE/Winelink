@@ -79,14 +79,14 @@ function run_main()
 					run_greeting "${SBC_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
 					run_checkdiskspace "2100" #min space required in MB
 					run_downloadbox86 "14113faa_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
-					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
+					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
 					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
 					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64"
+					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
 					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
@@ -110,7 +110,7 @@ function run_main()
 					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
 					run_custompi3kernel "1" # This kernel installer will ignore 64bit Pi3's since they already have 3G/1G VMem Swap (not needed for 64-bit RPiOS)
 					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
+					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
 					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					;; #"ARM32")
 				"ARM64")
@@ -119,7 +119,7 @@ function run_main()
 					run_checkdiskspace "3500" #min space required in MB
 					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
 					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64"
+					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
 					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
 					;; #"ARM64")
@@ -148,15 +148,15 @@ function run_main()
 				"ARM32")
 					run_greeting "${SBC_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
 					run_checkdiskspace "2100" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
-					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
+					#run_downloadbox86 "14113faa_RK3399" #emulator to run i386-wine on ARM32 # This works but does dynarec work on RK3399?
+					run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
 					run_Sideload_i386wine "devel" "7.1" "ubuntu" "${VERSION_CODENAME}" "-1"
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "ed8e01ea0c69739ced597fecb5c3d61b96c5c761" "RPI4" "ARM64"
+					#run_downloadbox86 "14113faa_RK3399" # This works but does dynarec work on RK3399?
+					run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM64"
 					run_Sideload_i386wine "devel" "7.1" "ubuntu" "${VERSION_CODENAME}" "-1"
 					#run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
@@ -532,7 +532,16 @@ function run_buildbox86() # Compile box64 & box86 on-device (takes a long time, 
                 git clone https://github.com/ptitSeb/box86 && cd box86/
                     git checkout "$commit86"
                     mkdir build; cd build
-                        cmake .. -DARM_DYNAREC=ON -D${series}${arch}=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo
+		    	if [ "${series}" = "RPi" ]; then
+                        	cmake .. -DARM_DYNAREC=ON -D${series}${arch}=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo
+				echo "Compiling box86 for RPi on ${arch}"
+			elif [ "${series}" = "RK3399" ]; then
+				cmake .. -D${series}=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo
+				echo "Compiling box86 for RK3399 on ${arch}"
+			else
+				cmake .. -DARM_DYNAREC=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+				echo "Compiling box86 for unknown SBC on ${arch}"
+			fi
 			if [ "$(nproc)" > 1 ]; then
                         	make -j$(($(nproc)-2)) # compile using all processors minus two (to prevent OS freezes)
 			else
