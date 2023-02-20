@@ -87,7 +87,7 @@ function run_main()
 					run_checkdiskspace "2800" #min space required in MB
 					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7." "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
 				esac #/case $ARCH
