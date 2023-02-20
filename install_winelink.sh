@@ -87,7 +87,7 @@ function run_main()
 					run_checkdiskspace "2800" #min space required in MB
 					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7." "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
 				esac #/case $ARCH
@@ -150,15 +150,16 @@ function run_main()
 					run_checkdiskspace "2100" #min space required in MB
 					run_downloadbox86 "14113faa_RK3399" #emulator to run i386-wine on ARM32 # This works but does dynarec work on RK3399?
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_Sideload_i386wine "devel" "7.1" "ubuntu" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.7" "ubuntu" "${VERSION_CODENAME}" "-1"
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
 					run_downloadbox86 "14113faa_RK3399" # This works but does dynarec work on RK3399?
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "ubuntu" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.7" "ubuntu" "${VERSION_CODENAME}" "-1"
 					#run_Install_i386wineDependencies_RpiOS64bit
+					run_Install_i386wineDependencies_Ubuntu64bit
 					;; #/"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -655,6 +656,46 @@ function run_Install_i386wineDependencies_RpiOS64bit()
 	#	libxi6:armhf libxinerama1:armhf libxrandr2:armhf libxrender1:armhf libxxf86vm1:armhf mesa-va-drivers:armhf osspd:armhf \
 	#	pulseaudio:armhf -y # for i386-wine on aarch64 - TODO: Something in this list makes taskbar disappear (after reboot) in bullseye
 	#	sudo apt-get install libasound2:armhf libpulse0:armhf libxml2:armhf libxslt1.1:armhf libxslt1-dev:armhf -y # fixes i386-wine sound? from Discord
+}
+
+function run_Install_i386wineDependencies_Ubuntu64bit()
+{
+	# Install :armhf libraries to run i386-Wine on Ubuntu 64-bit
+	# - these packages are needed for running box86/wine-i386 on a 64-bit Ubuntu via multiarch
+	echo -e "${GREENTXT}Installing armhf dependencies for i386-Wine on aarch64 . . .${NORMTXT}"
+	sudo dpkg --add-architecture armhf && sudo apt-get update #enable multi-arch
+	
+	#depends main packages - NOTE: This for loop method is inefficient, but ensures packages install even if some are missing.
+	for i in debconf-2.0:armhf debconf:armhf libasound2:armhf libc6:armhf libglib2.0-0:armhf libgphoto2-6:armhf \ 
+		libgphoto2-port12:armhf libgstreamer-plugins-base1.0-0:armhf libgstreamer1.0-0:armhf libldap-2.5-0:armhf \ 
+		libopenal1:armhf libpcap0.8:armhf libpulse0:armhf libsane1:armhf libudev1:armhf libusb-1.0-0:armhf \ 
+		libx11-6:armhf libxext6:armhf ocl-icd-libopencl1:armhf libasound2-plugins:armhf libncurses6:armhf; do
+		sudo apt-get install -y "$i"
+	done
+
+	#depends alternate packages
+	for i in debconf-2.0:armhf libopencl1:armhf libopencl-1.2-1:armhf libncurses5:armhf libncurses:armhf; do
+		sudo apt-get install -y "$i"
+	done
+
+	#recommends main packages
+	for i in libcap2-bin:armhf libcups2:armhf libdbus-1-3:armhf libfontconfig1:armhf libfreetype6:armhf \ 
+		libglu1-mesa:armhf libgnutls30:armhf libgssapi-krb5-2:armhf libkrb5-3:armhf libodbc1:armhf \ 
+		libosmesa6:armhf libsdl2-2.0-0:armhf libv4l-0:armhf libxcomposite1:armhf libxcursor1:armhf \ 
+		libxfixes3:armhf libxi6:armhf libxinerama1:armhf libxrandr2:armhf libxrender1:armhf libxxf86vm1; do
+		sudo apt-get install -y "$i"
+	done
+
+	#recommends alternate packages
+	for i in libglu1:armhf libgnutls28:armhf libgnutls26:armhf; do
+		sudo apt-get install -y "$i"
+	done
+
+	# This list found by downloading...
+	#	wget https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/main/binary-i386/wine-devel-i386_7.7~jammy-1_i386.deb
+	#	wget https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/main/binary-i386/winehq-devel_7.7~jammy-1_i386.deb
+	#	wget https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/main/binary-i386/wine-devel_7.7~jammy-1_i386.deb
+	# then `dpkg-deb -I package.deb`. Read output, add `:armhf` to packages in dep list, then try installing them on Pi aarch64.
 }
 
 function run_Sideload_amd64wineWithi386wine()
