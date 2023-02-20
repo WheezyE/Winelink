@@ -148,15 +148,15 @@ function run_main()
 				"ARM32")
 					run_greeting "${SBC_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
 					run_checkdiskspace "2100" #min space required in MB
-					#run_downloadbox86 "14113faa_RK3399" #emulator to run i386-wine on ARM32 # This works but does dynarec work on RK3399?
-					run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
+					run_downloadbox86 "14113faa_RK3399" #emulator to run i386-wine on ARM32 # This works but does dynarec work on RK3399?
+					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
 					run_Sideload_i386wine "devel" "7.1" "ubuntu" "${VERSION_CODENAME}" "-1"
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
-					#run_downloadbox86 "14113faa_RK3399" # This works but does dynarec work on RK3399?
-					run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM64"
+					run_downloadbox86 "14113faa_RK3399" # This works but does dynarec work on RK3399?
+					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM64"
 					run_Sideload_i386wine "devel" "7.1" "ubuntu" "${VERSION_CODENAME}" "-1"
 					#run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
