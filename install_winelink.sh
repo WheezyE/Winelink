@@ -87,7 +87,7 @@ function run_main()
 					run_checkdiskspace "2800" #min space required in MB
 					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7." "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
 				esac #/case $ARCH
@@ -143,7 +143,7 @@ function run_main()
 			;; #/"")
 		"OrangePi4")
 			case $ID in
-			"ubuntu") # Orange Pi 4 LTS with Ubuntu OS
+			"ubuntu") # Orange Pi 4 LTS with Ubuntu OS. Thank you Ole W. Saastad (LB4PJ) for sharing your OrangePi 4 LTS to test with!
 				case $ARCH in # determine 32-bit or 64-bit Ubuntu
 				"ARM32")
 					run_greeting "${SBC_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
@@ -159,7 +159,8 @@ function run_main()
 					run_downloadbox86 "14113faa_rk3399"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM64" #takes longer than downloading
 					#run_Install_i386wineDependencies_Ubuntu64bit #NOTE: My first attempt at this corrupted an OrangePi4 a bit. Needs more testing.
-					#run_Sideload_i386wine "devel" "7.7" "ubuntu" "${VERSION_CODENAME}" "-1" # THIS IS BROKEN FOR SOME REASONrun_Install_i386wineDependencies_RpiOS64bit
+					run_Install_i386wineDependencies_RpiOS64bit
+					#run_Sideload_i386wine "devel" "7.7" "ubuntu" "${VERSION_CODENAME}" "-1" # THIS IS BROKEN FOR SOME REASON
 					run_Sideload_i386wine "devel" "7.7" "debian" "bullseye" "-1" #kludge: Use debian wine on ubuntu for now
 					;; #/"ARM64")
 				esac #/case $ARCH
@@ -454,13 +455,13 @@ function run_downloadbox86()  # Download & install Box86. (This function needs a
 {
     local version="$1"
     
-    if [ "$arch" == "ARM64" ]; then
+    if [ "$ARCH" == "ARM64" ]; then
 	sudo dpkg --add-architecture armhf && sudo apt-get update
 	sudo apt-get install libc6:armhf -y # needed to run box86:armhf on aarch64
 	#sudo apt-get install libgtk2.0-0:armhf libsdl2-image-2.0-0:armhf libsdl1.2debian:armhf \
 	#	libopenal1:armhf libvorbisfile3:armhf libgl1:armhf libjpeg62:armhf libcurl4:armhf \
 	#	libasound2-plugins:armhf -y # not sure if needed. from: https://box86.org/2022/03/box86-box64-vs-qemu-vs-fex-vs-rosetta2/
-    elif [ "$arch" == "ARM32" ]; then
+    elif [ "$ARCH" == "ARM32" ]; then
     	:
     fi
     sudo apt-get install p7zip-full -y # TODO: remove redundant apt-get installs - put them at top of script.
