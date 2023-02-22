@@ -1038,7 +1038,7 @@ function run_installvarAC()  # Download/extract/install varAC chat app
     mkdir downloads 2>/dev/null; cd downloads
         # Download varAC linux working version 6.1 (static Link as no dynamic link known at the moment)
             echo -e "\n${GREENTXT}Downloading and installing VarAC . . .${NORMTXT}\n"
-            wget -q https://varac.hopp.to/varac_latest || { echo "VarAC download failed!" && run_giveup; }
+            wget -q -r -l1 -np -nd https://288b5dcd-0898-4460-b829-4a40f1724acf.usrfiles.com/archives/288b5d_c0231e0495a34733b30bdd5155276fb3.zip -O varac_latest || { echo "VarAC download failed!" && run_giveup; }
             
         # Extract/install VarAC
             mkdir -p ${HOME}/.wine/drive_c/VarAC
