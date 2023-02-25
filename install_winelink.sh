@@ -158,10 +158,10 @@ function run_main()
 					run_checkdiskspace "2100" #min space required in MB
 					run_downloadbox86 "14113faa_rk3399"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM64" #takes longer than downloading
-					#run_Install_i386wineDependencies_Ubuntu64bit #NOTE: My first attempt at this corrupted an OrangePi4 a bit. Needs more testing.
-					run_Install_i386wineDependencies_RpiOS64bit
 					#run_Sideload_i386wine "devel" "7.7" "ubuntu" "${VERSION_CODENAME}" "-1" # THIS IS BROKEN FOR SOME REASON
 					run_Sideload_i386wine "devel" "7.7" "debian" "bullseye" "-1" #kludge: Use debian wine on ubuntu for now
+					run_Install_i386wineDependencies_Ubuntu64bit
+					#run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -664,28 +664,27 @@ function run_Install_i386wineDependencies_Ubuntu64bit()
 	echo -e "${GREENTXT}Installing armhf dependencies for i386-Wine on aarch64 . . .${NORMTXT}"
 	sudo dpkg --add-architecture armhf && sudo apt-get update #enable multi-arch
 	
-	#depends main packages - NOTE: This for loop method is inefficient, but ensures packages install even if some are missing.
+	# NOTE: This for loop method is inefficient, but ensures packages install even if some are missing.
 	for i in 'libasound2:armhf' 'libc6:armhf' 'libglib2.0-0:armhf' 'libgphoto2-6:armhf' 'libgphoto2-port12:armhf' 'libgstreamer-plugins-base1.0-0:armhf' 'libgstreamer1.0-0:armhf' 'libldap-2.5-0:armhf' 'libopenal1:armhf' 'libpcap0.8:armhf' 'libpulse0:armhf' 'libsane1:armhf' 'libudev1:armhf' 'libusb-1.0-0:armhf' 'libx11-6:armhf' 'libxext6:armhf' 'ocl-icd-libopencl1:armhf' 'libasound2-plugins:armhf' 'libncurses6:armhf'; do
-		sudo apt-get install -y "$i"
+		sudo apt-get install -y "$i" #depends main packages
 		done
-	sudo apt-get install -y 'libunwind8:armhf' #amd64-wine likes this package too
-
-	#depends alternate packages
 	for i in 'libopencl1:armhf' 'libopencl-1.2-1:armhf' 'libncurses5:armhf' 'libncurses:armhf'; do
-		sudo apt-get install -y "$i"
+		sudo apt-get install -y "$i" #depends alternate packages
 		done
-
-	#recommends main packages
 	for i in 'libcap2-bin:armhf' 'libcups2:armhf' 'libdbus-1-3:armhf' 'libfontconfig1:armhf' 'libfreetype6:armhf' 'libglu1-mesa:armhf' 'libgnutls30:armhf' 'libgssapi-krb5-2:armhf' 'libkrb5-3:armhf' 'libodbc1:armhf' 'libosmesa6:armhf' 'libsdl2-2.0-0:armhf' 'libv4l-0:armhf' 'libxcomposite1:armhf' 'libxcursor1:armhf' 'libxfixes3:armhf' 'libxi6:armhf' 'libxinerama1:armhf' 'libxrandr2:armhf' 'libxrender1:armhf' 'libxxf86vm1'; do
-		sudo apt-get install -y "$i"
+		sudo apt-get install -y "$i" #recommends main packages
 		done
-	sudo apt-get install -y 'libjpeg62-turbo:armhf' #amd64-wine likes this package too
-
-	#recommends alternate packages
 	for i in 'libglu1:armhf' 'libgnutls28:armhf' 'libgnutls26:armhf'; do
-		sudo apt-get install -y "$i"
+		sudo apt-get install -y "$i" #recommends alternate packages
 		done
-	sudo apt-get install -y 'libjpeg8:armhf' #amd64-wine likes this package too 
+	
+	#amd64-wine likes these packages too?
+	sudo apt-get install -y 'libunwind8:armhf' 
+	sudo apt-get install -y 'libjpeg62-turbo:armhf'
+	sudo apt-get install -y 'libjpeg8:armhf'
+	
+	# Ubuntu will complain about /usr/lib/arm-linux-gnueabihf/ld-linux-armhf.so.3 crashing /usr/sbin/capsh. We can silent the error message.
+	sudo sed -i 's+enabled=1+enabled=0+g' /etc/default/apport
 
 	# This list found by downloading...
 	#	wget https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/main/binary-i386/wine-devel-i386_7.7~jammy-1_i386.deb
