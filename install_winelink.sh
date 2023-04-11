@@ -44,9 +44,12 @@ function run_main()
     ### Clean up previous runs (or failed runs) of this script
         sudo rm install_winelink.sh 2>/dev/null # silently remove this script so it cannot be re-run by accident
         sudo rm -rf ${HOME}/winelink 2>/dev/null # silently clean up any failed past runs of this script
-        sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop \
-                ${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop ${STARTMENU}/vara-soundcardsetup.desktop \
-                ${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop ${STARTMENU}/VarAC.desktop 2>/dev/null # remove old shortcuts
+        sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/rmssimpleterminal.desktop \
+                ${STARTMENU}/rmstrimode.desktop ${STARTMENU}/rmsadifanalyzer.desktop \
+                ${STARTMENU}/rmspacket.desktop ${STARTMENU}/rmsrelay.desktop ${STARTMENU}/rmslinktest.desktop \
+                ${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop ${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop \
+                ${STARTMENU}/vara-soundcardsetup.desktop ${STARTMENU}/vara-update.desktop ${STARTMENU}/VarAC.desktop \
+                ${STARTMENU}/resetwine.desktop 2>/dev/null # remove old shortcuts
         rm ${HOME}/RMS\ Express\ *.log 2>/dev/null # silently remove old RMS Express logs
         rm ${HOME}/VarAC.ini ${HOME}/VarAC_cat_commands.ini ${HOME}/VarAC_frequencies.conf ${HOME}/VarAC_frequency_schedule.conf ${HOME}/VarAC_alert_tags.conf
         
@@ -328,9 +331,18 @@ function run_main()
             if [ "$ARG" = "vara_only" ] || [ "$ARG" = "bap" ]; then #TODO: Am I using brackets and ='s correctly?
                 run_installvara
             else
-                run_installrms
-                run_installvara
-                run_installvarAC
+                run_installrmsexpress # main Winlink program for most users
+
+                run_installrmstrimode # sysop programs
+                run_installrmsadifanalyzer
+
+                run_installrmsterminal # misc sysop programs
+                run_installrmslinktest
+                run_installrmsrelay
+                run_installrmspacket
+
+                run_installvara # VARA HF, FM, Chat
+                run_installvarAC # unofficial VARA HF Chat program
             fi
         
         ### Post-installation
@@ -997,7 +1009,7 @@ function run_installahk()
     cd ..
 }
 
-function run_installrms()  # Download/extract/install RMS Express
+function run_installrmsexpress()  # Download/extract/install RMS Express
 {
     mkdir downloads 2>/dev/null; cd downloads
         # Download RMS Express (no matter its version number) [https://downloads.winlink.org/User%20Programs/]
@@ -1012,13 +1024,13 @@ function run_installrms()  # Download/extract/install RMS Express
 
         # Extract/install RMS Express
             7z x Winlink_Express_install_*.zip -o"WinlinkExpressInstaller" -y -bsp0 -bso0
-            wine WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
+            WINEDEBUG=-all wine WinlinkExpressInstaller/Winlink_Express_install.exe /SILENT
 	    
 	# Clean up
             rm -rf WinlinkExpressInstaller
 	    sleep 3; sudo rm -rf ~/.local/share/applications/wine/Programs/RMS\ Express/ # Remove wine's auto-generated program icon from the start menu
             
-        # Make a RMS Express desktop shortcut
+        # Make an RMS Express desktop shortcut
             echo '[Desktop Entry]'                                                                             | sudo tee ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Name=Winlink Express'                                                                        | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'GenericName=Winlink Express'                                                                 | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
@@ -1030,6 +1042,187 @@ function run_installrms()  # Download/extract/install RMS Express
             echo 'Icon=219D_RMS Express.0'                                                                     | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'StartupWMClass=rms express.exe'                                                              | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Categories=HamRadio;'                                                                        | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
+    cd ..
+}
+
+function run_installrmsterminal()
+{
+    mkdir downloads 2>/dev/null; cd downloads
+        # Download RMS Terminal (no matter its version number) [https://downloads.winlink.org/Sysop%20Programs/]
+            echo -e "\n${GREENTXT}Downloading and installing RMS Simple Terminal . . .${NORMTXT}\n"
+            wget -q -r -l1 -np -nd -A "RMS_Simple_Terminal_install_*.zip" https://downloads.winlink.org/Sysop%20Programs || { echo "RMS Simple Terminal download failed!" && run_giveup; }
+
+        # Extract/install RMS Terminal
+            7z x RMS_Simple_Terminal_install_*.zip -o"RMSTerminalInstaller" -y -bsp0 -bso0
+            WINEDEBUG=-all wine msiexec /i RMSTerminalInstaller/RMS\ Simple\ Terminal\ Setup.msi /quiet
+
+	# Clean up
+            rm -rf RMSTerminalInstaller
+	    #sleep 3; sudo rm -rf ~/.local/share/applications/wine/Programs/RMS\ Simple\ Terminal/ # Remove wine's auto-generated program icon from the start menu
+
+        # Make an RMS Simple Terminal desktop shortcut
+            echo '[Desktop Entry]'                                                                                               | sudo tee ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'Name=RMS Simple Terminal'                                                                                      | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'GenericName=RMS Simple Terminal'                                                                               | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'Comment=RMS Simple Terminal emulated with Box86/Wine'                                                          | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Simple\ Terminal/RMS\ Simple\ Terminal.exe' | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            #echo 'Icon=none.0'                                                                                                   | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'StartupWMClass=rms simple terminal.exe'                                                                        | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                                          | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+    cd ..
+}
+
+function run_installrmstrimode()  # Download/extract/install RMS Express
+{
+    mkdir downloads 2>/dev/null; cd downloads
+        # Download RMS Trimode (no matter its version number) [https://downloads.winlink.org/Sysop%20Programs/]
+            echo -e "\n${GREENTXT}Downloading and installing RMS Trimode . . .${NORMTXT}\n"
+            wget -q -r -l1 -np -nd -A "RMS_Trimode_install_*.zip" https://downloads.winlink.org/Sysop%20Programs || { echo "RMS Trimode download failed!" && run_giveup; }
+
+        # We could also use curl if we don't want to use wget to find the link . . .
+            #RMSTRILINKPREFIX="https://downloads.winlink.org"
+            #RMSTRILINKSUFFIX=$(curl -s https://downloads.winlink.org/User%20Programs/ | grep -oP '(?=/Sysop%20Programs/RMS_Trimode_install_).*?(\.zip).*(?=">RMS_Trimode_install_)')
+            #RMSTRILINK=$RMSTRILINKPREFIX$RMSTRILINKSUFFIX
+            #wget -q $RMSTRILINK || { echo "RMS Trimode download failed!" && run_giveup; }
+
+        # Extract/install RMS Trimode
+            7z x RMS_Trimode_install_*.zip -o"RMSTrimodeInstaller" -y -bsp0 -bso0
+            WINEDEBUG=-all wine RMSTrimodeInstaller/RMS_Trimode_install.exe /SILENT
+
+	# Clean up
+            rm -rf RMSTrimodeInstaller
+	    sleep 3; sudo rm -rf ~/.local/share/applications/wine/Programs/RMS\ Trimode/ # Remove wine's auto-generated program icon from the start menu
+
+        # Make an RMS Trimode desktop shortcut
+            echo '[Desktop Entry]'                                                                                               | sudo tee ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Name=RMS Trimode'                                                                                              | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'GenericName=RMS Trimode'                                                                                       | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Comment=RMS Trimode emulated with Box86/Wine'                                                                  | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Trimode/RMS\ Trimode.exe' | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Icon=C4A8_RMS Trimode.0'                                                                                       | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'StartupWMClass=rms trimode.exe'                                                                                | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                                          | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+    cd ..
+}
+
+function run_installrmsadifanalyzer()
+{
+    mkdir downloads 2>/dev/null; cd downloads
+        # Download RMS ADIF Analyzer (no matter its version number) [https://downloads.winlink.org/Sysop%20Programs/]
+            echo -e "\n${GREENTXT}Downloading and installing ADIF Analyzer (companion app for RMS Trimode) . . .${NORMTXT}\n"
+            wget -q -r -l1 -np -nd -A "ADIF_Analyzer_install_*.zip" https://downloads.winlink.org/Sysop%20Programs || { echo "RMS ADIF Analyzer download failed!" && run_giveup; }
+
+        # Extract/install RMS ADIF Analyzer
+            7z x ADIF_Analyzer_install_*.zip -o"RMSADIFInstaller" -y -bsp0 -bso0
+            WINEDEBUG=-all wine RMSADIFInstaller/ADIF_Analyzer_install.exe /SILENT
+	    #TODO: Extract .ico from exe, convert to .png, and save as .0 in ${HOME}/.local/share/icons/hicolor/48x48/apps/
+
+	# Clean up
+            rm -rf RMSADIFInstaller
+	    sleep 3; sudo rm -rf ~/.local/share/applications/wine/Programs/ADIF\ Analyzer/ # Remove wine's auto-generated program icon from the start menu
+
+        # Make an RMS ADIF Analyzer desktop shortcut
+            echo '[Desktop Entry]'                                                                                               | sudo tee ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Name=RMS ADIF Analyzer'                                                                                        | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'GenericName=RMS ADIF Analyzer'                                                                                 | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Comment=ADIF Analyzer emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/ADIF\ Analyzer/ADIF\ Analyzer.exe' | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Icon=2BD9_ADIF Analyzer.0'                                                                                     | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'StartupWMClass=adif analyzer.exe'                                                                              | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                                          | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+    cd ..
+}
+
+function run_installrmspacket()
+{
+    mkdir downloads 2>/dev/null; cd downloads
+        # Download RMS Packet (no matter its version number) [https://downloads.winlink.org/Sysop%20Programs/]
+            echo -e "\n${GREENTXT}Downloading and installing RMS Packet . . .${NORMTXT}\n"
+            wget -q -r -l1 -np -nd -A "RMS_Packet_install_*.zip" https://downloads.winlink.org/Sysop%20Programs || { echo "RMS Packet download failed!" && run_giveup; }
+
+        # Extract/install RMS Packet
+            7z x RMS_Packet_install_*.zip -o"RMSPacketInstaller" -y -bsp0 -bso0
+            WINEDEBUG=-all wine RMSPacketInstaller/RMS_Packet_install.exe /SILENT
+
+	# Clean up
+            rm -rf RMSPacketInstaller
+	    sleep 3; sudo rm -rf ~/.local/share/applications/wine/Programs/RMS\ Packet/ # Remove wine's auto-generated program icon from the start menu
+
+        # Make an RMS Packet desktop shortcut
+            echo '[Desktop Entry]'                                                                                             | sudo tee ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Name=RMS Packet'                                                                                             | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'GenericName=RMS Packet'                                                                                      | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Comment=RMS Packet emulated with Box86/Wine'                                                                 | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Packet/RMS\ Packet.exe' | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Type=Application'                                                                                            | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                                          | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Icon=3563_RMS Packet.0'                                                                                      | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'StartupWMClass=rms packet.exe'                                                                               | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                                        | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+    cd ..
+}
+
+function run_installrmsrelay()
+{
+    mkdir downloads 2>/dev/null; cd downloads
+        # Download RMS Relay (no matter its version number) [https://downloads.winlink.org/Sysop%20Programs/]
+            echo -e "\n${GREENTXT}Downloading and installing RMS Relay . . .${NORMTXT}\n"
+            wget -q -r -l1 -np -nd -A "RMS_Relay_install_*.zip" https://downloads.winlink.org/Sysop%20Programs || { echo "RMS Relay download failed!" && run_giveup; }
+
+        # Extract/install RMS Relay
+            7z x RMS_Relay_install_*.zip -o"RMSRelayInstaller" -y -bsp0 -bso0
+            WINEDEBUG=-all wine RMSRelayInstaller/RMS_Relay_install.exe /SILENT
+
+	# Clean up
+            rm -rf RMSRelayInstaller
+	    #sleep 3; sudo rm -rf ~/.local/share/applications/wine/Programs/RMS\ Relay/ # Remove wine's auto-generated program icon from the start menu
+
+        # Make an RMS Relay desktop shortcut
+            echo '[Desktop Entry]'                                                                                           | sudo tee ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'Name=RMS Relay'                                                                                            | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'GenericName=RMS Relay'                                                                                     | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'Comment=RMS Relay emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Relay/RMS\ Relay.exe' | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'Type=Application'                                                                                          | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                                        | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            #echo 'Icon=2BD9_ADIF Analyzer.0'                                                                                 | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'StartupWMClass=rms relay.exe'                                                                              | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                                      | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+    cd ..
+}
+
+function run_installrmslinktest()
+{
+    mkdir downloads 2>/dev/null; cd downloads
+        # Download RMS Link Test (no matter its version number) [https://downloads.winlink.org/Sysop%20Programs/]
+            echo -e "\n${GREENTXT}Downloading and installing RMS Link Test . . .${NORMTXT}\n"
+            wget -q -r -l1 -np -nd -A "RMS_Link_Test_install_*.zip" https://downloads.winlink.org/Sysop%20Programs || { echo "RMS Link Test download failed!" && run_giveup; }
+
+        # Extract/install RMS Link Test
+            7z x RMS_Link_Test_install_*.zip -o"RMSLinkTestInstaller" -y -bsp0 -bso0
+            WINEDEBUG=-all wine RMSLinkTestInstaller/RMS_Link_Test_install.exe /SILENT
+
+	# Clean up
+            rm -rf RMSLinkTestInstaller
+	    sleep 3; sudo rm -rf ~/.local/share/applications/wine/Programs/RMS\ Link\ Test/ # Remove wine's auto-generated program icon from the start menu
+
+        # Make an RMS Link Test desktop shortcut
+            echo '[Desktop Entry]'                                                                                               | sudo tee ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Name=RMS Link Test'                                                                                            | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'GenericName=RMS Link Test'                                                                                     | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Comment=RMS Link Test emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Link\ Test/RMS\ Link\ Test.exe' | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Icon=C08D_RMS Link Test.0'                                                                                     | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'StartupWMClass=rms link test.exe'                                                                              | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Categories=HamRadio;'                                                                                          | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
     cd ..
 }
 
@@ -1590,9 +1783,12 @@ function run_makeuninstallscript()
 		UNWL=$? # the answer of the yes/no questions is stored in the $? variable ( 0 = yes, 1 = no ).
 		if	[ "$UNWL" = 0 ]; # If user answered 'yes', then ...
 		then
-			sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop \
-				${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop ${STARTMENU}/vara-soundcardsetup.desktop \
-				${STARTMENU}/vara-update.desktop ${STARTMENU}/resetwine.desktop ${STARTMENU}/VarAC.desktop 2>/dev/null # remove old shortcuts
+			sudo rm ${STARTMENU}/winlinkexpress.desktop ${STARTMENU}/rmssimpleterminal.desktop \
+				${STARTMENU}/rmstrimode.desktop ${STARTMENU}/rmsadifanalyzer.desktop \
+				${STARTMENU}/rmspacket.desktop ${STARTMENU}/rmsrelay.desktop ${STARTMENU}/rmslinktest.desktop \
+				${STARTMENU}/vara.desktop ${STARTMENU}/vara-fm.desktop ${STARTMENU}/vara-sat.desktop ${STARTMENU}/vara-chat.desktop \
+				${STARTMENU}/vara-soundcardsetup.desktop ${STARTMENU}/vara-update.desktop ${STARTMENU}/VarAC.desktop \
+				${STARTMENU}/resetwine.desktop 2>/dev/null # remove old shortcuts
 			sudo rm -rf ${HOME}/winelink 2>/dev/null
 			rm ${HOME}/RMS\ Express\ *.log 2>/dev/null # silently remove old RMS Express logs
 			rm ${HOME}/VarAC.ini ${HOME}/VarAC_cat_commands.ini ${HOME}/VarAC_frequencies.conf ${HOME}/VarAC_frequency_schedule.conf ${HOME}/VarAC_alert_tags.conf
