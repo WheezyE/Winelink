@@ -1,12 +1,12 @@
 ![logo](WinelinkLogo.png "Project logo")
 # Winɘlink
-A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4.
+A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4, Orange Pi 4 LTS, and x86/x64 Linux (Mint/Ubuntu/Debian).  Raspberry Pi 3B+ also kind of works.
 
 _This project has lots of bugs and should be considered [alpha](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha) software._
 
 ------------------------
 ![Winlink-Pi4](Winlink-Pi4.gif)
-_RMS Express & VARA running on a Raspberry Pi 4B (RPiOS) [video sped-up]_
+_RMS Express/Trimode & VARA running on a Raspberry Pi 4B (RPiOS) [video sped-up]_
 
 ------------------------
 ![VARA-Pi4](VARA-Pi4.png "VARA running on a Raspberry Pi 4B (Twister OS)")
