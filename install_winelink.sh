@@ -83,14 +83,14 @@ function run_main()
 					run_checkdiskspace "2100" #min space required in MB
 					run_downloadbox86 "14113faa_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
 					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
 				esac #/case $ARCH
@@ -114,7 +114,7 @@ function run_main()
 					run_custompi3kernel "1" # This kernel installer will ignore 64bit Pi3's since they already have 3G/1G VMem Swap (not needed for 64-bit RPiOS)
 					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					;; #"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH}" "28" "3.5" "${ARG}"
@@ -123,7 +123,7 @@ function run_main()
 					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
 					run_downloadbox86 "14113faa_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
 					;; #"ARM64")
 				esac #/case $ARCH
@@ -154,7 +154,7 @@ function run_main()
 					run_downloadbox86 "14113faa_rk3399" #emulator to run i386-wine on ARM32
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
 					#run_Sideload_i386wine "devel" "7.7" "ubuntu" "${VERSION_CODENAME}" "-1"
-					run_Sideload_i386wine "devel" "7.7" "debian" "bullseye" "-1" #kludge: Use debian wine on ubuntu for now
+					run_Sideload_i386wine "devel" "7.22" "debian" "bullseye" "-1" #kludge: Use debian wine on ubuntu for now
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
@@ -162,7 +162,7 @@ function run_main()
 					run_downloadbox86 "14113faa_rk3399"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RK3399" "ARM64" #takes longer than downloading
 					#run_Sideload_i386wine "devel" "7.7" "ubuntu" "${VERSION_CODENAME}" "-1" # THIS IS BROKEN FOR SOME REASON
-					run_Sideload_i386wine "devel" "7.7" "debian" "bullseye" "-1" #kludge: Use debian wine on ubuntu for now
+					run_Sideload_i386wine "devel" "7.22" "debian" "bullseye" "-1" #kludge: Use debian wine on ubuntu for now
 					run_Install_i386wineDependencies_Ubuntu64bit
 					#run_Install_i386wineDependencies_RpiOS64bit
 					;; #/"ARM64")
