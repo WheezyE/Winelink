@@ -81,14 +81,14 @@ function run_main()
 				"ARM32")
 					run_greeting "${SBC_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
 					run_checkdiskspace "2100" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
+					run_downloadbox86 "5cdc1b9f_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
 					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4"
+					run_downloadbox86 "5cdc1b9f_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
 					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
@@ -112,7 +112,7 @@ function run_main()
 					run_checkdiskspace "4100" #min space required in MB
 					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
 					run_custompi3kernel "1" # This kernel installer will ignore 64bit Pi3's since they already have 3G/1G VMem Swap (not needed for 64-bit RPiOS)
-					run_downloadbox86 "14113faa_RPi4"
+					run_downloadbox86 "5cdc1b9f_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
 					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					;; #"ARM32")
@@ -121,7 +121,7 @@ function run_main()
 					#ARG="bap" # Force-skip RMS Express installation (since it doesn't run great on RPi3B+)
 					run_checkdiskspace "3500" #min space required in MB
 					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
-					run_downloadbox86 "14113faa_RPi4"
+					run_downloadbox86 "5cdc1b9f_RPi4"
 					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
 					run_Sideload_i386wine "devel" "7.22" "debian" "${VERSION_CODENAME}" "-1"
 					run_Install_i386wineDependencies_RpiOS64bit
