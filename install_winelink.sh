@@ -334,7 +334,7 @@ function run_main()
                 run_installrmsexpress # main Winlink program for most users
 
                 run_installrmstrimode # sysop programs
-                run_installrmsadifanalyzer
+                run_installrmsadifanalyzer #broken for box86 - 6/22/2023
 
                 run_installrmsterminal # misc sysop programs
                 run_installrmslinktest
@@ -342,7 +342,7 @@ function run_main()
                 run_installrmspacket
 
                 run_installvara # VARA HF, FM, Chat
-                run_installvarAC # unofficial VARA HF Chat program
+                #run_installvarAC # unofficial VARA HF Chat program
             fi
         
         ### Post-installation
@@ -352,7 +352,7 @@ function run_main()
                 : # If 'bap' is passed to this script, then don't run run_varasoundcardsetup
             else
                 run_varasoundcardsetup
-                run_varACsetup
+                #run_varACsetup
             fi
 	    run_makeuninstallscript
 	    
@@ -572,70 +572,77 @@ function run_buildbox86() # Compile box64 & box86 on-device (takes a long time, 
 }
 
 function run_Sideload_i386wine() {
-	# NOTE: We only really need i386-wine/box86 on RPiOS 64/32-bit for RMS Express and VARA since they are 32-bit.
-	# We don't need really amd64-wine64/box64 for our purposes of running RMS Express and VARA.
-
 	# Wine version variables
 	local branch="$1" #example: "devel" or "stable" without quotes (wine-staging 4.5+ depends on libfaudio0 and requires more install steps)
 	local version="$2" #example: "7.1"
 	local id="$3" #example: debian ($ID_LIKE) - TODO: implement other distros, like Ubuntu
 	local dist="$4" #example: bullseye ($VERSION_CODENAME)
 	local tag="$5" #example: -1
-
-	# Clean up any old wine instances
-	wineserver -k &> /dev/null # stop any old wine installations from running - TODO: double-check this command
-	rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
-	rm -rf ~/.local/share/applications/wine # remove any old program shortcuts
-
-	# Backup any old wine installs
-	rm -rf ~/wine-old 2>/dev/null; mv ~/wine ~/wine-old 2>/dev/null
-	rm -rf ~/.wine-old 2>/dev/null; mv ~/.wine ~/.wine-old 2>/dev/null
-	sudo mv /usr/local/bin/wine /usr/local/bin/wine-old 2>/dev/null
-	sudo mv /usr/local/bin/wineboot /usr/local/bin/wineboot-old 2>/dev/null
-	sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old 2>/dev/null
-	sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old 2>/dev/null
-
-	# Wine download links from WineHQ: https://dl.winehq.org/wine-builds/
-	#LNKA="https://dl.winehq.org/wine-builds/${id}/dists/${dist}/main/binary-amd64/" #amd64-wine links
-	#DEB_A1="wine-${branch}-amd64_${version}~${dist}${tag}_amd64.deb" #wine64 main bin
-	#DEB_A2="wine-${branch}_${version}~${dist}${tag}_amd64.deb" #wine64 support files (required for wine64 / can work alongside wine_i386 main bin)
-		#DEB_A3="winehq-${branch}_${version}~${dist}${tag}_amd64.deb" #shortcuts & docs?
-	LNKB="https://dl.winehq.org/wine-builds/${id}/dists/${dist}/main/binary-i386/" #i386-wine links
-	DEB_B1="wine-${branch}-i386_${version}~${dist}${tag}_i386.deb" #wine_i386 main bin
-	DEB_B2="wine-${branch}_${version}~${dist}${tag}_i386.deb" #wine_i386 support files (required for wine_i386 if no wine64 / CONFLICTS WITH wine64 support files)
-		#DEB_B3="winehq-${branch}_${version}~${dist}${tag}_i386.deb" #shortcuts & docs?
-
-	# Download, extract wine, and install wine
-	mkdir downloads 2>/dev/null; cd downloads
-		echo -e "${GREENTXT}Downloading wine . . .${NORMTXT}" # Install i386-wine (32-bit)
-		wget -q ${LNKB}${DEB_B1} || { echo "${DEB_B1} download failed!" && run_giveup; }
-		wget -q ${LNKB}${DEB_B2} || { echo "${DEB_B2} download failed!" && run_giveup; }
-		echo -e "${GREENTXT}Extracting wine . . .${NORMTXT}"
-		dpkg-deb -x ${DEB_B1} wine-installer
-		dpkg-deb -x ${DEB_B2} wine-installer
-		echo -e "${GREENTXT}Installing wine . . .${NORMTXT}\n"
-		mv wine-installer/opt/wine* ~/wine
+ 
+	# if [ $WINEVER is populated (indicating wine is the desired version) ] && [ dotnet4 is installed (indicating wine is functioning) ] then skip re-wine install.
+	local WINEVER=$(wine --version | grep "$version\b")
+	if [ ! -z "$WINEVER" ] && [ -d "$HOME/.wine/drive_c/windows/Microsoft.NET/Framework/v4.0.30319" ]
+	then
+		echo "Wine has already been installed and run. Skipping wine installation."
+	else	
+		# NOTE: We only really need i386-wine/box86 on RPiOS 64/32-bit for RMS Express and VARA since they are 32-bit.
+		# We don't need really amd64-wine64/box64 for our purposes of running RMS Express and VARA.
 		
-		## Install amd64-wine (64-bit) and i386-wine (32-bit)
-		#echo -e "\n${GREENTXT}Downloading wine . . .${NORMTXT}"
-		#wget -q ${LNKA}${DEB_A1} || { echo "${DEB_A1} download failed!" && run_giveup; }
-		#wget -q ${LNKA}${DEB_A2} || { echo "${DEB_A2} download failed!" && run_giveup; }
-		#wget -q ${LNKB}${DEB_B1} || { echo "${DEB_B1} download failed!" && run_giveup; }
-		#echo -e "${GREENTXT}Extracting wine . . .${NORMTXT}"
-		#dpkg-deb -x ${DEB_A1} wine-installer
-		#dpkg-deb -x ${DEB_A2} wine-installer
-		#dpkg-deb -x ${DEB_B1} wine-installer
-		#echo -e "${GREENTXT}Installing wine . . .${NORMTXT}\n"
-		#mv wine-installer/opt/wine* ~/wine	
-	cd ..
-
-	# Install symlinks (and make 32bit launcher. Credits: grayduck, Botspot) - TODO: Try to remove linux32 flag
-	echo -e '#!/bin/bash\nsetarch linux32 -L '"$HOME/wine/bin/wine "'"$@"' | sudo tee -a /usr/local/bin/wine >/dev/null # script to launch wine programs as 32bit only
-	#sudo ln -s ~/wine/bin/wine /usr/local/bin/wine # you could also just make a symlink, but box86 only works for 32bit apps at the moment
-	sudo ln -s ~/wine/bin/wineboot /usr/local/bin/wineboot
-	sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
-	sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
-	sudo chmod +x /usr/local/bin/wine /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver
+		# Clean up any old wine instances
+		wineserver -k &> /dev/null # stop any old wine installations from running - TODO: double-check this command
+		rm -rf ~/.cache/wine # remove any old wine-mono or wine-gecko install files in case wine was installed previously
+		rm -rf ~/.local/share/applications/wine # remove any old program shortcuts
+	
+		# Backup any old wine installs
+		rm -rf ~/wine-old 2>/dev/null; mv ~/wine ~/wine-old 2>/dev/null
+		rm -rf ~/.wine-old 2>/dev/null; mv ~/.wine ~/.wine-old 2>/dev/null
+		sudo mv /usr/local/bin/wine /usr/local/bin/wine-old 2>/dev/null
+		sudo mv /usr/local/bin/wineboot /usr/local/bin/wineboot-old 2>/dev/null
+		sudo mv /usr/local/bin/winecfg /usr/local/bin/winecfg-old 2>/dev/null
+		sudo mv /usr/local/bin/wineserver /usr/local/bin/wineserver-old 2>/dev/null
+	
+		# Wine download links from WineHQ: https://dl.winehq.org/wine-builds/
+		#LNKA="https://dl.winehq.org/wine-builds/${id}/dists/${dist}/main/binary-amd64/" #amd64-wine links
+		#DEB_A1="wine-${branch}-amd64_${version}~${dist}${tag}_amd64.deb" #wine64 main bin
+		#DEB_A2="wine-${branch}_${version}~${dist}${tag}_amd64.deb" #wine64 support files (required for wine64 / can work alongside wine_i386 main bin)
+			#DEB_A3="winehq-${branch}_${version}~${dist}${tag}_amd64.deb" #shortcuts & docs?
+		LNKB="https://dl.winehq.org/wine-builds/${id}/dists/${dist}/main/binary-i386/" #i386-wine links
+		DEB_B1="wine-${branch}-i386_${version}~${dist}${tag}_i386.deb" #wine_i386 main bin
+		DEB_B2="wine-${branch}_${version}~${dist}${tag}_i386.deb" #wine_i386 support files (required for wine_i386 if no wine64 / CONFLICTS WITH wine64 support files)
+			#DEB_B3="winehq-${branch}_${version}~${dist}${tag}_i386.deb" #shortcuts & docs?
+	
+		# Download, extract wine, and install wine
+		mkdir downloads 2>/dev/null; cd downloads
+			echo -e "${GREENTXT}Downloading wine . . .${NORMTXT}" # Install i386-wine (32-bit)
+			wget -q ${LNKB}${DEB_B1} || { echo "${DEB_B1} download failed!" && run_giveup; }
+			wget -q ${LNKB}${DEB_B2} || { echo "${DEB_B2} download failed!" && run_giveup; }
+			echo -e "${GREENTXT}Extracting wine . . .${NORMTXT}"
+			dpkg-deb -x ${DEB_B1} wine-installer
+			dpkg-deb -x ${DEB_B2} wine-installer
+			echo -e "${GREENTXT}Installing wine . . .${NORMTXT}\n"
+			mv wine-installer/opt/wine* ~/wine
+			
+			## Install amd64-wine (64-bit) and i386-wine (32-bit)
+			#echo -e "\n${GREENTXT}Downloading wine . . .${NORMTXT}"
+			#wget -q ${LNKA}${DEB_A1} || { echo "${DEB_A1} download failed!" && run_giveup; }
+			#wget -q ${LNKA}${DEB_A2} || { echo "${DEB_A2} download failed!" && run_giveup; }
+			#wget -q ${LNKB}${DEB_B1} || { echo "${DEB_B1} download failed!" && run_giveup; }
+			#echo -e "${GREENTXT}Extracting wine . . .${NORMTXT}"
+			#dpkg-deb -x ${DEB_A1} wine-installer
+			#dpkg-deb -x ${DEB_A2} wine-installer
+			#dpkg-deb -x ${DEB_B1} wine-installer
+			#echo -e "${GREENTXT}Installing wine . . .${NORMTXT}\n"
+			#mv wine-installer/opt/wine* ~/wine	
+		cd ..
+	
+		# Install symlinks (and make 32bit launcher. Credits: grayduck, Botspot) - TODO: Try to remove linux32 flag
+		echo -e '#!/bin/bash\nsetarch linux32 -L '"$HOME/wine/bin/wine "'"$@"' | sudo tee -a /usr/local/bin/wine >/dev/null # script to launch wine programs as 32bit only
+		#sudo ln -s ~/wine/bin/wine /usr/local/bin/wine # you could also just make a symlink, but box86 only works for 32bit apps at the moment
+		sudo ln -s ~/wine/bin/wineboot /usr/local/bin/wineboot
+		sudo ln -s ~/wine/bin/winecfg /usr/local/bin/winecfg
+		sudo ln -s ~/wine/bin/wineserver /usr/local/bin/wineserver
+		sudo chmod +x /usr/local/bin/wine /usr/local/bin/wineboot /usr/local/bin/winecfg /usr/local/bin/wineserver
+	fi
 }
 
 function run_Install_i386wineDependencies_RpiOS64bit()
@@ -645,28 +652,19 @@ function run_Install_i386wineDependencies_RpiOS64bit()
 	echo -e "${GREENTXT}Installing armhf dependencies for i386-Wine on aarch64 . . .${NORMTXT}"
 	sudo dpkg --add-architecture armhf && sudo apt-get update #enable multi-arch
 	
-	#depends main packages - NOTE: This for loop method is inefficient, but ensures packages install even if some are missing.
-	for i in 'libasound2:armhf' 'libc6:armhf' 'libglib2.0-0:armhf' 'libgphoto2-6:armhf' 'libgphoto2-port12:armhf' 'libgstreamer-plugins-base1.0-0:armhf' 'libgstreamer1.0-0:armhf' 'libldap-2.4-2:armhf' 'libopenal1:armhf' 'libpcap0.8:armhf' 'libpulse0:armhf' 'libsane1:armhf' 'libudev1:armhf' 'libusb-1.0-0:armhf' 'libvkd3d1:armhf' 'libx11-6:armhf' 'libxext6:armhf' 'libasound2-plugins:armhf' 'ocl-icd-libopencl1:armhf' 'libncurses6:armhf' 'libncurses5:armhf' 'libcap2-bin:armhf' 'libcups2:armhf' 'libdbus-1-3:armhf' 'libfontconfig1:armhf' 'libfreetype6:armhf' 'libglu1-mesa:armhf' 'libglu1:armhf' 'libgnutls30:armhf' 'libgssapi-krb5-2:armhf' 'libkrb5-3:armhf' 'libodbc1:armhf' 'libosmesa6:armhf' 'libsdl2-2.0-0:armhf' 'libv4l-0:armhf' 'libxcomposite1:armhf' 'libxcursor1:armhf' 'libxfixes3:armhf' 'libxi6:armhf' 'libxinerama1:armhf' 'libxrandr2:armhf' 'libxrender1:armhf' 'libxxf86vm1' 'libc6:armhf' 'libcap2-bin:armhf'; do
-		sudo apt-get install -y "$i"
-		done
-		# This list found by downloading...
-		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel-i386_7.1~bullseye-1_i386.deb
-		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/winehq-devel_7.1~bullseye-1_i386.deb
-		#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel_7.1~bullseye-1_i386.deb
-		# then `dpkg-deb -I package.deb`. Read output, add `:armhf` to packages in dep list, then try installing them on Pi aarch64.
-	
-	# Old i386-wine dependency list for box86/wine on aarch64 (worked for buster, but causes taskbar to disappear in bullseye) from Discord
-	# Credits: monkaBlyat (Dr. van RockPi), Itai-Nelken, & WheezyE
-	#sudo apt-get install libavcodec58:armhf libavformat58:armhf libboost-filesystem1.74.0:armhf libboost-iostreams1.74.0:armhf \
-	#	libboost-program-options1.74.0:armhf libcal3d12v5:armhf libcups2:armhf libcurl4:armhf libfontconfig1:armhf \
-	#	libfreetype6:armhf libgdk-pixbuf2.0-0:armhf libgl1-mesa-dev:armhf libgtk2.0-0:armhf libjpeg62:armhf libmpg123-0:armhf \
-	#	libmyguiengine3debian1v5:armhf libncurses5:armhf libncurses6:armhf libopenal1:armhf libpng16-16:armhf \
-	#	libsdl1.2-dev:armhf libsdl2-2.0-0:armhf libsdl2-image-2.0-0:armhf libsdl2-mixer-2.0-0:armhf libsdl2-net-2.0-0:armhf \
-	#	libsdl-mixer1.2:armhf libsmpeg0:armhf libsnappy1v5:armhf libstdc++6:armhf libswscale5:armhf libudev1:armhf \
-	#	libvorbis-dev:armhf libx11-6:armhf libx11-dev:armhf libxcb1:armhf libxcomposite1:armhf libxcursor1:armhf libxext6:armhf \
-	#	libxi6:armhf libxinerama1:armhf libxrandr2:armhf libxrender1:armhf libxxf86vm1:armhf mesa-va-drivers:armhf osspd:armhf \
-	#	pulseaudio:armhf -y # for i386-wine on aarch64 - TODO: Something in this list makes taskbar disappear (after reboot) in bullseye
-	#	sudo apt-get install libasound2:armhf libpulse0:armhf libxml2:armhf libxslt1.1:armhf libxslt1-dev:armhf -y # fixes i386-wine sound? from Discord
+	sudo apt-get install -y libasound2:armhf libc6:armhf libglib2.0-0:armhf libgphoto2-6:armhf libgphoto2-port12:armhf \
+	    libgstreamer-plugins-base1.0-0:armhf libgstreamer1.0-0:armhf libldap-2.4-2:armhf libopenal1:armhf libpcap0.8:armhf \
+	    libpulse0:armhf libsane1:armhf libudev1:armhf libusb-1.0-0:armhf libvkd3d1:armhf libx11-6:armhf libxext6:armhf \
+	    libasound2-plugins:armhf ocl-icd-libopencl1:armhf libncurses6:armhf libncurses5:armhf libcap2-bin:armhf libcups2:armhf \
+	    libdbus-1-3:armhf libfontconfig1:armhf libfreetype6:armhf libglu1-mesa:armhf libglu1:armhf libgnutls30:armhf \
+	    libgssapi-krb5-2:armhf libkrb5-3:armhf libodbc1:armhf libosmesa6:armhf libsdl2-2.0-0:armhf libv4l-0:armhf \
+	    libxcomposite1:armhf libxcursor1:armhf libxfixes3:armhf libxi6:armhf libxinerama1:armhf libxrandr2:armhf \
+	    libxrender1:armhf libxxf86vm1 libc6:armhf libcap2-bin:armhf x11-utils:armhf libxcomposite-dev:armhf # to run wine-i386 through box86:armhf on aarch64
+	# Dependencies can be found through trial-error and/or by by downloading...
+	#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel-i386_7.1~bullseye-1_i386.deb
+	#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/winehq-devel_7.1~bullseye-1_i386.deb
+	#	wget https://dl.winehq.org/wine-builds/debian/dists/bullseye/main/binary-i386/wine-devel_7.1~bullseye-1_i386.deb
+	# then `dpkg-deb -I package.deb`. Read output, add `:armhf` to packages in dep list, then try installing them on Pi aarch64.
 }
 
 function run_Install_i386wineDependencies_Ubuntu64bit()
@@ -683,7 +681,7 @@ function run_Install_i386wineDependencies_Ubuntu64bit()
 	for i in 'libopencl1:armhf' 'libopencl-1.2-1:armhf' 'libncurses5:armhf' 'libncurses:armhf'; do
 		sudo apt-get install -y "$i" #depends alternate packages
 		done
-	for i in 'libcap2-bin:armhf' 'libcups2:armhf' 'libdbus-1-3:armhf' 'libfontconfig1:armhf' 'libfreetype6:armhf' 'libglu1-mesa:armhf' 'libgnutls30:armhf' 'libgssapi-krb5-2:armhf' 'libkrb5-3:armhf' 'libodbc1:armhf' 'libosmesa6:armhf' 'libsdl2-2.0-0:armhf' 'libv4l-0:armhf' 'libxcomposite1:armhf' 'libxcursor1:armhf' 'libxfixes3:armhf' 'libxi6:armhf' 'libxinerama1:armhf' 'libxrandr2:armhf' 'libxrender1:armhf' 'libxxf86vm1'; do
+	for i in 'libcap2-bin:armhf' 'libcups2:armhf' 'libdbus-1-3:armhf' 'libfontconfig1:armhf' 'libfreetype6:armhf' 'libglu1-mesa:armhf' 'libgnutls30:armhf' 'libgssapi-krb5-2:armhf' 'libkrb5-3:armhf' 'libodbc1:armhf' 'libosmesa6:armhf' 'libsdl2-2.0-0:armhf' 'libv4l-0:armhf' 'libxcomposite1:armhf' 'libxcursor1:armhf' 'libxfixes3:armhf' 'libxi6:armhf' 'libxinerama1:armhf' 'libxrandr2:armhf' 'libxrender1:armhf' 'libxxf86vm1:armhf'; do
 		sudo apt-get install -y "$i" #recommends main packages
 		done
 	for i in 'libglu1:armhf' 'libgnutls28:armhf' 'libgnutls26:armhf'; do
@@ -798,13 +796,20 @@ function run_Install_amd64wineDependencies_RpiOS64bit()
 
 function run_installwinemono()  # Wine-mono replaces MS.NET 4.6 and earlier.
 {
-    # MS.NET 4.6 takes a very long time to install on RPi4 in Wine and runs slower than wine-mono
-    sudo apt-get install p7zip-full -y
-    mkdir ~/.cache/wine 2>/dev/null
-    echo -e "\n${GREENTXT}Downloading and installing wine-mono . . .${NORMTXT}\n"
-    wget -q -P ~/.cache/wine https://dl.winehq.org/wine/wine-mono/7.2.0/wine-mono-7.2.0-x86.msi  || { echo "wine-mono .msi install file download failed!" && run_giveup; }
-    wine msiexec /i ~/.cache/wine/wine-mono-7.2.0-x86.msi
-    rm -rf ~/.cache/wine # clean up to save disk space
+	if [ -d "$HOME/.wine/drive_c/windows/Microsoft.NET/Framework/v4.0.30319" ]
+	then
+	    echo "Wine-mono has already been installed and run. Skipping wine-mono installation."
+	else
+		# MS.NET 4.6 takes a very long time to install on RPi4 in Wine and runs slower than wine-mono
+		sudo apt-get install p7zip-full -y
+		mkdir ~/.cache/wine 2>/dev/null
+		echo -e "\n${GREENTXT}Downloading and installing wine-mono . . .${NORMTXT}\n"
+		wget -q -P ~/.cache/wine https://dl.winehq.org/wine/wine-mono/7.2.0/wine-mono-7.2.0-x86.msi  || { echo "wine-mono .msi install file download failed!" && run_giveup; }
+		wine msiexec /i ~/.cache/wine/wine-mono-7.2.0-x86.msi
+		
+		rm -rf ~/.cache/wine # clean up to save disk space
+  		wineboot -e && wineboot -f && wineserver -k # try to free up Wine's RAM(?) in wine (try to prevent freezes on Raspberry Pi)
+	fi
 }
 
 function run_increasepi3swapfile()
@@ -976,21 +981,19 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
     local varaonly="$1"
     
     # Silently create a new wineprefix
-        echo -e "\n${GREENTXT}Creating a new wineprefix.  This may take a moment . . .${NORMTXT}\n" 
+        echo -e "\n${GREENTXT}Initializing wineprefix.  This may take a moment . . .${NORMTXT}\n" 
         rm -rf ~/.cache/wine # make sure no old wine-mono files are in wine's cache, or else they will be auto-installed on first wineboot
         DISPLAY=0 WINEARCH=win32 WINEDEBUG=-all wine wineboot # initialize Wine silently (silently makes a fresh wineprefix in `~/.wine`)
 
     # Install pre-requisite software into the wineprefix for RMS Express and VARA
         if [ "$varaonly" = "vara_only" ]; then
 	    echo -e "\n${GREENTXT}Setting up your wineprefix for VARA . . .${NORMTXT}\n"
-	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
-	    #WTERR_VB6RUN=$( winetricks -q vb6run | tee /dev/stderr | grep -o -P '(warning: Downloading )(.*?)(VB6.0-KB290887-X86.exe failed)' ) # more precise error reporting
 	else
 	    echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
-	    run_installwinemono # for RMS Express - wine-mono replaces dotnet46
-	    #BOX86_NOBANNER=1 winetricks -q dotnet46 win7 sound=alsa # for RMS Express
-	    BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
+	    run_installwinemono # for RMS Express (wine-mono replaces dotnet46)
 	fi
+ 	BOX86_DYNAREC=0 BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
+	#could also do 'BOX86_DYNAREC=0 wine winecfg -v win7'
 	# TODO: Check to see if 'winetricks -q corefonts riched20' would make text look nicer
 }
 
@@ -1054,7 +1057,7 @@ function run_installrmsterminal()
 
         # Extract/install RMS Terminal
             7z x RMS_Simple_Terminal_install_*.zip -o"RMSTerminalInstaller" -y -bsp0 -bso0
-            WINEDEBUG=-all wine msiexec /i RMSTerminalInstaller/RMS\ Simple\ Terminal\ Setup.msi /quiet
+            BOX86_DYNAREC=0 WINEDEBUG=-all wine msiexec /i RMSTerminalInstaller/RMS\ Simple\ Terminal\ Setup.msi /quiet
 
 	# Clean up
             rm -rf RMSTerminalInstaller
@@ -1118,7 +1121,7 @@ function run_installrmsadifanalyzer()
 
         # Extract/install RMS ADIF Analyzer
             7z x ADIF_Analyzer_install_*.zip -o"RMSADIFInstaller" -y -bsp0 -bso0
-            WINEDEBUG=-all wine RMSADIFInstaller/ADIF_Analyzer_install.exe /SILENT
+            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSADIFInstaller/ADIF_Analyzer_install.exe /SILENT
 	    #TODO: Extract .ico from exe, convert to .png, and save as .0 in ${HOME}/.local/share/icons/hicolor/48x48/apps/
 
 	# Clean up
@@ -1148,7 +1151,7 @@ function run_installrmspacket()
 
         # Extract/install RMS Packet
             7z x RMS_Packet_install_*.zip -o"RMSPacketInstaller" -y -bsp0 -bso0
-            WINEDEBUG=-all wine RMSPacketInstaller/RMS_Packet_install.exe /SILENT
+            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSPacketInstaller/RMS_Packet_install.exe /SILENT
 
 	# Clean up
             rm -rf RMSPacketInstaller
@@ -1177,7 +1180,7 @@ function run_installrmsrelay()
 
         # Extract/install RMS Relay
             7z x RMS_Relay_install_*.zip -o"RMSRelayInstaller" -y -bsp0 -bso0
-            WINEDEBUG=-all wine RMSRelayInstaller/RMS_Relay_install.exe /SILENT
+            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSRelayInstaller/RMS_Relay_install.exe /SILENT
 
 	# Clean up
             rm -rf RMSRelayInstaller
@@ -1206,7 +1209,7 @@ function run_installrmslinktest()
 
         # Extract/install RMS Link Test
             7z x RMS_Link_Test_install_*.zip -o"RMSLinkTestInstaller" -y -bsp0 -bso0
-            WINEDEBUG=-all wine RMSLinkTestInstaller/RMS_Link_Test_install.exe /SILENT
+            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSLinkTestInstaller/RMS_Link_Test_install.exe /SILENT
 
 	# Clean up
             rm -rf RMSLinkTestInstaller
@@ -1427,7 +1430,7 @@ function run_makevaraupdatescript()
 					
 				# Run varahf_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA HF . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
+					BOX86_DYNAREC=0 BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
 				
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ setup*.exe
@@ -1466,7 +1469,7 @@ function run_makevaraupdatescript()
 
 				# Run varafm_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA FM . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
+					BOX86_DYNAREC=0 BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
 
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ FM\ setup*.exe
@@ -1505,7 +1508,7 @@ function run_makevaraupdatescript()
 		#
 		#		# Run varasat_install.ahk
 		#			echo -e "\n${GREENTXT}Installing VARA SAT . . .${NORMTXT}\n"
-		#			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
+		#			BOX86_DYNAREC=0 BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
 		#
 		#		# Clean up the installation
 		#			rm ~/.wine/drive_c/VARA\ SAT\ setup*.exe
