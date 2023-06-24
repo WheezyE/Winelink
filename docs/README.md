@@ -68,16 +68,16 @@ If you use this script in your project (or are inspired by it) just please be su
 <details><summary>Future Work: Roadmap</summary>
 
  - [ ] Add an AHK script to help the user with ARDOP first time soundcard setup.
- - [ ] Add HDD-space check to make sure user has enough space to install everything
  - [ ] Time all individual components and embed comments in functions for Pi models. Add variable timer to welcome screen.
- - [ ] Switch to using Seb's GitHub box86 binaries (or hosted box86 bins) instead of Pale's internet archive binaries.
  - [ ] Help DRA-board compatability with VARA ([might be a box86 issue?](https://github.com/ptitSeb/box86/issues/567))
- - [ ] Bisect box86 commits that crash VARA's local TCP to RMS connection (bug in newer box86's)
  - [ ] Consider adding a sed script to find/delete any small-value frequencies in `RMS Channels.dat` that would crash the HF Channel Selection Browser
  - [ ] Clean up code with [Google style guide](https://google.github.io/styleguide/shellguide.html).
  - [ ] Work with WineHQ to [figure out why VARA's CPU gauge isn't working](https://bugs.winehq.org/show_bug.cgi?id=50728).
  - [ ] Work with WineHQ to [figure out why ARDOP & VARA don't always connect to RMS Express over TCP when first starting](https://bugs.winehq.org/show_bug.cgi?id=52521).
  - [ ] Add progress bar (GUI?) for installation.
+ - [x] Add HDD-space check to make sure user has enough space to install everything
+ - [x] Switch to using Seb's GitHub box86 binaries (or hosted box86 bins) instead of Pale's internet archive binaries.
+ - [x] Bisect box86 commits that crash VARA's local TCP to RMS connection (bug in newer box86's)
  - [x] Add updated example images to readme.
  - [x] Rely on [archive.org box86 binaries](https://archive.org/details/box86.7z_20200928) instead of compiling.
     - [ ] Give user the choice to compile or not.

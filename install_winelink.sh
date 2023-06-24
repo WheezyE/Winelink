@@ -396,7 +396,7 @@ function run_greeting()
     echo ""
     echo "####################### Winlink & VARA Installer Script #######################"
     echo "# Author: Eric Wiessner (KI7POL)                         System: ${hardware}  #"
-    echo "# Version: 0.0098a                                 Install time: apx ${tinst} min   #"
+    echo "# Version: 0.0099a                                 Install time: apx ${tinst} min   #"
     echo "#                                                Space required: apx ${space} GB   #"
     echo "# Credits:                                                                    #"
     echo "#   The Box86 team (ptitSeb, pale, chills340, Itai-Nelken, Heasterian, et al) #"
