@@ -56,8 +56,10 @@ function run_main()
     ### Create winelink directory
         mkdir ${HOME}/winelink && cd ${HOME}/winelink # store all downloaded/installed files in their own directory
     
-        ### Start logging
-        exec > >(tee "winelink.log") 2>&1
+        ### LOGGING: Start
+        exec 77>"winelink.log" # fd 77 is arbitrary since we just need an available descriptor (i.e. not 0, 1, 2 or another number that you have already allocated)
+	export BASH_XTRACEFD=77 # tell bash about it
+ 	set -x # turn on the debug stream
         
 	### Wine omni-installation
 	########################################################################################################################################
@@ -366,7 +368,11 @@ function run_main()
 		    : #do nothing
 		    ;; #/*)
             esac #/case $ARCH
-	    
+
+	    # LOGGING: Close the output
+	    set +x
+	    exec 77>&-
+     
 	    # cleanup
 	    rm -rf ${HOME}/winelink/downloads 2>/dev/null # silently remove Winlink downloads directory
 	    rm ${HOME}/winelink/winelink.log 2>/dev/null # silently remove old RMS Express logs
@@ -2329,6 +2335,11 @@ function run_giveup()  # If our script failed at any critical stages, notify the
     echo "For help, please reference the '${HOME}/winelink\winelink.log' file"
     echo "You can also open an issue on github.com/WheezyE/Winelink/"
     echo ""
+
+    # LOGGING: Close the output
+    set +x
+    exec 77>&-
+    
     exit
 }
 
