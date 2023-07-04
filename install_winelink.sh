@@ -1542,7 +1542,7 @@ function run_makevaraupdatescript()
 
 				# Run the VARA Chat installer silently
 					echo -e "\n${GREENTXT}Installing VARA Chat . . .${NORMTXT}\n"
-					wine ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
+					BOX86_NOBANNER=1 BOX86_DYNAREC=0 wine ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
 				
 				# Clean up the installer
 					rm ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe
