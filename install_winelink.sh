@@ -2328,6 +2328,7 @@ function run_detect_othersbc()
 
 function run_giveup()  # If our script failed at any critical stages, notify the user and quit
 {
+    wineserver -k # for next run of script
     echo ""
     echo "Winelink installation failed."
     echo ""
