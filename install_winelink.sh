@@ -82,18 +82,12 @@ function run_main()
 				case $ARCH in # determine 32-bit or 64-bit RPiOS
 				"ARM32")
 					run_greeting "${SBC_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
-					run_checkdiskspace "2100" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_piappswine ${ARCH} #pseudocode
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
 					run_checkdiskspace "2800" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
-					run_Install_i386wineDependencies_RpiOS64bit
+					run_piappswine ${ARCH} #pseudocode
 					;; #/"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -112,21 +106,13 @@ function run_main()
 					run_greeting "${SBC_SERIES} ${ARCH}" "35" "4.1" "${ARG}"
 					#ARG="bap" # Force-skip RMS Express installation (since it doesn't run great on RPi3B+)
 					run_checkdiskspace "4100" #min space required in MB
-					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
-					run_custompi3kernel "1" # This kernel installer will ignore 64bit Pi3's since they already have 3G/1G VMem Swap (not needed for 64-bit RPiOS)
-					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_piappswine
 					;; #"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH}" "28" "3.5" "${ARG}"
 					#ARG="bap" # Force-skip RMS Express installation (since it doesn't run great on RPi3B+)
 					run_checkdiskspace "3500" #min space required in MB
-					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
-					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
-					run_Install_i386wineDependencies_RpiOS64bit
+					run_piappswine
 					;; #"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -139,8 +125,7 @@ function run_main()
 		"RPiZ2") # TODO - Get a PiZ2W and test this
 			#run_custompi3kernel "1" 
 			#run_installwine "piz2" "devel" "7.1" "${ID_LIKE}" "${VERSION_CODENAME}" "-1"
-			clear
-			echo -e "ERROR: Raspberry Pi Zero 2W is not supported yet, but might be in the future.\nGiving up on install."
+			run_piappswine
 			run_giveup
 			;; #/"PiZ2")
 		"Termux") #TODO: Enable this when Termux install available
@@ -467,6 +452,17 @@ function run_checkdiskspace()
 		echo "Please free up more space or use a larger SD card, then try again."
 		run_giveup
 	fi
+}
+
+function run_piappswine()
+{
+# https://pi-apps.io/wiki/development/DOCUMENTATION/#the-manage-script
+# https://pi-apps.io/wiki/getting-started/command-line-interface/
+	wget https://raw.githubusercontent.com/Botspot/pi-apps/master/install
+	sudo chmod +x install
+	./install
+	$HOME/pi-apps/manage install Wine (x86)
+	$HOME/pi-apps/manage install Wine (x64) #pseudocode
 }
 
 function run_downloadbox86()  # Download & install Box86. (This function needs a date passed to it) - TODO: Replace with self-hosted github binaries
