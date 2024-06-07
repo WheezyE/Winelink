@@ -1,0 +1,39 @@
+w_metadata winlinksysop apps \
+    title="Winlink sysop programs (Winlink Radio Messaging System server apps)" \
+    publisher="Winlink Global Radio Email" \
+    year="2023" \
+    media="download" \
+    file1="ADIF_Analyzer_install-1-1-1-0.zip" \
+    file2="RMS_Link_Test_install_2-0-24-0.zip" \
+    file3="RMS_Packet_install_2-1-49-0.zip" \
+    file4="RMS_Relay_install_3-2-10-0.zip" \
+    file5="RMS_Trimode_install_1-3-53-0.zip" \
+    installed_exe1="c:/RMS/ADIF Analyzer/ADIF Analyzer.exe" \
+    installed_exe2="c:/RMS/RMS Link Test/RMS Link Test.exe" \
+    installed_exe3="c:/RMS/RMS Packet/RMS Packet.exe" \
+    installed_exe4="c:/RMS/RMS Relay/RMS Relay.exe" \
+    installed_exe5="c:/RMS/RMS Trimode/RMS Trimode.exe" \
+    homepage="https://winlink.org"
+
+load_winlinksysop()
+{
+    w_call winemono
+    load_sound alsa
+    w_set_winver win10
+    w_download https://web.archive.org/web/20240530025215/https://downloads.winlink.org/Sysop%20Programs/ADIF_Analyzer_install-1-1-1-0.zip 40877b91359d44aa6a2c3825ce7c859bb2c9958e79a7b6a09e3616fc25defa95
+    w_download https://web.archive.org/web/20240530025215/https://downloads.winlink.org/Sysop%20Programs/RMS_Link_Test_install_2-0-24-0.zip 2e075dfa0a98da1cc87ac56410ab5cdd65268c46e698add59688ea0a00a9bfb8
+    w_download https://web.archive.org/web/20240530025215/https://downloads.winlink.org/Sysop%20Programs/RMS_Packet_install_2-1-49-0.zip 563c00df64d03dd481c792c3b7bfa21c001605cc0f0400255770cfbcb1d6b2e5
+    w_download https://web.archive.org/web/20240530025215/https://downloads.winlink.org/Sysop%20Programs/RMS_Relay_install_3-2-10-0.zip 0558db01d4f77339ffbbd6a0f91979cfae5161252a69058f0de145d760abce6b
+    w_download https://web.archive.org/web/20240530025215/https://downloads.winlink.org/Sysop%20Programs/RMS_Trimode_install_1-3-53-0.zip 52602cdf001d773f4784d2d62ce0c2d72f6496d3ce02290cf1caa052e3859e27
+    w_try_unzip "${W_TMP}" "${W_CACHE}/${W_PACKAGE}/${file1}"
+    w_try_unzip "${W_TMP}" "${W_CACHE}/${W_PACKAGE}/${file2}"
+    w_try_unzip "${W_TMP}" "${W_CACHE}/${W_PACKAGE}/${file3}"
+    w_try_unzip "${W_TMP}" "${W_CACHE}/${W_PACKAGE}/${file4}"
+    w_try_unzip "${W_TMP}" "${W_CACHE}/${W_PACKAGE}/${file5}"
+    w_try "${WINE}" "${W_TMP}/ADIF_Analyzer_install.exe" ${W_OPT_UNATTENDED:+/VERYSILENT}
+    w_try "${WINE}" "${W_TMP}/RMS_Link_Test_install.exe" ${W_OPT_UNATTENDED:+/VERYSILENT}
+    w_try "${WINE}" "${W_TMP}/RMS_Packet_install.exe" ${W_OPT_UNATTENDED:+/VERYSILENT}
+    w_try "${WINE}" "${W_TMP}/RMS_Relay_install.exe" ${W_OPT_UNATTENDED:+/VERYSILENT}
+    w_try "${WINE}" "${W_TMP}/RMS_Trimode_install.exe" ${W_OPT_UNATTENDED:+/VERYSILENT}
+    w_warn "\n          NOTE!!! RUN THIS COMMAND TO ENABLE COM PORTS FOR\n          RADIO-TO-COMPUTER \"USB CAT CONTROL\" CONNECTIONS:\n                 sudo usermod -a -G dialout \$USER\n                 (then log out and log in again)\n"
+}
