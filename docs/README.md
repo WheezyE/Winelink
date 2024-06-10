@@ -1,3 +1,5 @@
+# NOTE: Winɘlink is currently under maintenance but will be up and running again before June 18, 2024.
+
 ![logo](WinelinkLogo.png "Project logo")
 # Winɘlink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4, Orange Pi 4 LTS, and x86/x64 Linux (Mint/Ubuntu/Debian).  Raspberry Pi 3B+ also kind of works.
