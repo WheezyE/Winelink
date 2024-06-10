@@ -1,3 +1,13 @@
+# NOTE: Winɘlink is under maintenance.
+For now, please use [pi-apps](https://github.com/botspot/pi-apps) to install VARA HF using on-screen prompts after running following command:
+```
+wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash
+```
+I'll use pi-apps' Wine installer in this script in the future. This way I can focus on VARA & Winlink compatibility in Wine (and not have to maintain Wine installs on ARM OS's).
+ -- KI7POL 07/25/2024
+
+---
+
 ![logo](WinelinkLogo.png "Project logo")
 # Winɘlink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4, Orange Pi 4 LTS, and x86/x64 Linux (Mint/Ubuntu/Debian).  Raspberry Pi 3B+ also kind of works.
