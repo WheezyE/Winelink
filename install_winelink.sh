@@ -1415,13 +1415,13 @@ function run_makevaraupdatescript()
 			if [ "$SILENT" != "silent" ]; then
 				zenity --warning --timeout=12 --height 150 --width 500 --text="Updating VARA HF, VARA FM, and VARA Chat now ...\\n\\nThis may take a moment." --title="Updating VARA Suite" &
 			fi
-			
+		#Download everything instead of one at a time
+   		wget -A "VARA HF*.zip" 'https://downloads.winlink.org/VARA%20Products/' -P ${VARAUPDATE} || { echo "VARA HF download failed!" && run_giveup; }
+     
 			# Download / extract / silently install VARA HF
 				# Search the rosmodem website for a VARA HF mega.nz link of any version, then download it
 					echo -e "\n${GREENTXT}Downloading VARA HF . . .${NORMTXT}\n"
-					VARAHFLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)')
-					megadl ${VARAHFLINK} --path=${VARAUPDATE} || { echo "VARA HF download failed!" && run_giveup; }
-					7z x ${VARAUPDATE}/VARA\ HF*.zip -o"${VARAUPDATE}/VARAHFInstaller" -y -bsp0 -bso0
+					7z x ${VARAUPDATE}/VARA\downloads.winlink.org\'VARA Products'\HF*.zip -o"${VARAUPDATE}/VARAHFInstaller" -y -bsp0 -bso0
 					mv ${VARAUPDATE}/VARAHFInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # move VARA installer into wineprefix (so AHK can find it)
 
 				# Create varahf_install.ahk autohotkey script
@@ -1459,8 +1459,7 @@ function run_makevaraupdatescript()
 				# Search the rosmodem website for a VARA FM mega.nz link of any version, then download it
 					echo -e "\n${GREENTXT}Downloading VARA FM . . .${NORMTXT}\n"
 					VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA FM v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-					megadl ${VARAFMLINK} --path=${VARAUPDATE} || { echo "VARA FM download failed!" && run_giveup; }
-					7z x ${VARAUPDATE}/VARA\ FM*.zip -o"${VARAUPDATE}/VARAFMInstaller" -y -bsp0 -bso0
+					7z x ${VARAUPDATE}/VARA\downloads.winlink.org\'VARA Products'\ FM*.zip -o"${VARAUPDATE}/VARAFMInstaller" -y -bsp0 -bso0
 					mv ${VARAUPDATE}/VARAFMInstaller/VARA\ FM\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
 
 				# Create varafm_install.ahk autohotkey script
@@ -1498,8 +1497,7 @@ function run_makevaraupdatescript()
 		#		# Search the rosmodem website for a VARA SAT mega.nz link of any version, then download it
 		#			echo -e "\n${GREENTXT}Downloading VARA SAT . . .${NORMTXT}\n"
 		#			VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA SAT v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-		#			megadl ${VARAFMLINK} --path=${VARAUPDATE} || { echo "VARA SAT download failed!" && run_giveup; }
-		#			7z x ${VARAUPDATE}/VARA\ SAT*.zip -o"${VARAUPDATE}/VARASATInstaller" -y -bsp0 -bso0
+		#			7z x ${VARAUPDATE}/VARA\downloads.winlink.org\'VARA Products'\ SAT*.zip -o"${VARAUPDATE}/VARASATInstaller" -y -bsp0 -bso0
 		#			mv ${VARAUPDATE}/VARASATInstaller/VARA\ SAT\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
 		#
 		#		# Create varasat_install.ahk autohotkey script
@@ -1537,8 +1535,7 @@ function run_makevaraupdatescript()
 				# Search the rosmodem website for a VARA Chat mega.nz link of any version, then download it
 					echo -e "\n${GREENTXT}Downloading VARA Chat . . .${NORMTXT}\n"
 					VARACHATLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA Chat v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-					megadl ${VARACHATLINK} --path=${VARAUPDATE} || { echo "VARA Chat download failed!" && run_giveup; }
-					7z x ${VARAUPDATE}/VARA\ Chat*.zip -o"${VARAUPDATE}/VARAChatInstaller" -y -bsp0 -bso0
+					7z x ${VARAUPDATE}/VARA\downloads.winlink.org\'VARA Products'\ Chat*.zip -o"${VARAUPDATE}/VARAChatInstaller" -y -bsp0 -bso0
 
 				# Run the VARA Chat installer silently
 					echo -e "\n${GREENTXT}Installing VARA Chat . . .${NORMTXT}\n"
