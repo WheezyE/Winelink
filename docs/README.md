@@ -1,4 +1,7 @@
-# NOTE: Winɘlink is currently under maintenance but will be up and running again before June 18, 2024.
+# NOTE: Winɘlink is currently under maintenance but will be up and running again ~~before June 18, 2024~~ as soons as possible.
+In the meantime, please see this testing branch of pi-apps which will allow you to install VARA HF before field day. https://github.com/WheezyE/pi-apps
+I am currently working with Botspot and gman to see if they might want VARA HF in pi-apps. I also plan to use the pi-apps Wine installation in this script in the future since they maintain theirs more often than I maintain mine.
+ -- KI7POL 06/18/2024
 
 ![logo](WinelinkLogo.png "Project logo")
 # Winɘlink
