@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # TODO: Check for exe's after each install. Error if no exe present.
-# TODO: Add timeout timer for VARA settings menu in case of freeze. Then do `wineserver -k` if needed
 # TODO: Add bap switch to run_giveup
-# TODO: Compile newer custom 32-bit RPiOS kernel for RPi3 and host it.
 
 # About:
 #    This script will help you install Box86, Wine, winetricks, Windows DLL's, Winlink (RMS Express) & VARA.  You will then
@@ -82,18 +80,12 @@ function run_main()
 				case $ARCH in # determine 32-bit or 64-bit RPiOS
 				"ARM32")
 					run_greeting "${SBC_SERIES} ${ARCH} " " 8" "2.1" "${ARG}" #Vars: "Hardware", "OS Bits", "Minutes", "GB", "bap" (check if user passed "bap" to script)
-					run_checkdiskspace "2100" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4" #emulator to run i386-wine on ARM32 (freeze version at ed8e01ea, which runs RMS, VARAHF/FM, and TCP works)
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					run_piappswine ${ARCH}
 					;; #/"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH} " "10" "2.8" "${ARG}"
-					run_checkdiskspace "2800" #min space required in MB
-					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
-					run_Install_i386wineDependencies_RpiOS64bit
+					#run_checkdiskspace "2800" #min space required in MB
+					run_piappswine ${ARCH}
 					;; #/"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -111,22 +103,14 @@ function run_main()
 				"ARM32")
 					run_greeting "${SBC_SERIES} ${ARCH}" "35" "4.1" "${ARG}"
 					#ARG="bap" # Force-skip RMS Express installation (since it doesn't run great on RPi3B+)
-					run_checkdiskspace "4100" #min space required in MB
-					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
-					run_custompi3kernel "1" # This kernel installer will ignore 64bit Pi3's since they already have 3G/1G VMem Swap (not needed for 64-bit RPiOS)
-					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM32" #TODO: Double-check this (arm32 better for building?) # NOTE: RPI3 and RPI3ARM64 don't build on Pi3B+ (`cc: error: unrecognized command-line option ‘-marm’`) but RPI4ARM64 does.
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
+					#run_checkdiskspace "4100" #min space required in MB
+					run_piappswine ${ARCH}
 					;; #"ARM32")
 				"ARM64")
 					run_greeting "${SBC_SERIES} ${ARCH}" "28" "3.5" "${ARG}"
 					#ARG="bap" # Force-skip RMS Express installation (since it doesn't run great on RPi3B+)
-					run_checkdiskspace "3500" #min space required in MB
-					run_increasepi3swapfile # Helps prevent insufficient RAM crashes when building box86
-					run_downloadbox86 "14113faa_RPi4"
-					#run_buildbox86 "14113faabace7f8f8c6a7d0bb5f6e2fea36c43f1" "RPI4" "ARM64"
-					run_Sideload_i386wine "devel" "7.1" "debian" "${VERSION_CODENAME}" "-1"
-					run_Install_i386wineDependencies_RpiOS64bit
+					#run_checkdiskspace "3500" #min space required in MB
+					run_piappswine ${ARCH}
 					;; #"ARM64")
 				esac #/case $ARCH
 				;; #/"raspbian"|"debian")
@@ -139,8 +123,7 @@ function run_main()
 		"RPiZ2") # TODO - Get a PiZ2W and test this
 			#run_custompi3kernel "1" 
 			#run_installwine "piz2" "devel" "7.1" "${ID_LIKE}" "${VERSION_CODENAME}" "-1"
-			clear
-			echo -e "ERROR: Raspberry Pi Zero 2W is not supported yet, but might be in the future.\nGiving up on install."
+			run_piappswine
 			run_giveup
 			;; #/"PiZ2")
 		"Termux") #TODO: Enable this when Termux install available
@@ -323,7 +306,7 @@ function run_main()
 	########################################################################################################################################
 		
         ### Install winetricks & autohotkey - TODO: Add wget & package manager detection
-            run_installwinetricks # software installer script for wine
+            run_installwinetricks
             run_installahk
         
         ### Set up Wine (silently make & configure a new wineprefix)
@@ -467,6 +450,27 @@ function run_checkdiskspace()
 		echo "Please free up more space or use a larger SD card, then try again."
 		run_giveup
 	fi
+}
+
+function run_piappswine()
+{
+    local arch="$1"
+    if [[ ! -d $HOME/pi-apps/ ]]; then
+	    # Installing pi-apps (for simplified wine/box86 installation)
+	    wget https://raw.githubusercontent.com/Botspot/pi-apps/master/install
+	    sudo chmod +x install
+	    ./install
+	    rm -f "${HOME}/Desktop/pi-apps.desktop"
+     fi
+
+    #Installing wine from pi-apps
+    # https://pi-apps.io/wiki/development/DOCUMENTATION/#the-manage-script
+    # https://pi-apps.io/wiki/getting-started/command-line-interface/
+    if [ $arch == "ARM32" ]; then
+        "${HOME}/pi-apps/manage" install-if-not-installed 'Wine (x86)' ||  { echo "Failed to install wine" && run_giveup; }
+    elif [ $arch == "ARM64" ]; then
+        "${HOME}/pi-apps/manage" install-if-not-installed 'Wine (x64)' ||  { echo "Failed to install wine" && run_giveup; }
+    fi
 }
 
 function run_downloadbox86()  # Download & install Box86. (This function needs a date passed to it) - TODO: Replace with self-hosted github binaries
@@ -1417,10 +1421,9 @@ function run_makevaraupdatescript()
 			fi
 			
 			# Download / extract / silently install VARA HF
-				# Search the rosmodem website for a VARA HF mega.nz link of any version, then download it
+				# Search the winlink.org website for a VARA HF link of any version, then download it
 					echo -e "\n${GREENTXT}Downloading VARA HF . . .${NORMTXT}\n"
-					VARAHFLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA HF v)')
-					megadl ${VARAHFLINK} --path=${VARAUPDATE} || { echo "VARA HF download failed!" && run_giveup; }
+     					wget -q -r -l1 -np -nd "https://downloads.winlink.org/VARA%20Products" -A "VARA HF*setup.zip" -P ${VARAUPDATE} || error 'Failed to download VARA HF Installer from winlink.org'
 					7z x ${VARAUPDATE}/VARA\ HF*.zip -o"${VARAUPDATE}/VARAHFInstaller" -y -bsp0 -bso0
 					mv ${VARAUPDATE}/VARAHFInstaller/VARA\ setup*.exe ~/.wine/drive_c/ # move VARA installer into wineprefix (so AHK can find it)
 
@@ -1436,7 +1439,7 @@ function run_makevaraupdatescript()
 					
 				# Run varahf_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA HF . . .${NORMTXT}\n"
-					BOX86_DYNAREC=0 BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
+					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
 				
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ setup*.exe
@@ -1458,8 +1461,7 @@ function run_makevaraupdatescript()
 			# Download / extract / silently install VARA FM
 				# Search the rosmodem website for a VARA FM mega.nz link of any version, then download it
 					echo -e "\n${GREENTXT}Downloading VARA FM . . .${NORMTXT}\n"
-					VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA FM v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-					megadl ${VARAFMLINK} --path=${VARAUPDATE} || { echo "VARA FM download failed!" && run_giveup; }
+					wget -q -r -l1 -np -nd "https://downloads.winlink.org/VARA%20Products" -A "VARA FM*setup.zip" -P ${VARAUPDATE} || error 'Failed to download VARA FM Installer from winlink.org'
 					7z x ${VARAUPDATE}/VARA\ FM*.zip -o"${VARAUPDATE}/VARAFMInstaller" -y -bsp0 -bso0
 					mv ${VARAUPDATE}/VARAFMInstaller/VARA\ FM\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
 
@@ -1497,8 +1499,7 @@ function run_makevaraupdatescript()
 		#	# Download / extract / silently install VARA SAT
 		#		# Search the rosmodem website for a VARA SAT mega.nz link of any version, then download it
 		#			echo -e "\n${GREENTXT}Downloading VARA SAT . . .${NORMTXT}\n"
-		#			VARAFMLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA SAT v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-		#			megadl ${VARAFMLINK} --path=${VARAUPDATE} || { echo "VARA SAT download failed!" && run_giveup; }
+		#			wget -q -r -l1 -np -nd "https://downloads.winlink.org/VARA%20Products" -A "VARA SAT*setup.zip" -P ${VARAUPDATE} || error 'Failed to download VARA SAT Installer from winlink.org'
 		#			7z x ${VARAUPDATE}/VARA\ SAT*.zip -o"${VARAUPDATE}/VARASATInstaller" -y -bsp0 -bso0
 		#			mv ${VARAUPDATE}/VARASATInstaller/VARA\ SAT\ setup*.exe ~/.wine/drive_c/ # move VARA installer here (so AHK can find it later)
 		#
@@ -1536,8 +1537,7 @@ function run_makevaraupdatescript()
 			# Download / extract / silently install VARA Chat
 				# Search the rosmodem website for a VARA Chat mega.nz link of any version, then download it
 					echo -e "\n${GREENTXT}Downloading VARA Chat . . .${NORMTXT}\n"
-					VARACHATLINK=$(curl -s https://rosmodem.wordpress.com/ | grep -oP '(?=https://mega.nz).*?(?=" target="_blank" rel="noopener noreferrer">VARA Chat v)') # Find the mega.nz link from the rosmodem website no matter its version, then store it as a variable
-					megadl ${VARACHATLINK} --path=${VARAUPDATE} || { echo "VARA Chat download failed!" && run_giveup; }
+					wget -q -r -l1 -np -nd "https://downloads.winlink.org/VARA%20Products" -A "VARA Chat*setup.zip" -P ${VARAUPDATE} || error 'Failed to download VARA HF Installer from winlink.org'
 					7z x ${VARAUPDATE}/VARA\ Chat*.zip -o"${VARAUPDATE}/VARAChatInstaller" -y -bsp0 -bso0
 
 				# Run the VARA Chat installer silently
