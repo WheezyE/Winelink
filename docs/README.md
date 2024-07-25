@@ -1,13 +1,3 @@
-# NOTE: Winɘlink is under maintenance.
-For now, please use [pi-apps](https://github.com/botspot/pi-apps) to install VARA HF using on-screen prompts after running following command:
-```
-wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash
-```
-I'll use pi-apps' Wine installer in this script in the future. This way I can focus on VARA & Winlink compatibility in Wine (and not have to maintain Wine installs on ARM OS's).
- -- KI7POL 07/25/2024
-
----
-
 ![logo](WinelinkLogo.png "Project logo")
 # Winɘlink
 A [Winlink](http://winlink.org/) (RMS Express & VARA) installer Script for the Raspberry Pi 4, Orange Pi 4 LTS, and x86/x64 Linux (Mint/Ubuntu/Debian).  Raspberry Pi 3B+ also kind of works.
@@ -31,6 +21,8 @@ curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink
      bash install_winelink.sh
 ```
 ###### _If desired, you can tell the script to only install VARA by running `curl -O https://raw.githubusercontent.com/WheezyE/Winelink/main/install_winelink.sh && bash install_winelink.sh vara_only`_
+
+###### _I don't have much time to maintain Winelink these days.  I've merged VARA HF into [pi-apps](https://github.com/botspot/pi-apps) as a backup option for users in case this script breaks in the future.  If needed, simply run `wget -qO- https://raw.githubusercontent.com/Botspot/pi-apps/master/install | bash` then run pi-apps and follow the on-screen prompts to install VARA HF._
 
 ## Known issues
  - _RMS Express sometimes won't connect (over TCP) to ARDOP & VARA. Just close RMS Express and re-open it (this is a bug in wine)._
