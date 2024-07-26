@@ -513,7 +513,7 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
             BOX64_NOBANNER=1 BOX86_NOBANNER=1 winetricks -q mdx || { echo "Winetricks failed to download/install managed DirectX for ARDOP!" && run_giveup; } # for ARDOP (included with RMS Express)
 	fi
  	BOX64_NOBANNER=1 BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
-	#could also do 'BOX86_DYNAREC=0 wine winecfg -v win7'
+	#could also do 'wine winecfg -v win7'
 	# TODO: Check to see if 'winetricks -q corefonts riched20' would make text look nicer
 }
 
@@ -577,7 +577,7 @@ function run_installrmsterminal()
 
         # Extract/install RMS Terminal
             7z x RMS_Simple_Terminal_install_*.zip -o"RMSTerminalInstaller" -y -bsp0 -bso0
-            BOX86_DYNAREC=0 WINEDEBUG=-all wine msiexec /i RMSTerminalInstaller/RMS\ Simple\ Terminal\ Setup.msi /quiet
+            WINEDEBUG=-all wine msiexec /i RMSTerminalInstaller/RMS\ Simple\ Terminal\ Setup.msi /quiet
 
 	# Clean up
             rm -rf RMSTerminalInstaller
@@ -641,7 +641,7 @@ function run_installrmsadifanalyzer()
 
         # Extract/install RMS ADIF Analyzer
             7z x ADIF_Analyzer_install_*.zip -o"RMSADIFInstaller" -y -bsp0 -bso0
-            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSADIFInstaller/ADIF_Analyzer_install.exe /SILENT
+            WINEDEBUG=-all wine RMSADIFInstaller/ADIF_Analyzer_install.exe /SILENT
 	    #TODO: Extract .ico from exe, convert to .png, and save as .0 in ${HOME}/.local/share/icons/hicolor/48x48/apps/
 
 	# Clean up
@@ -671,7 +671,7 @@ function run_installrmspacket()
 
         # Extract/install RMS Packet
             7z x RMS_Packet_install_*.zip -o"RMSPacketInstaller" -y -bsp0 -bso0
-            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSPacketInstaller/RMS_Packet_install.exe /SILENT
+            WINEDEBUG=-all wine RMSPacketInstaller/RMS_Packet_install.exe /SILENT
 
 	# Clean up
             rm -rf RMSPacketInstaller
@@ -700,7 +700,7 @@ function run_installrmsrelay()
 
         # Extract/install RMS Relay
             7z x RMS_Relay_install_*.zip -o"RMSRelayInstaller" -y -bsp0 -bso0
-            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSRelayInstaller/RMS_Relay_install.exe /SILENT
+            WINEDEBUG=-all wine RMSRelayInstaller/RMS_Relay_install.exe /SILENT
 
 	# Clean up
             rm -rf RMSRelayInstaller
@@ -729,7 +729,7 @@ function run_installrmslinktest()
 
         # Extract/install RMS Link Test
             7z x RMS_Link_Test_install_*.zip -o"RMSLinkTestInstaller" -y -bsp0 -bso0
-            BOX86_DYNAREC=0 WINEDEBUG=-all wine RMSLinkTestInstaller/RMS_Link_Test_install.exe /SILENT
+            WINEDEBUG=-all wine RMSLinkTestInstaller/RMS_Link_Test_install.exe /SILENT
 
 	# Clean up
             rm -rf RMSLinkTestInstaller
@@ -987,7 +987,7 @@ function run_makevaraupdatescript()
 
 				# Run varafm_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA FM . . .${NORMTXT}\n"
-					BOX86_DYNAREC=0 BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
+					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
 
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ FM\ setup*.exe
@@ -1025,7 +1025,7 @@ function run_makevaraupdatescript()
 		#
 		#		# Run varasat_install.ahk
 		#			echo -e "\n${GREENTXT}Installing VARA SAT . . .${NORMTXT}\n"
-		#			BOX86_DYNAREC=0 BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
+		#			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
 		#
 		#		# Clean up the installation
 		#			rm ~/.wine/drive_c/VARA\ SAT\ setup*.exe
@@ -1052,7 +1052,7 @@ function run_makevaraupdatescript()
 
 				# Run the VARA Chat installer silently
 					echo -e "\n${GREENTXT}Installing VARA Chat . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 BOX86_DYNAREC=0 wine ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
+					BOX86_NOBANNER=1 wine ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
 				
 				# Clean up the installer
 					rm ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe
