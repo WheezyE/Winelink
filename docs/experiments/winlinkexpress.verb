@@ -10,7 +10,8 @@ w_metadata winlinkexpress apps \
 
 load_winlinkexpress()
 {
-    w_call winemono
+    w_call winemono # for RMS Express: implements .net46
+    w_call mdx # for ARDOP: installs microsoft.directx.directsound.dll for soundcard detection
     load_sound alsa
     w_set_winver win10
     w_download https://web.archive.org/web/20240529202203/https://downloads.winlink.org/User%20Programs/Winlink_Express_install_1-7-15-0.zip d520f9c89b4024ffb2d7e36fa28bd3e91a861b61fc9cff660b94edd8ebe7d540

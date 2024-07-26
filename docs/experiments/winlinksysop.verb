@@ -18,6 +18,7 @@ w_metadata winlinksysop apps \
 load_winlinksysop()
 {
     w_call winemono
+    w_call mdx # for ARDOP
     load_sound alsa
     w_set_winver win10
     w_download https://web.archive.org/web/20240530025215/https://downloads.winlink.org/Sysop%20Programs/ADIF_Analyzer_install-1-1-1-0.zip 40877b91359d44aa6a2c3825ce7c859bb2c9958e79a7b6a09e3616fc25defa95

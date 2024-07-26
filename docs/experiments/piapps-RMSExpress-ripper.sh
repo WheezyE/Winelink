@@ -14,7 +14,7 @@ elif [ $arch == 64 ];then
 fi
 
 #Configuring wineprefix for RMS Express programs
-BOX86_DYNAREC=0 BOX64_DYNAREC=0 BOX86_NOBANNER=1 BOX64_NOBANNER=1 winetricks -q sound=alsa #dotnet46
+BOX86_DYNAREC=0 BOX64_DYNAREC=0 BOX86_NOBANNER=1 BOX64_NOBANNER=1 winetricks -q mdx sound=alsa
 
 #Ensuring wine-mono is installed (wine-mono runs & installs faster than .NET 4.6)
 if [ -d "$HOME/.wine/drive_c/windows/Microsoft.NET/Framework/v4.0.30319" ]

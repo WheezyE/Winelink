@@ -510,8 +510,9 @@ function run_setupwineprefix()  # Set up a new wineprefix silently.  A wineprefi
 	else
 	    echo -e "\n${GREENTXT}Setting up your wineprefix for RMS Express & VARA . . .${NORMTXT}\n"
 	    run_installwinemono # for RMS Express (wine-mono replaces dotnet46)
+            BOX64_NOBANNER=1 BOX86_NOBANNER=1 winetricks -q mdx || { echo "Winetricks failed to download/install managed DirectX for ARDOP!" && run_giveup; } # for ARDOP (included with RMS Express)
 	fi
- 	BOX86_DYNAREC=0 BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
+ 	BOX64_NOBANNER=1 BOX86_NOBANNER=1 winetricks -q vb6run pdh_nt4 win7 sound=alsa || { echo "Winetricks failed to download/install VB6 or PDH.DLL!" && run_giveup; } # for VARA
 	#could also do 'BOX86_DYNAREC=0 wine winecfg -v win7'
 	# TODO: Check to see if 'winetricks -q corefonts riched20' would make text look nicer
 }
