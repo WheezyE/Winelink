@@ -558,8 +558,8 @@ function run_installrmsexpress()  # Download/extract/install RMS Express
             echo 'Name=Winlink Express'                                                                        | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'GenericName=Winlink Express'                                                                 | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Comment=RMS Express emulated with Box86/Wine'                                                | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            #echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null # TODO: Does this improve stability or cost speed?
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
+            #echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=1 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null # TODO: Does this improve stability or cost speed?
             echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Icon=219D_RMS Express.0'                                                                     | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
@@ -588,7 +588,7 @@ function run_installrmsterminal()
             echo 'Name=RMS Simple Terminal'                                                                                      | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'GenericName=RMS Simple Terminal'                                                                               | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'Comment=RMS Simple Terminal emulated with Box86/Wine'                                                          | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Simple\ Terminal/RMS\ Simple\ Terminal.exe' | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Simple\ Terminal/RMS\ Simple\ Terminal.exe' | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             #echo 'Icon=none.0'                                                                                                   | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
@@ -623,7 +623,7 @@ function run_installrmstrimode()  # Download/extract/install RMS Express
             echo 'Name=RMS Trimode'                                                                                              | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'GenericName=RMS Trimode'                                                                                       | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'Comment=RMS Trimode emulated with Box86/Wine'                                                                  | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Trimode/RMS\ Trimode.exe' | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Trimode/RMS\ Trimode.exe' | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'Icon=C4A8_RMS Trimode.0'                                                                                       | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
@@ -653,7 +653,7 @@ function run_installrmsadifanalyzer()
             echo 'Name=RMS ADIF Analyzer'                                                                                        | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'GenericName=RMS ADIF Analyzer'                                                                                 | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'Comment=ADIF Analyzer emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/ADIF\ Analyzer/ADIF\ Analyzer.exe' | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/ADIF\ Analyzer/ADIF\ Analyzer.exe' | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'Icon=2BD9_ADIF Analyzer.0'                                                                                     | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
@@ -682,7 +682,7 @@ function run_installrmspacket()
             echo 'Name=RMS Packet'                                                                                             | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'GenericName=RMS Packet'                                                                                      | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'Comment=RMS Packet emulated with Box86/Wine'                                                                 | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Packet/RMS\ Packet.exe' | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Packet/RMS\ Packet.exe' | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'Type=Application'                                                                                            | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                          | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'Icon=3563_RMS Packet.0'                                                                                      | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
@@ -711,7 +711,7 @@ function run_installrmsrelay()
             echo 'Name=RMS Relay'                                                                                            | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'GenericName=RMS Relay'                                                                                     | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'Comment=RMS Relay emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Relay/RMS\ Relay.exe' | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Relay/RMS\ Relay.exe' | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'Type=Application'                                                                                          | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                        | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             #echo 'Icon=2BD9_ADIF Analyzer.0'                                                                                 | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
@@ -740,7 +740,7 @@ function run_installrmslinktest()
             echo 'Name=RMS Link Test'                                                                                            | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'GenericName=RMS Link Test'                                                                                     | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'Comment=RMS Link Test emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Link\ Test/RMS\ Link\ Test.exe' | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Link\ Test/RMS\ Link\ Test.exe' | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'Icon=C08D_RMS Link Test.0'                                                                                     | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
@@ -775,7 +775,7 @@ function run_installvarAC()  # Download/extract/install varAC chat app
             echo 'Name=VarAC Chat'                                                                             | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'GenericName=VarAC Chat'                                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Comment=VarAC emulated with Box86/Wine'                                                      | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
-            echo 'Exec=env BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe' | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/VarAC/VarAC.exe' | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
             echo 'Icon='$HOME'/.wine/drive_c/VarAC/img/'${VARACICON}                                           | sudo tee -a ${STARTMENU}/VarAC.desktop > /dev/null
@@ -842,7 +842,7 @@ function run_varACsetup() # TODO: This is a kludge until VarAC can be patched to
 		echo '        Send, {Enter}'                                                           >> ${AHK}/varac_configure.ahk
 		echo '        WinWait, VarAC ; Wait for VarAC to open'                                 >> ${AHK}/varac_configure.ahk
 		echo '        WinClose, VarAC ; Close VarAC'                                           >> ${AHK}/varac_configure.ahk
-		BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varac_configure.ahk # nobanner option to make console prettier
+		BOX64_NOBANNER=1 BOX86_NOBANNER=1 BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varac_configure.ahk # nobanner option to make console prettier
 		rm ${AHK}/varac_configure.ahk
 		sleep 5
 	    
@@ -879,7 +879,7 @@ function run_installvara()  # Download / extract / install VARA HF/FM/Chat
 
     # Install dll's needed by users of "RA-boards," like the DRA-50
     #  https://masterscommunications.com/products/radio-adapter/dra/dra-index.html
-       #BOX86_NOBANNER=1 winetricks -q hid # unsure if this is needed...
+       #BOX64_NOBANNER=1 BOX86_NOBANNER=1 winetricks -q hid # unsure if this is needed...
        ##sudo apt-get install p7zip-full -y
        ##wget -q http://uz7.ho.ua/modem_beta/ptt-dll.zip
        ##7z x ptt-dll.zip -o"$HOME/.wine/drive_c/VARA/" -y -bsp0 -bso0 # For VARA HF & VARAChat
@@ -949,7 +949,7 @@ function run_makevaraupdatescript()
 					
 				# Run varahf_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA HF . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
+					BOX64_NOBANNER=1 BOX86_NOBANNER=1 BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varahf_install.ahk # install VARA silently using AHK
 				
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ setup*.exe
@@ -987,7 +987,7 @@ function run_makevaraupdatescript()
 
 				# Run varafm_install.ahk
 					echo -e "\n${GREENTXT}Installing VARA FM . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
+					BOX64_NOBANNER=1 BOX86_NOBANNER=1 BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varafm_install.ahk # install VARA silently using AHK
 
 				# Clean up the installation
 					rm ~/.wine/drive_c/VARA\ FM\ setup*.exe
@@ -1025,7 +1025,7 @@ function run_makevaraupdatescript()
 		#
 		#		# Run varasat_install.ahk
 		#			echo -e "\n${GREENTXT}Installing VARA SAT . . .${NORMTXT}\n"
-		#			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
+		#			BOX64_NOBANNER=1 BOX86_NOBANNER=1 BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${AHK}/AutoHotkey.exe ${AHK}/varasat_install.ahk # install VARA silently using AHK
 		#
 		#		# Clean up the installation
 		#			rm ~/.wine/drive_c/VARA\ SAT\ setup*.exe
@@ -1052,7 +1052,7 @@ function run_makevaraupdatescript()
 
 				# Run the VARA Chat installer silently
 					echo -e "\n${GREENTXT}Installing VARA Chat . . .${NORMTXT}\n"
-					BOX86_NOBANNER=1 wine ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
+					BOX64_NOBANNER=1 BOX86_NOBANNER=1 wine ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe /SILENT # install VARA Chat
 				
 				# Clean up the installer
 					rm ${VARAUPDATE}/VARAChatInstaller/VARA\ Chat\ setup*.exe
@@ -1123,7 +1123,7 @@ function run_makevarasoundcardsetupscript()
 			zenity --info --height 100 --width 350 --text="We will now setup your soundcards for Wine. \n\nPlease navigate to the Audio tab and choose your systems soundcards \n\nInstall will continue once you have closed the winecfg menu." --title="Wine Soundcard Setup"
 			echo -e "${GREENTXT}Loading winecfg now . . .${NORMTXT}\n"
 			echo ""
-			BOX86_NOBANNER=1 winecfg # nobanner just for prettier terminal
+			BOX64_NOBANNER=1 BOX86_NOBANNER=1 winecfg # nobanner just for prettier terminal
 		
 		# Guide the user to the VARA HF audio setup menu (configure hardware soundcard input/output)
 			clear
@@ -1161,7 +1161,7 @@ function run_makevarasoundcardsetupscript()
 			echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> ${AHK}/varahf_configure.ahk
 			echo '        Sleep 100'                                                               >> ${AHK}/varahf_configure.ahk
 			echo '        WinClose, VARA HF ; Close VARA'                                          >> ${AHK}/varahf_configure.ahk
-			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varahf_configure.ahk # nobanner option to make console prettier
+			BOX64_NOBANNER=1 BOX86_NOBANNER=1 BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varahf_configure.ahk # nobanner option to make console prettier
 			rm ${AHK}/varahf_configure.ahk
 			sleep 5
 		
@@ -1198,7 +1198,7 @@ function run_makevarasoundcardsetupscript()
 			echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> ${AHK}/varafm_configure.ahk
 			echo '        Sleep 100'                                                               >> ${AHK}/varafm_configure.ahk
 			echo '        WinClose, VARA FM ; Close VARA'                                          >> ${AHK}/varafm_configure.ahk
-			BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varafm_configure.ahk # Nobanner option to make console prettier
+			BOX64_NOBANNER=1 BOX86_NOBANNER=1 BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varafm_configure.ahk # Nobanner option to make console prettier
 			rm ${AHK}/varafm_configure.ahk
 			sleep 5
 			
@@ -1242,7 +1242,7 @@ function run_makevarasoundcardsetupscript()
 	#		echo '        WinWaitClose, SoundCard ; Wait for user to finish setting up soundcard'  >> ${AHK}/varasat_configure.ahk
 	#		echo '        Sleep 100'                                                               >> ${AHK}/varasat_configure.ahk
 	#		echo '        WinClose, VARA SAT ; Close VARA'                                         >> ${AHK}/varasat_configure.ahk
-	#		BOX86_NOBANNER=1 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varasat_configure.ahk # nobanner option to make console prettier
+	#		BOX64_NOBANNER=1 BOX86_NOBANNER=1 BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine ${HOME}/winelink/ahk/AutoHotkey.exe ${AHK}/varasat_configure.ahk # nobanner option to make console prettier
 	#		rm ${AHK}/varasat_configure.ahk
 	#		sleep 5
 		
