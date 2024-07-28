@@ -558,8 +558,7 @@ function run_installrmsexpress()  # Download/extract/install RMS Express
             echo 'Name=Winlink Express'                                                                        | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'GenericName=Winlink Express'                                                                 | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Comment=RMS Express emulated with Box86/Wine'                                                | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
-            #echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=1 BOX86_DYNAREC_STRONGMEM=1 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null # TODO: Does this improve stability or cost speed?
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=4 BOX86_DYNAREC_STRONGMEM=4 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS\ Express/RMS\ Express.exe'  | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Type=Application'                                                                            | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'StartupNotify=true'                                                                          | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
             echo 'Icon=219D_RMS Express.0'                                                                     | sudo tee -a ${STARTMENU}/winlinkexpress.desktop > /dev/null
@@ -588,7 +587,7 @@ function run_installrmsterminal()
             echo 'Name=RMS Simple Terminal'                                                                                      | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'GenericName=RMS Simple Terminal'                                                                               | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'Comment=RMS Simple Terminal emulated with Box86/Wine'                                                          | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
-            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Simple\ Terminal/RMS\ Simple\ Terminal.exe' | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=4 BOX86_DYNAREC_STRONGMEM=4 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Simple\ Terminal/RMS\ Simple\ Terminal.exe' | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
             #echo 'Icon=none.0'                                                                                                   | sudo tee -a ${STARTMENU}/rmssimpleterminal.desktop > /dev/null
@@ -623,7 +622,7 @@ function run_installrmstrimode()  # Download/extract/install RMS Express
             echo 'Name=RMS Trimode'                                                                                              | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'GenericName=RMS Trimode'                                                                                       | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'Comment=RMS Trimode emulated with Box86/Wine'                                                                  | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
-            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Trimode/RMS\ Trimode.exe' | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=4 BOX86_DYNAREC_STRONGMEM=4 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Trimode/RMS\ Trimode.exe' | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
             echo 'Icon=C4A8_RMS Trimode.0'                                                                                       | sudo tee -a ${STARTMENU}/rmstrimode.desktop > /dev/null
@@ -653,7 +652,7 @@ function run_installrmsadifanalyzer()
             echo 'Name=RMS ADIF Analyzer'                                                                                        | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'GenericName=RMS ADIF Analyzer'                                                                                 | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'Comment=ADIF Analyzer emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
-            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/ADIF\ Analyzer/ADIF\ Analyzer.exe' | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=4 BOX86_DYNAREC_STRONGMEM=4 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/ADIF\ Analyzer/ADIF\ Analyzer.exe' | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
             echo 'Icon=2BD9_ADIF Analyzer.0'                                                                                     | sudo tee -a ${STARTMENU}/rmsadifanalyzer.desktop > /dev/null
@@ -682,7 +681,7 @@ function run_installrmspacket()
             echo 'Name=RMS Packet'                                                                                             | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'GenericName=RMS Packet'                                                                                      | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'Comment=RMS Packet emulated with Box86/Wine'                                                                 | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
-            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Packet/RMS\ Packet.exe' | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=4 BOX86_DYNAREC_STRONGMEM=4 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Packet/RMS\ Packet.exe' | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'Type=Application'                                                                                            | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                          | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
             echo 'Icon=3563_RMS Packet.0'                                                                                      | sudo tee -a ${STARTMENU}/rmspacket.desktop > /dev/null
@@ -711,7 +710,7 @@ function run_installrmsrelay()
             echo 'Name=RMS Relay'                                                                                            | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'GenericName=RMS Relay'                                                                                     | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'Comment=RMS Relay emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
-            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Relay/RMS\ Relay.exe' | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=4 BOX86_DYNAREC_STRONGMEM=4 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Relay/RMS\ Relay.exe' | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'Type=Application'                                                                                          | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                        | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
             #echo 'Icon=2BD9_ADIF Analyzer.0'                                                                                 | sudo tee -a ${STARTMENU}/rmsrelay.desktop > /dev/null
@@ -740,7 +739,7 @@ function run_installrmslinktest()
             echo 'Name=RMS Link Test'                                                                                            | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'GenericName=RMS Link Test'                                                                                     | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'Comment=RMS Link Test emulated with Box86/Wine'                                                                | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
-            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Link\ Test/RMS\ Link\ Test.exe' | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
+            echo 'Exec=env BOX64_DYNAREC_BIGBLOCK=0 BOX86_DYNAREC_BIGBLOCK=0 BOX64_DYNAREC_STRONGMEM=4 BOX86_DYNAREC_STRONGMEM=4 WINEDEBUG=-all wine '$HOME'/.wine/drive_c/RMS/RMS\ Link\ Test/RMS\ Link\ Test.exe' | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'Type=Application'                                                                                              | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'StartupNotify=true'                                                                                            | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
             echo 'Icon=C08D_RMS Link Test.0'                                                                                     | sudo tee -a ${STARTMENU}/rmslinktest.desktop > /dev/null
