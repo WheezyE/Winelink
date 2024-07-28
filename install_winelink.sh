@@ -445,7 +445,7 @@ function run_checkdiskspace()
 function run_piappswine()
 {
     local arch="$1"
-    if [[ ! -d $HOME/pi-apps/ ]]; then
+    if [[ ! -f $HOME/pi-apps/manage ]]; then
 	    # Installing pi-apps (for simplified wine/box86 installation)
 	    wget https://raw.githubusercontent.com/Botspot/pi-apps/master/install
 	    sudo chmod +x install
